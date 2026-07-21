@@ -1861,3 +1861,15 @@ header {
     letter-spacing:3px;
 
 }
+background:
+linear-gradient(
+rgba(10,12,16,.72),
+rgba(10,12,16,.86)
+),
+url("assets/images/hero-background.webp");
+
+background-size:cover;
+
+background-position:center;
+
+background-attachment:fixed;
