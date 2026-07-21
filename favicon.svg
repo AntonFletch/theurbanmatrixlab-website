@@ -1,0 +1,20 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+<rect width="256" height="256" rx="60" fill="#111214"/>
+
+<circle cx="128" cy="128" r="85" stroke="#C9A34A" stroke-width="8"/>
+
+<path d="M80 128L128 75L176 128L128 181L80 128Z"
+stroke="#E8CC7B"
+stroke-width="8"
+fill="none"/>
+
+<text x="128" y="145"
+text-anchor="middle"
+font-family="serif"
+font-size="48"
+fill="#9B7CFF">
+UMX
+</text>
+
+</svg>
