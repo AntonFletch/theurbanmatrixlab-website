@@ -537,15 +537,17 @@ h1 {
 
 .logo-mark {
 
-    width:55px;
+    width:60px;
 
-    height:55px;
+    height:60px;
 
     display:flex;
 
     align-items:center;
 
     justify-content:center;
+
+    position:relative;
 
     border:2px solid #c9a34a;
 
@@ -562,7 +564,83 @@ h1 {
     background:#111214;
 
     box-shadow:
-    0 0 15px rgba(201,163,74,.25);
+    0 0 20px rgba(201,163,74,.35);
+
+}
+
+
+.logo-mark::before {
+
+    content:"";
+
+    position:absolute;
+
+    inset:-6px;
+
+    border-radius:50%;
+
+    border:1px solid rgba(201,163,74,.5);
+
+    animation:logoPulse 4s ease-in-out infinite;
+
+}
+
+
+.logo-mark::after {
+
+    content:"";
+
+    position:absolute;
+
+    inset:-10px;
+
+    border-radius:50%;
+
+    border-top:2px solid #c9a34a;
+
+    border-right:2px solid transparent;
+
+    animation:logoRotate 8s linear infinite;
+
+}
+
+
+@keyframes logoRotate {
+
+    from {
+
+        transform:rotate(0deg);
+
+    }
+
+    to {
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+
+@keyframes logoPulse {
+
+    0%,100% {
+
+        opacity:.3;
+
+        transform:scale(1);
+
+    }
+
+    50% {
+
+        opacity:.8;
+
+        transform:scale(1.08);
+
+    }
+
+}
 
 }
 
