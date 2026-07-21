@@ -585,3 +585,71 @@ h1 {
     color:#c9a34a;
 
 }
+
+.hero::after {
+
+    content:"";
+
+    position:absolute;
+
+    top:-20%;
+    right:-10%;
+
+    width:500px;
+    height:800px;
+
+    background:
+    linear-gradient(
+        135deg,
+        rgba(232,204,123,.22),
+        transparent 65%
+    );
+
+    transform:rotate(25deg);
+
+    filter:blur(35px);
+
+    opacity:.8;
+
+    animation:lightMove 12s ease-in-out infinite;
+
+    pointer-events:none;
+
+}
+
+
+@keyframes lightMove {
+
+    0% {
+
+        transform:
+        translate(40px,-40px)
+        rotate(25deg);
+
+        opacity:.35;
+
+    }
+
+
+    50% {
+
+        transform:
+        translate(0,0)
+        rotate(25deg);
+
+        opacity:.75;
+
+    }
+
+
+    100% {
+
+        transform:
+        translate(40px,-40px)
+        rotate(25deg);
+
+        opacity:.35;
+
+    }
+
+}
