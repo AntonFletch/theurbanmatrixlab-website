@@ -1720,3 +1720,77 @@ header {
     font-size:.95rem;
 
 }
+/* UMX BRAND LOGO */
+
+.brand {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+
+.logo-mark {
+
+    width:55px;
+
+    height:55px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    border:2px solid #c9a34a;
+
+    color:#e8cc7b;
+
+    font-size:28px;
+
+    background:#101012;
+
+    box-shadow:
+    0 0 20px rgba(201,163,74,.25);
+
+}
+
+
+.logo-text {
+
+    display:flex;
+
+    flex-direction:column;
+
+    line-height:1.1;
+
+}
+
+
+.brand-main {
+
+    font-family:'Cinzel',serif;
+
+    color:#e8cc7b;
+
+    letter-spacing:2px;
+
+    font-size:1rem;
+
+}
+
+
+.brand-sub {
+
+    color:#9b7cff;
+
+    font-size:.75rem;
+
+    letter-spacing:3px;
+
+}
