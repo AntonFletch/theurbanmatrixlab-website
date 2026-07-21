@@ -6,15 +6,20 @@
 :root {
 
     --gold: #c8a951;
-    --gold-light: #e3c978;
-    --stone: #f3eee4;
-    --cream: #faf7f0;
-    --charcoal: #222222;
-    --gray: #666666;
+    --gold-light: #e5cc7a;
+
+    --purple: #6d5aa8;
+
+    --background: #111214;
+    --surface: #191b1f;
+    --surface-light: #22252b;
+
+    --charcoal: #e8e4da;
+    --gray: #a7a7a7;
+
     --white: #ffffff;
 
 }
-
 
 /* RESET */
 
