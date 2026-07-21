@@ -901,3 +901,86 @@ h1 {
     0 0 30px rgba(201,163,74,.35);
 
 }
+/* LEADERSHIP SECTION */
+
+.leadership {
+
+    background:#111214;
+
+    position:relative;
+
+}
+
+
+.leadership-title {
+
+    font-family:'Cinzel',serif;
+
+    color:#e8cc7b;
+
+    letter-spacing:5px;
+
+    text-align:center;
+
+}
+
+
+.founder-card {
+
+    max-width:850px;
+
+    margin:40px auto;
+
+    padding:45px;
+
+    text-align:center;
+
+    background:
+    linear-gradient(
+        145deg,
+        #18181b,
+        #0d0d0f
+    );
+
+    border:1px solid rgba(118,98,181,.5);
+
+    border-radius:20px;
+
+    box-shadow:
+    0 20px 50px rgba(0,0,0,.4);
+
+}
+
+
+.founder-card h3 {
+
+    font-family:'Cinzel',serif;
+
+    color:#9b7cff;
+
+    text-shadow:
+    2px 2px 0 #000;
+
+    letter-spacing:3px;
+
+}
+
+
+.founder-card h4 {
+
+    color:#e8cc7b;
+
+    font-weight:400;
+
+    letter-spacing:2px;
+
+}
+
+
+.founder-card p {
+
+    color:#c8c5bd;
+
+    line-height:1.8;
+
+}
