@@ -984,3 +984,134 @@ h1 {
     line-height:1.8;
 
 }
+/* CONTACT PREMIUM DESIGN */
+
+.contact {
+
+    background:
+    linear-gradient(
+        180deg,
+        #0e0e10,
+        #151515
+    );
+
+    text-align:center;
+
+}
+
+
+.contact h2 {
+
+    font-family:'Cinzel',serif;
+
+    color:#e8cc7b;
+
+    letter-spacing:4px;
+
+}
+
+
+.contact p {
+
+    color:#c5c2bb;
+
+}
+
+
+.contact-info {
+
+    margin:40px auto;
+
+    padding:35px;
+
+    max-width:600px;
+
+    background:#111214;
+
+    border:1px solid rgba(201,163,74,.35);
+
+    border-radius:20px;
+
+}
+
+
+.contact-info strong {
+
+    color:#e8cc7b;
+
+}
+
+
+.contact-info a {
+
+    color:#9b7cff;
+
+    text-decoration:none;
+
+}
+
+
+.contact-info a:hover {
+
+    color:#e8cc7b;
+
+}
+
+
+/* BUTTON UPGRADE */
+
+.primary-btn {
+
+    display:inline-block;
+
+    padding:15px 35px;
+
+    border-radius:30px;
+
+    background:#c9a34a;
+
+    color:#111214;
+
+    font-weight:700;
+
+    text-decoration:none;
+
+    letter-spacing:1px;
+
+    transition:.3s ease;
+
+}
+
+
+.primary-btn:hover {
+
+    transform:translateY(-4px);
+
+    box-shadow:
+    0 10px 30px rgba(201,163,74,.35);
+
+}
+
+
+/* FOOTER */
+
+footer {
+
+    background:#09090a;
+
+    border-top:1px solid rgba(201,163,74,.25);
+
+    text-align:center;
+
+    padding:40px 20px;
+
+}
+
+
+footer p {
+
+    color:#8d8a84;
+
+    font-size:.9rem;
+
+}
