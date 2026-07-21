@@ -377,3 +377,44 @@ h1 {
 }
 
 }
+.founder-title {
+
+    color:#7662b5;
+
+    -webkit-text-stroke:1px #000;
+
+    text-shadow:
+    2px 2px 0 #000,
+    -2px -2px 0 #000;
+
+    font-family:'Cinzel', serif;
+
+    letter-spacing:3px;
+
+    font-size:2rem;
+
+}
+
+
+.founder-role {
+
+    color:#c9a34a;
+
+    font-size:1.2rem;
+
+}
+
+
+.founder-name {
+
+    margin-top:30px;
+
+    color:#7662b5;
+
+    font-size:.95rem;
+
+    letter-spacing:2px;
+
+    opacity:.8;
+
+}
