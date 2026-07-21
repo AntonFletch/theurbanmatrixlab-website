@@ -416,3 +416,24 @@ footer {
 
     flex-wrap:wrap;
     justify-content:center
+
+
+    .stats .container {
+
+    display:flex;
+    flex-direction:column;
+    gap:30px;
+    max-width:700px;
+
+}
+
+
+.stat {
+
+    background:#17191e;
+    border:1px solid rgba(201,163,74,.25);
+    border-radius:18px;
+    padding:30px;
+    text-align:center;
+
+}
