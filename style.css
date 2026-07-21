@@ -1918,3 +1918,61 @@ Building Better Environments
     color:#c8c5bd;
 
 }
+/* ===== UMX Dashboard ===== */
+
+.dashboard-header{
+    text-align:center;
+    padding:50px 20px;
+}
+
+.dashboard-header h1{
+    color:#e8cc7b;
+    font-family:'Cinzel',serif;
+    font-size:3rem;
+}
+
+.dashboard-grid{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:25px;
+
+    padding:40px;
+
+}
+
+.dashboard-card{
+
+    background:#181818;
+
+    border:1px solid rgba(201,163,74,.25);
+
+    border-radius:18px;
+
+    padding:35px;
+
+    text-align:center;
+
+    font-size:1.2rem;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.dashboard-card:hover{
+
+    transform:translateY(-6px);
+
+    border-color:#e8cc7b;
+
+    box-shadow:0 0 25px rgba(201,163,74,.25);
+
+}
