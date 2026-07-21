@@ -1115,3 +1115,125 @@ footer p {
     font-size:.9rem;
 
 }
+/* UMX ARCHITECTURAL DETAILS */
+
+section {
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+
+section::before {
+
+    content:"";
+
+    position:absolute;
+
+    width:300px;
+
+    height:300px;
+
+    border:1px solid rgba(201,163,74,.08);
+
+    transform:rotate(45deg);
+
+    right:-150px;
+
+    top:50px;
+
+    pointer-events:none;
+
+}
+
+
+section::after {
+
+    content:"";
+
+    position:absolute;
+
+    width:200px;
+
+    height:200px;
+
+    border:1px solid rgba(118,98,181,.08);
+
+    transform:rotate(30deg);
+
+    left:-100px;
+
+    bottom:50px;
+
+    pointer-events:none;
+
+}
+
+
+/* MOBILE DESIGN */
+
+@media(max-width:768px){
+
+
+    .navbar {
+
+        flex-direction:column;
+
+        gap:20px;
+
+    }
+
+
+    .nav-links {
+
+        padding:0;
+
+        gap:15px;
+
+        flex-wrap:wrap;
+
+        justify-content:center;
+
+    }
+
+
+    .hero-title {
+
+        font-size:2.2rem;
+
+        letter-spacing:4px;
+
+    }
+
+
+    .hero-subtitle {
+
+        font-size:1.1rem;
+
+    }
+
+
+    .service-grid {
+
+        grid-template-columns:1fr;
+
+    }
+
+
+    .founder-card {
+
+        padding:25px;
+
+    }
+
+
+    .logo-text {
+
+        font-size:.7rem;
+
+    }
+
+
+}
