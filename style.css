@@ -1237,3 +1237,46 @@ section::after {
 
 
 }
+.logo-mark {
+
+    width:60px;
+
+    height:60px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    position:relative;
+
+    border:2px solid #c9a34a;
+
+    border-radius:50%;
+
+    background:
+    linear-gradient(
+        145deg,
+        #1c1c20,
+        #09090a
+    );
+
+    box-shadow:
+    0 0 25px rgba(201,163,74,.25);
+
+}
+
+
+.logo-symbol {
+
+    color:#e8cc7b;
+
+    font-size:28px;
+
+    transform:rotate(45deg);
+
+    text-shadow:
+    0 0 15px rgba(232,204,123,.5);
+
+        }
