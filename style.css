@@ -1354,3 +1354,84 @@ section::after {
     color:#bdb8ad;
 
 }
+/* FUTURE SYSTEMS */
+
+.systems {
+
+    background:
+    linear-gradient(
+        180deg,
+        #151515,
+        #0d0d0f
+    );
+
+    text-align:center;
+
+}
+
+
+.systems h2 {
+
+    font-family:'Cinzel',serif;
+
+    color:#e8cc7b;
+
+    letter-spacing:4px;
+
+}
+
+
+.systems > .container > p {
+
+    max-width:850px;
+
+    margin:25px auto 50px;
+
+    color:#c5c2bb;
+
+    line-height:1.8;
+
+}
+
+
+.systems-grid {
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(260px,1fr));
+
+    gap:30px;
+
+}
+
+
+.system-card {
+
+    padding:35px;
+
+    background:#111214;
+
+    border:1px solid rgba(201,163,74,.3);
+
+    border-radius:18px;
+
+}
+
+
+.system-card h3 {
+
+    font-family:'Cinzel',serif;
+
+    color:#9b7cff;
+
+}
+
+
+.system-card p {
+
+    color:#bdb8ad;
+
+    line-height:1.7;
+
+}
