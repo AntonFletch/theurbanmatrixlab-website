@@ -1280,3 +1280,77 @@ section::after {
     0 0 15px rgba(232,204,123,.5);
 
         }
+/* COMPANY STORY */
+
+.story {
+
+    background:#141416;
+
+    text-align:center;
+
+}
+
+
+.story h2 {
+
+    font-family:'Cinzel',serif;
+
+    color:#e8cc7b;
+
+    letter-spacing:4px;
+
+}
+
+
+.story > .container > p {
+
+    max-width:850px;
+
+    margin:30px auto 50px;
+
+    color:#c5c2bb;
+
+    line-height:1.9;
+
+}
+
+
+.story-grid {
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(240px,1fr));
+
+    gap:25px;
+
+}
+
+
+.story-card {
+
+    background:#101012;
+
+    border:1px solid rgba(201,163,74,.3);
+
+    padding:30px;
+
+    border-radius:18px;
+
+}
+
+
+.story-card h3 {
+
+    color:#9b7cff;
+
+    font-family:'Cinzel',serif;
+
+}
+
+
+.story-card p {
+
+    color:#bdb8ad;
+
+}
