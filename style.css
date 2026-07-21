@@ -524,3 +524,64 @@ h1 {
     }
 
 }
+.logo {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+
+.logo-mark {
+
+    width:55px;
+
+    height:55px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border:2px solid #c9a34a;
+
+    border-radius:50%;
+
+    color:#c9a34a;
+
+    font-family:'Cinzel',serif;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    background:#111214;
+
+    box-shadow:
+    0 0 15px rgba(201,163,74,.25);
+
+}
+
+
+.logo-text {
+
+    font-family:'Cinzel',serif;
+
+    font-size:.85rem;
+
+    line-height:1.3;
+
+    letter-spacing:2px;
+
+}
+
+
+.logo-text span {
+
+    color:#c9a34a;
+
+}
