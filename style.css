@@ -1594,3 +1594,80 @@ header {
     }
 
 }
+/* UMX HERO ATMOSPHERE */
+
+.hero {
+
+    position:relative;
+
+    overflow:hidden;
+
+    background:
+
+    radial-gradient(
+        circle at 80% 20%,
+        rgba(201,163,74,.18),
+        transparent 35%
+    ),
+
+    radial-gradient(
+        circle at 20% 80%,
+        rgba(118,98,181,.15),
+        transparent 35%
+    ),
+
+    linear-gradient(
+        135deg,
+        #171719,
+        #0b0b0d
+    );
+
+}
+
+
+.hero::before {
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background-image:
+
+    linear-gradient(
+        rgba(201,163,74,.06) 1px,
+        transparent 1px
+    ),
+
+    linear-gradient(
+        90deg,
+        rgba(201,163,74,.06) 1px,
+        transparent 1px
+    );
+
+
+    background-size:
+
+    70px 70px;
+
+
+    transform:
+
+    perspective(500px)
+    rotateX(60deg)
+    translateY(-100px);
+
+
+    opacity:.35;
+
+}
+
+
+.hero-content {
+
+    position:relative;
+
+    z-index:2;
+
+}
