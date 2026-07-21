@@ -1,61 +1,45 @@
-/* =========================================
-   THE URBAN MATRIX LAB LLC
-   Premium Design System
-========================================= */
-
 :root {
 
-    --gold: #c8a951;
-    --gold-light: #e5cc7a;
+    --gold: #c9a34a;
+    --gold-light: #e8cc7b;
 
-    --purple: #6d5aa8;
+    --purple: #7662b5;
 
-    --background: #111214;
-    --surface: #191b1f;
-    --surface-light: #22252b;
+    --background: #101114;
+    --surface: #17191e;
+    --surface-light: #20242b;
 
-    --charcoal: #e8e4da;
-    --gray: #a7a7a7;
-
-    --white: #ffffff;
+    --text: #e8e4d8;
+    --muted: #a9a6a0;
 
 }
 
-/* RESET */
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    scroll-behavior: smooth;
+
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    scroll-behavior:smooth;
+
 }
 
 
 body {
 
-    font-family: "Inter", sans-serif;
-    background: var(--stone);
-    color: var(--charcoal);
-    line-height: 1.7;
-
-}
-
-
-h1,
-h2,
-h3 {
-
-    font-family: "Cinzel", serif;
-    letter-spacing: 1px;
+    font-family:'Inter', sans-serif;
+    background:var(--background);
+    color:var(--text);
+    line-height:1.7;
 
 }
 
 
 .container {
 
-    width: 90%;
-    max-width: 1200px;
-    margin: auto;
+    width:90%;
+    max-width:1200px;
+    margin:auto;
 
 }
 
@@ -64,193 +48,189 @@ h3 {
 
 header {
 
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
+    position:fixed;
+    width:100%;
+    top:0;
+    z-index:1000;
+    backdrop-filter:blur(12px);
+    background:rgba(16,17,20,.85);
+    border-bottom:1px solid rgba(201,163,74,.2);
 
 }
 
 
 .navbar {
 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 25px 5%;
-
-    background: rgba(250,247,240,0.85);
-    backdrop-filter: blur(12px);
-
-    border-bottom: 1px solid rgba(200,169,81,.25);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:25px 5%;
 
 }
 
 
 .logo {
 
-    font-family: "Cinzel", serif;
-    font-weight: 700;
-    font-size: 1.1rem;
+    font-family:'Cinzel',serif;
+    font-size:1.2rem;
+    letter-spacing:2px;
 
 }
 
 
 .logo span {
 
-    color: var(--gold);
+    color:var(--gold);
 
 }
 
 
 .nav-links {
 
-    display: flex;
-    list-style: none;
-    gap: 30px;
+    display:flex;
+    gap:30px;
+    list-style:none;
 
 }
 
 
 .nav-links a {
 
-    text-decoration: none;
-    color: var(--charcoal);
-    font-weight: 500;
-
-    transition: .3s;
+    color:var(--text);
+    text-decoration:none;
+    transition:.3s;
 
 }
 
 
 .nav-links a:hover {
 
-    color: var(--gold);
+    color:var(--gold);
 
 }
+
 
 
 /* HERO */
 
 .hero {
 
-    min-height: 100vh;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-
-    position: relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:120px 20px;
 
     background:
 
-    linear-gradient(
-        rgba(243,238,228,.92),
-        rgba(250,247,240,.92)
+    radial-gradient(
+        circle at top right,
+        rgba(118,98,181,.25),
+        transparent 35%
     ),
 
-    repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 40px,
-        rgba(200,169,81,.08) 41px
+    radial-gradient(
+        circle at bottom left,
+        rgba(201,163,74,.18),
+        transparent 35%
+    ),
+
+    linear-gradient(
+        135deg,
+        #101114,
+        #1b1d23
     );
 
 }
 
 
+.hero:before {
+
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background-image:
+    linear-gradient(
+        rgba(201,163,74,.05) 1px,
+        transparent 1px
+    ),
+    linear-gradient(
+        90deg,
+        rgba(201,163,74,.05) 1px,
+        transparent 1px
+    );
+
+    background-size:80px 80px;
+
+}
+
+
+
 .hero-content {
 
-    max-width: 900px;
-
-    padding-top: 100px;
-
-    animation: fadeUp 1.2s ease;
+    max-width:900px;
+    position:relative;
 
 }
 
 
-.hero h1 {
+h1 {
 
-    font-size: clamp(2.8rem,7vw,5rem);
-
-    color: var(--charcoal);
-
-    margin-bottom: 25px;
-
-}
-
-
-.hero h2 {
-
-    color: var(--gold);
-
-    font-size: 1.6rem;
-
-    margin-bottom: 25px;
+    font-family:'Cinzel',serif;
+    font-size:clamp(2.5rem,6vw,5rem);
+    letter-spacing:5px;
+    color:var(--gold-light);
+    margin-bottom:25px;
 
 }
 
 
-.hero p {
+h2 {
 
-    font-size: 1.15rem;
+    font-family:'Cinzel',serif;
+    color:var(--gold);
+    margin-bottom:25px;
 
-    color: var(--gray);
+}
 
-    margin-bottom: 35px;
+
+p {
+
+    color:var(--muted);
+    font-size:1.1rem;
 
 }
 
 
 /* BUTTONS */
 
-.hero-buttons {
-
-    display: flex;
-
-    justify-content: center;
-
-    gap: 20px;
-
-    flex-wrap: wrap;
-
-}
-
-
 .primary-btn,
 .secondary-btn {
 
-    display: inline-block;
-
-    padding: 14px 35px;
-
-    border-radius: 40px;
-
-    text-decoration: none;
-
-    transition: .3s;
+    display:inline-block;
+    margin:25px 10px;
+    padding:15px 35px;
+    border-radius:40px;
+    text-decoration:none;
+    transition:.3s;
 
 }
 
 
 .primary-btn {
 
-    background: var(--gold);
-
-    color: white;
+    background:var(--gold);
+    color:#111;
 
 }
 
 
 .secondary-btn {
 
-    border: 2px solid var(--gold);
-
-    color: var(--gold);
+    border:1px solid var(--gold);
+    color:var(--gold);
 
 }
 
@@ -258,44 +238,32 @@ header {
 .primary-btn:hover,
 .secondary-btn:hover {
 
-    transform: translateY(-5px);
+    transform:translateY(-5px);
+    box-shadow:0 10px 30px rgba(201,163,74,.3);
 
 }
+
 
 
 /* SECTIONS */
 
 section {
 
-    padding: 100px 0;
+    padding:100px 0;
 
 }
 
 
-section h2 {
+.about,
+.services,
+.vision,
+.leadership,
+.contact {
 
-    text-align: center;
-
-    font-size: 2.5rem;
-
-    margin-bottom: 35px;
-
-    color: var(--charcoal);
+    background:var(--background);
 
 }
 
-
-section p {
-
-    max-width: 900px;
-
-    margin: auto;
-
-    color: var(--gray);
-
-    font-size: 1.1rem;
-
-}
 
 
 /* SERVICE CARDS */
@@ -303,13 +271,10 @@ section p {
 .service-grid,
 .values-grid {
 
-    display: grid;
-
-    grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
-
-    gap: 30px;
-
-    margin-top: 50px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:30px;
+    margin-top:50px;
 
 }
 
@@ -317,17 +282,12 @@ section p {
 .service-card,
 .value-card {
 
-    background: var(--white);
+    background:var(--surface);
+    padding:35px;
+    border-radius:18px;
+    border:1px solid rgba(201,163,74,.2);
 
-    padding: 35px;
-
-    border-radius: 18px;
-
-    border-top: 4px solid var(--gold);
-
-    box-shadow: 0 15px 40px rgba(0,0,0,.08);
-
-    transition: .3s;
+    transition:.4s;
 
 }
 
@@ -335,7 +295,8 @@ section p {
 .service-card:hover,
 .value-card:hover {
 
-    transform: translateY(-10px);
+    transform:translateY(-10px);
+    border-color:var(--gold);
 
 }
 
@@ -343,131 +304,75 @@ section p {
 .service-card h3,
 .value-card h3 {
 
-    margin-bottom: 15px;
-
-    color: var(--gold);
-
-}
-
-
-.service-card p,
-.value-card p {
-
-    font-size: 1rem;
+    color:var(--gold-light);
+    font-family:'Cinzel',serif;
+    margin-bottom:15px;
 
 }
 
-
-/* LEADERSHIP */
-
-.leadership {
-
-    background: var(--charcoal);
-
-    color: white;
-
-}
-
-
-.leadership h2,
-.leadership h3 {
-
-    color: var(--gold-light);
-
-}
-
-
-.leadership p {
-
-    color: #ddd;
-
-}
 
 
 /* CONTACT */
 
 .contact {
 
-    text-align: center;
+    text-align:center;
 
 }
 
 
 .contact-info {
 
-    margin: 35px 0;
+    margin:40px 0;
 
 }
 
 
 .contact a {
 
-    color: var(--gold);
-
-    text-decoration: none;
+    color:var(--gold-light);
 
 }
+
 
 
 /* FOOTER */
 
 footer {
 
-    background: #171717;
-
-    color: #aaa;
-
-    text-align: center;
-
-    padding: 35px;
+    background:#090a0c;
+    padding:40px;
+    text-align:center;
+    border-top:1px solid rgba(201,163,74,.2);
 
 }
 
-
-/* ANIMATION */
-
-@keyframes fadeUp {
-
-    from {
-
-        opacity:0;
-
-        transform: translateY(40px);
-
-    }
-
-    to {
-
-        opacity:1;
-
-        transform:translateY(0);
-
-    }
-
-}
 
 
 /* MOBILE */
 
 @media(max-width:768px){
 
-.nav-links {
-
-    display:none;
-
-}
-
-
-.hero h1 {
-
-    font-size:2.5rem;
-
-}
-
-
 .navbar {
 
-    padding:20px;
+    flex-direction:column;
+    gap:20px;
+
+}
+
+
+.nav-links {
+
+    gap:15px;
+    flex-wrap:wrap;
+    justify-content:center;
+
+}
+
+
+h1 {
+
+    font-size:2.5rem;
 
 }
 
