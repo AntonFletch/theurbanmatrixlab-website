@@ -1874,3 +1874,47 @@ background-position:center;
 
 background-attachment:fixed;
 Building Better Environments
+
+.stats{
+
+    padding:70px 0;
+
+    background:#121315;
+
+}
+
+.stats .container{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:30px;
+
+}
+
+.stat{
+
+    text-align:center;
+
+    padding:30px;
+
+}
+
+.stat h2{
+
+    font-family:'Cinzel',serif;
+
+    color:#e8cc7b;
+
+    font-size:2rem;
+
+    margin-bottom:10px;
+
+}
+
+.stat p{
+
+    color:#c8c5bd;
+
+}
