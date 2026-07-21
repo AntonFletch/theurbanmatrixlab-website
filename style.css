@@ -1671,3 +1671,52 @@ header {
     z-index:2;
 
 }
+/* TRUST BAR */
+
+.trust-bar {
+
+    background:#111214;
+
+    border-top:
+    1px solid rgba(201,163,74,.2);
+
+    border-bottom:
+    1px solid rgba(201,163,74,.2);
+
+}
+
+
+.trust-grid {
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:25px;
+
+    padding:40px 0;
+
+    text-align:center;
+
+}
+
+
+.trust-item h3 {
+
+    font-family:'Cinzel',serif;
+
+    color:#e8cc7b;
+
+    letter-spacing:2px;
+
+}
+
+
+.trust-item p {
+
+    color:#bdb8ad;
+
+    font-size:.95rem;
+
+}
