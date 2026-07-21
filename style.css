@@ -857,3 +857,47 @@ h1 {
     line-height:1.7;
 
 }
+/* SERVICE SYMBOLS */
+
+.service-icon {
+
+    width:55px;
+
+    height:55px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin-bottom:20px;
+
+    border:1px solid rgba(201,163,74,.6);
+
+    border-radius:50%;
+
+    color:#e8cc7b;
+
+    font-size:24px;
+
+    font-family:'Cinzel',serif;
+
+    background:#111214;
+
+    box-shadow:
+    0 0 20px rgba(201,163,74,.15);
+
+    transition:.4s ease;
+
+}
+
+
+.service-card:hover .service-icon {
+
+    transform:scale(1.15);
+
+    box-shadow:
+    0 0 30px rgba(201,163,74,.35);
+
+}
