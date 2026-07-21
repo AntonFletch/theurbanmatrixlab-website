@@ -1435,3 +1435,66 @@ section::after {
     line-height:1.7;
 
 }
+/* UMX PAGE ENTRANCE */
+
+body {
+
+    animation:pageLoad 1s ease forwards;
+
+}
+
+
+.hero-content,
+.container {
+
+    animation:contentRise .9s ease forwards;
+
+}
+
+
+@keyframes pageLoad {
+
+    from {
+
+        opacity:0;
+
+    }
+
+    to {
+
+        opacity:1;
+
+    }
+
+}
+
+
+@keyframes contentRise {
+
+    from {
+
+        opacity:0;
+
+        transform:translateY(25px);
+
+    }
+
+
+    to {
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+
+/* SMOOTH SCROLL */
+
+html {
+
+    scroll-behavior:smooth;
+
+}
