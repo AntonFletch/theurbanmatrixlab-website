@@ -4,16 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>The Urban Matrix Lab LLC</title>
+<title>The Urban Matrix Lab LLC | Intelligent Property Solutions</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
+
+:root {
+    --gold: #c9a227;
+    --purple: #6b4bb3;
+    --dark: #1b1b1b;
+    --stone: #f2ede3;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing:border-box;
+    scroll-behavior:smooth;
+}
+
 body {
     margin:0;
-    background:#050505;
-    color:#f5f5f5;
     font-family:'Inter', sans-serif;
+    color:#252525;
+    background:var(--stone);
 }
 
 .container {
@@ -22,202 +36,320 @@ body {
     margin:auto;
 }
 
+/* HERO */
+
 .hero {
     min-height:100vh;
     display:flex;
     align-items:center;
-    text-align:center;
     position:relative;
     overflow:hidden;
+    background:
+    radial-gradient(circle at top right, rgba(201,162,39,.25), transparent 35%),
+    linear-gradient(135deg,#f8f3ea,#e6dccb);
 }
 
 .hero:before {
     content:"";
     position:absolute;
     inset:0;
-    background:
-    linear-gradient(rgba(212,175,55,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(212,175,55,.08) 1px, transparent 1px);
-    background-size:80px 80px;
-    transform:perspective(500px) rotateX(55deg);
-    opacity:.25;
+    background-image:
+    linear-gradient(rgba(201,162,39,.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,162,39,.12) 1px, transparent 1px);
+    background-size:70px 70px;
+    opacity:.35;
 }
 
-.content {
+.hero-content {
     position:relative;
     z-index:2;
+    text-align:center;
 }
 
 h1 {
     font-family:'Cinzel', serif;
     font-size:clamp(2.5rem,6vw,5rem);
-    color:#d4af37;
-    letter-spacing:4px;
+    letter-spacing:5px;
+    margin-bottom:20px;
+    color:#1b1b1b;
 }
 
-h2 {
-    font-family:'Cinzel', serif;
-    color:#d4af37;
+.gold {
+    color:var(--gold);
 }
 
 .subtitle {
-    font-size:1.4rem;
-    color:#ddd;
-}
-
-p {
-    line-height:1.7;
-    color:#bbb;
+    font-size:1.5rem;
+    color:#555;
+    margin-bottom:25px;
 }
 
 .button {
     display:inline-block;
-    margin-top:25px;
-    padding:15px 35px;
-    border:1px solid #d4af37;
-    color:#d4af37;
+    padding:16px 35px;
+    margin:10px;
+    border-radius:30px;
     text-decoration:none;
+    font-weight:600;
     transition:.3s;
 }
 
-.button:hover {
-    background:#d4af37;
-    color:#000;
+.primary {
+    background:var(--gold);
+    color:white;
 }
+
+.secondary {
+    border:2px solid var(--purple);
+    color:var(--purple);
+}
+
+.button:hover {
+    transform:translateY(-3px);
+}
+
+/* SECTIONS */
 
 section {
-    padding:80px 0;
+    padding:90px 0;
 }
 
-.cards {
+.title {
+    text-align:center;
+    font-family:'Cinzel',serif;
+    font-size:2.5rem;
+    color:#222;
+    margin-bottom:40px;
+}
+
+.text {
+    max-width:850px;
+    margin:auto;
+    text-align:center;
+    line-height:1.8;
+    font-size:1.1rem;
+}
+
+/* CARDS */
+
+.grid {
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:25px;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:30px;
 }
 
 .card {
-    border:1px solid rgba(212,175,55,.3);
-    padding:30px;
-    background:#0b0b0b;
+    background:white;
+    padding:35px;
+    border-radius:20px;
+    border-top:4px solid var(--gold);
+    box-shadow:0 15px 40px rgba(0,0,0,.08);
+    transition:.3s;
 }
 
 .card:hover {
-    border-color:#d4af37;
+    transform:translateY(-8px);
 }
 
-footer {
-    padding:30px;
-    text-align:center;
-    border-top:1px solid #222;
-    color:#777;
+.card h3 {
+    font-family:'Cinzel',serif;
+    color:#222;
 }
+
+.card p {
+    color:#666;
+    line-height:1.6;
+}
+
+/* FUTURE */
+
+.future {
+    background:#1b1b1b;
+    color:white;
+}
+
+.future .title {
+    color:var(--gold);
+}
+
+.future p {
+    color:#ddd;
+}
+
+/* CONTACT */
+
+.contact {
+    text-align:center;
+}
+
+/* FOOTER */
+
+footer {
+    background:#111;
+    color:#aaa;
+    text-align:center;
+    padding:30px;
+}
+
 </style>
 
 </head>
 
+
 <body>
 
+
 <section class="hero">
-<div class="container content">
+
+<div class="container hero-content">
 
 <h1>
-THE URBAN MATRIX LAB LLC
+THE <span class="gold">URBAN</span><br>
+MATRIX LAB LLC
 </h1>
 
-<p class="subtitle">
-Engineering the Future of Living
-</p>
+<div class="subtitle">
+Engineering Intelligent Spaces. Restoring Better Living.
+</div>
 
 <p>
 Property rehabilitation, intelligent maintenance systems,
-air quality solutions, and technology-driven property services
+air quality solutions, and technology-driven services
 throughout Western Montana.
 </p>
 
-<a class="button" href="#contact">
-Request a Quote
+<a class="button primary" href="#contact">
+Request Consultation
+</a>
+
+<a class="button secondary" href="#services">
+Explore Services
 </a>
 
 </div>
+
 </section>
 
 
+
 <section>
+
 <div class="container">
 
-<h2>The Matrix Approach</h2>
+<h2 class="title">
+The Matrix Philosophy
+</h2>
 
-<p>
-Where craftsmanship, technology, and intelligent systems connect.
-The Urban Matrix Lab LLC creates reliable property solutions
-through modern operations and future-focused innovation.
+<p class="text">
+Where timeless principles of structure meet modern technology.
+The Urban Matrix Lab LLC combines craftsmanship,
+data-driven operations, and innovative systems to create
+better environments for people and properties.
 </p>
 
 </div>
+
 </section>
 
 
-<section>
+
+<section id="services">
+
 <div class="container">
 
-<h2>Services</h2>
+<h2 class="title">
+Core Services
+</h2>
 
-<div class="cards">
+
+<div class="grid">
+
 
 <div class="card">
-<h3>Property Maintenance</h3>
+<h3>Property Rehabilitation</h3>
 <p>
-Repairs, turnovers, seasonal maintenance,
-and ongoing property care.
+Restoration, improvements, cleanup,
+and transformation of residential and commercial spaces.
 </p>
 </div>
 
+
 <div class="card">
-<h3>Rehabilitation</h3>
+<h3>Intelligent Maintenance</h3>
 <p>
-Cleanup, restoration, improvements,
-and property transformation.
+Reliable repairs, turnovers, seasonal services,
+and technology-supported operations.
 </p>
 </div>
+
 
 <div class="card">
 <h3>Air Quality Solutions</h3>
 <p>
-Moisture awareness, inspections,
-and healthier indoor environments.
+Moisture awareness, indoor environment assessments,
+and healthier living spaces.
 </p>
 </div>
+
 
 <div class="card">
-<h3>Smart Property Systems</h3>
+<h3>Property Intelligence</h3>
 <p>
-Technology-enabled workflows,
-remote reporting, and future automation.
+Inspections, documentation,
+and future-ready digital reporting systems.
 </p>
 </div>
 
+
 </div>
 
 </div>
+
 </section>
 
 
-<section id="contact">
+
+<section class="future">
+
 <div class="container">
 
-<h2>Connect With Us</h2>
+<h2 class="title">
+Building The Future
+</h2>
+
+<p class="text">
+The Urban Matrix Lab LLC is developing a connected approach
+to property operations through smart technology,
+remote field systems, and intelligent workflows.
+</p>
+
+</div>
+
+</section>
+
+
+
+<section id="contact" class="contact">
+
+<div class="container">
+
+<h2 class="title">
+Connect With Us
+</h2>
 
 <p>
 Serving Western Montana including Missoula,
 Polson, and surrounding communities.
 </p>
 
-<a class="button" href="mailto:info@theurbanmatrixlab.com">
+<a class="button primary" href="mailto:contact@theurbanmatrixlab.com">
 Contact The Urban Matrix Lab
 </a>
 
 </div>
+
 </section>
+
 
 
 <footer>
