@@ -72,27 +72,29 @@ a {
 }
 
 .brand {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    display:flex;
+    align-items:center;
+    gap:15px;
 }
 
-.logo-mark {
-    color: #d4af37;
-    font-size: 35px;
+.logo-text {
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
 .brand-main {
-    display: block;
-    color: #ffffff;
-    font-size: 22px;
-    font-weight: 700;
+    display:inline;
+    color:#ffffff;
+    font-size:22px;
+    font-weight:700;
 }
 
 .brand-sub {
-    display: block;
-    color: #d4af37;
-    font-size: 14px;
+    display:inline;
+    color:#d4af37;
+    font-size:22px;
+    font-weight:700;
 }
 
 .nav-links {
