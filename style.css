@@ -1,48 +1,19 @@
-/* ===== UMX SPLASH SCREEN ===== */
-
-#splash-screen{
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    background:#000;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:99999;
-    transition:opacity 1s ease;
+#splash-screen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
 }
 
-#splash-screen.hide{
-    opacity:0;
-    pointer-events:none;
+.splash-logo {
+    width: 80%;
+    max-width: 600px;
 }
 
-.splash-logo{
-    width:100vw;
-    height:100vh;
-    object-fit:contain;
-    opacity:0;
-    transform:scale(.95);
-    animation:logoIntro 1s ease forwards;
-}
-
-#website-content{
-    opacity:0;
-    transition:opacity 1s ease;
-}
-
-#website-content.show{
-    opacity:1;
-}
-
-@keyframes logoIntro{
-    from{
-        opacity:0;
-        transform:scale(.95);
-    }
-    to{
-        opacity:1;
-        transform:scale(1);
-    }
+#website-content {
+    opacity: 0;
+    transition: opacity 1s ease;
 }
