@@ -1,584 +1,418 @@
-<!DOCTYPE html>
-<html lang="en">
-<script type="application/ld+json">
-
-{
- "@context":"https://schema.org",
- "@type":"LocalBusiness",
- "name":"The Urban Matrix Lab LLC",
- "description":"Property maintenance, rehabilitation, inspections, indoor environment solutions, and technology-supported property services throughout Western Montana.",
- "telephone":"+1-406-396-3737",
- "email":"TheUrbanMatrixLab@gmail.com",
- "areaServed":"Western Montana",
- "serviceType":[
-    "Property Maintenance",
-    "Property Rehabilitation",
-    "Property Inspections",
-    "Indoor Air Quality",
-    "Technology-Supported Operations"
- ]
+:root {
+    --gold: #c9a34a;
+    --gold-light: #e8cc7b;
+    --purple: #7662b5;
+    --background: #101114;
+    --surface: #17191e;
+    --text: #e8e4d8;
+    --muted: #b8b4aa;
 }
 
-</script>
-<head>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--background);
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: hidden;
+}
 
-<title>The Urban Matrix Lab LLC | Intelligent Property Solutions</title>
+.container {
+    width: min(90%, 1200px);
+    margin: 0 auto;
+}
 
-<meta name="description" content="The Urban Matrix Lab LLC provides professional property maintenance, rehabilitation, inspections, and technology-supported property services throughout Western Montana.">
 
-<meta name="keywords" content="Property Maintenance, Rehabilitation, Air Quality, Property Inspection, Montana, Missoula, Polson">
+/* HEADER */
 
-<meta name="author" content="Anthony William Fletcher">
-    <meta name="robots" content="index, follow">
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(16,17,20,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,163,74,.25);
+}
 
-<meta name="theme-color" content="#111214">
 
-<meta name="geo.region" content="US-MT">
+.navbar {
+    min-height: 85px;
+    width: min(90%,1200px);
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:30px;
+}
 
-<meta name="geo.placename" content="Western Montana">
 
-<meta name="business:contact_data:phone_number" content="+14063963737">
+.brand {
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
 
-<meta name="business:contact_data:email" content="TheUrbanMatrixLab@gmail.com">
 
-<meta property="og:title" content="The Urban Matrix Lab LLC">
+.logo-mark {
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--gold-light);
+    font-size:25px;
+}
 
-<meta property="og:description" content="Building Better Environments Through Skilled Service and Intelligent Systems.">
 
-<meta property="og:type" content="website">
+.logo-text {
+    display:flex;
+    flex-direction:column;
+}
 
-<meta property="og:url" content="https://theurbanmatrixlab.com">
-    <meta name="twitter:card" content="summary_large_image">
 
-<meta name="twitter:title" content="The Urban Matrix Lab LLC">
+.brand-main {
+    color:var(--gold-light);
+    font-family:'Cinzel',serif;
+    letter-spacing:2px;
+}
 
-<meta name="twitter:description" content="Professional property maintenance, rehabilitation, inspections, and technology-supported property solutions throughout Western Montana.">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
+.brand-sub {
+    color:var(--purple);
+    font-size:.75rem;
+    letter-spacing:3px;
+}
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+.nav-links {
+    display:flex;
+    list-style:none;
+    gap:25px;
+}
 
-<link rel="stylesheet" href="style.css">
 
-<link rel="icon" href="favicon.ico">
+.nav-links a {
+    color:var(--text);
+    text-decoration:none;
+}
 
-</head>
 
-<body>
-<header>
-    <nav class="navbar">
+.nav-links a:hover {
+    color:var(--gold-light);
+}
 
-        <div class="logo">
 
-    <div class="logo-mark">
-    <span class="logo-symbol">◆</span>
-    </div>
 
-    <div class="logo-text">
-        THE <span>URBAN</span><br>
-        MATRIX LAB LLC
-    </div>
+/* HERO */
 
-        </div>
+.hero {
 
-        <ul class="nav-links">
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#vision">Vision</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
+    min-height:90vh;
 
-    </nav>
-</header>
+    display:flex;
 
+    align-items:center;
 
-<section class="hero">
+    justify-content:center;
 
-    <div class="hero-content">
-<h1 class="hero-title">
-    THE URBAN MATRIX LAB LLC
-</h1>
+    text-align:center;
 
-<h2 class="hero-subtitle">
-    Intelligent Property Solutions<br>
-    Built Through Craftsmanship, Technology, and Precision
-</h2>
+    position:relative;
 
-<p class="hero-description">
-    A Western Montana property solutions company specializing in
-    rehabilitation, maintenance operations, inspections, indoor
-    environment solutions, and technology-supported systems designed
-    to protect and improve the places people live and work.
-</p>
+    padding:120px 20px;
 
-        <div class="hero-buttons">
+    background:
 
-            <a href="#services" class="primary-btn">
-                Explore Services
-            </a>
+    radial-gradient(
+        circle at top right,
+        rgba(201,163,74,.25),
+        transparent 35%
+    ),
 
-            <a href="#contact" class="secondary-btn">
-                Request Consultation
-            </a>
+    radial-gradient(
+        circle at bottom left,
+        rgba(118,98,181,.2),
+        transparent 35%
+    ),
 
-        </div>
+    linear-gradient(
+        135deg,
+        #17191e,
+        #090a0c
+    );
 
-    </div>
+}
 
-</section>
-<section id="about" class="about">
 
-    <div class="container">
+.hero-content {
+    max-width:900px;
+}
 
-        <h2>
-            Our Mission
-        </h2>
 
-        <p>
-            The Urban Matrix Lab LLC is dedicated to improving the condition,
-            performance, and long-term value of residential and commercial
-            properties throughout Western Montana.
+.hero-title {
+    font-family:'Cinzel',serif;
+    color:var(--gold-light);
+    font-size:clamp(2.5rem,6vw,5rem);
+    letter-spacing:5px;
+}
 
-            We combine dependable field services with organized operations,
-            modern technology, and thoughtful solutions to create better
-            environments for the people who live and work within them.
-        </p>
 
+.hero-subtitle {
 
-        <h2>
-            Our Philosophy
-        </h2>
+    font-family:'Cinzel',serif;
+    color:var(--purple);
+    margin:20px 0;
 
-        <p>
-            Strong environments are created through careful planning,
-            balanced design, skilled workmanship, and consistent attention
-            over time.
+}
 
-            We apply these principles through professional service,
-            detailed documentation, and systems designed to create reliable
-            results for our customers.
-        </p>
 
-    </div>
+.hero-description {
 
-</section>
-    <section id="story" class="story">
+    max-width:800px;
+    margin:auto;
+    color:var(--muted);
+    font-size:1.1rem;
 
-    <div class="container">
+}
 
-        <h2>
-            The Urban Matrix Approach
-        </h2>
 
-        <p>
-            The Urban Matrix Lab LLC was created to bring together
-            skilled workmanship, organized systems, and modern
-            technology into one unified property solutions company.
 
-            We believe every structure has a story, every space has
-            potential, and every property deserves thoughtful care.
+/* BUTTONS */
 
-            Our approach combines practical field services with
-            detailed documentation, reliable communication, and
-            forward-thinking solutions designed for long-term value.
-        </p>
+.primary-btn,
+.secondary-btn {
 
+    display:inline-block;
+    margin:25px 10px;
+    padding:15px 35px;
+    border-radius:40px;
+    text-decoration:none;
 
-        <div class="story-grid">
+}
 
 
-            <div class="story-card">
+.primary-btn {
 
-                <h3>
-                    Craftsmanship
-                </h3>
+    background:var(--gold);
+    color:#111;
 
-                <p>
-                    Quality work begins with attention to detail,
-                    responsibility, and respect for the property.
-                </p>
+}
 
-            </div>
 
+.secondary-btn {
 
-            <div class="story-card">
+    border:1px solid var(--gold);
+    color:var(--gold-light);
 
-                <h3>
-                    Systems
-                </h3>
+}
 
-                <p>
-                    Organized processes create consistency,
-                    transparency, and better results.
-                </p>
 
-            </div>
 
+/* SECTIONS */
 
-            <div class="story-card">
 
-                <h3>
-                    Innovation
-                </h3>
+section {
+    padding:100px 0;
+}
 
-                <p>
-                    Technology helps improve communication,
-                    efficiency, and future capabilities.
-                </p>
 
-            </div>
+h2 {
 
+    text-align:center;
+    font-family:'Cinzel',serif;
+    color:var(--gold-light);
+    letter-spacing:3px;
+    margin-bottom:30px;
 
-        </div>
+}
 
-    </div>
 
-    </section>
-<section id="services" class="services">
+p {
+    color:var(--muted);
+}
 
-    <div class="container">
 
-        <h2>
-            Core Services
-        </h2>
 
-        <p>
-            The Urban Matrix Lab LLC provides practical property solutions
-            designed to protect, improve, and maintain residential and
-            commercial environments throughout Western Montana.
-        </p>
+.about p,
+.story p,
+.vision p,
+.systems p {
 
+    max-width:850px;
+    margin:20px auto;
+    text-align:center;
 
-        <div class="service-grid">
+}
 
 
-            <div class="service-card">
 
-    <div class="service-card">
+/* GRIDS */
 
-    <div class="service-icon">⚙</div>
+.stats,
+.trust-bar {
 
-    <h3>
-        Property Maintenance
-    </h3>
+    background:#111214;
 
-                <p>
-                    Repairs, turnovers, seasonal maintenance,
-                    preventative care, and ongoing property support
-                    designed to preserve value and functionality.
-                </p>
+}
 
-            </div>
 
+.stats .container,
+.trust-grid,
+.service-grid,
+.values-grid,
+.story-grid,
+.systems-grid {
 
-            <div class="service-card">
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:30px;
 
-    <div class="service-icon">⌂</div>
+}
 
-    <h3>
-        Property Rehabilitation
-    </h3>
 
-                <p>
-                    Cleanup, restoration support, improvements,
-                    painting, and property recovery projects that
-                    help transform spaces for continued use.
-                </p>
+.stat,
+.trust-item {
 
-            </div>
+    text-align:center;
+    padding:30px;
 
+}
 
-            <div class="service-card">
 
-    <div class="service-icon">◈</div>
+.stat h2,
+.trust-item h3 {
 
-    <h3>
-        Property Inspections
-    </h3>
+    color:var(--gold-light);
 
-                <p>
-                    Organized observations, photo documentation,
-                    condition reporting, and maintenance recommendations
-                    to help owners make informed decisions.
-                </p>
+}
 
-            </div>
 
 
-            <div class="service-card">
+/* CARDS */
 
-    <div class="service-icon">◌</div>
 
-    <h3>
-        Indoor Air Quality
-    </h3>
+.service-card,
+.value-card,
+.story-card,
+.system-card,
+.founder-card,
+.contact-info {
 
-                <p>
-                    Moisture awareness, indoor environment observations,
-                    and practical recommendations focused on healthier
-                    and more comfortable spaces.
-                </p>
+    background:var(--surface);
 
-            </div>
+    border:1px solid rgba(201,163,74,.25);
 
+    border-radius:18px;
 
-            <div class="service-card">
+    padding:35px;
 
-    <div class="service-icon">◇</div>
+}
 
-    <h3>
-        Technology-Supported Operations
-    </h3>
 
-                <p>
-                    Digital documentation, organized workflows,
-                    and future-ready systems designed to improve
-                    communication and accountability.
-                </p>
 
-            </div>
+.service-card h3,
+.value-card h3,
+.story-card h3,
+.system-card h3 {
 
+    color:var(--gold-light);
+    font-family:'Cinzel',serif;
 
-        </div>
+}
 
-    </div>
 
-</section>
-<section id="vision" class="vision">
 
-    <div class="container">
+.service-icon {
 
-        <h2>
-            Our Vision
-        </h2>
+    font-size:30px;
+    color:var(--gold-light);
+    margin-bottom:15px;
 
-        <p>
-            The Urban Matrix Lab LLC is building toward a future where
-            dependable property services, organized operations, and modern
-            technology work together to create better-managed environments.
+}
 
-            Our vision is to become a trusted property solutions company
-            throughout Western Montana while developing systems that improve
-            communication, efficiency, and transparency for our customers.
-        </p>
 
 
-        <h2>
-            Our Values
-        </h2>
+/* LEADERSHIP */
 
+.founder-card {
 
-        <div class="values-grid">
+    max-width:850px;
+    margin:40px auto;
+    text-align:center;
 
-            <div class="value-card">
-                <h3>Professionalism</h3>
-                <p>
-                    Clear communication, respectful service,
-                    and dependable project execution.
-                </p>
-            </div>
+}
 
 
-            <div class="value-card">
-                <h3>Integrity</h3>
-                <p>
-                    Honest decisions and responsible care for
-                    every property we serve.
-                </p>
-            </div>
+.founder-card h3 {
 
+    color:var(--purple);
+    font-family:'Cinzel',serif;
 
-            <div class="value-card">
-                <h3>Innovation</h3>
-                <p>
-                    Using modern tools and improved systems
-                    to create better results.
-                </p>
-            </div>
+}
 
 
-            <div class="value-card">
-                <h3>Continuous Improvement</h3>
-                <p>
-                    Always learning, adapting, and improving
-                    the way we operate.
-                </p>
-            </div>
+/* CONTACT */
 
 
-        </div>
+.contact {
 
-    </div>
+    text-align:center;
 
-</section>
+}
 
 
-<section id="leadership" class="leadership">
+.contact-info {
 
-    <div class="container">
-        <section id="systems" class="systems">
+    max-width:600px;
+    margin:40px auto;
 
-    <div class="container">
+}
 
-        <h2>
-            Future Systems
-        </h2>
 
-        <p>
-            The Urban Matrix Lab LLC is developing a technology-supported
-            approach to property operations by combining field expertise,
-            digital organization, and intelligent workflows.
-        </p>
+.contact a {
 
+    color:var(--gold-light);
 
-        <div class="systems-grid">
+}
 
 
-            <div class="system-card">
+/* FOOTER */
 
-                <h3>
-                    Digital Documentation
-                </h3>
 
-                <p>
-                    Organized reporting, project records, and visual
-                    documentation designed to improve communication
-                    between teams and clients.
-                </p>
+footer {
 
-            </div>
+    background:#090a0c;
+    text-align:center;
+    padding:40px 20px;
 
+}
 
-            <div class="system-card">
 
-                <h3>
-                    Intelligent Workflows
-                </h3>
+/* MOBILE */
 
-                <p>
-                    Structured processes that help manage tasks,
-                    schedules, inspections, and property needs.
-                </p>
 
-            </div>
+@media(max-width:768px){
 
+.navbar {
 
-            <div class="system-card">
+    flex-direction:column;
+    padding:20px;
 
-                <h3>
-                    Connected Operations
-                </h3>
+}
 
-                <p>
-                    Building systems that support efficiency,
-                    accountability, and long-term growth.
-                </p>
 
-            </div>
+.nav-links {
 
-
-        </div>
-
-    </div>
-
-        </section>
-
-        <h2 class="leadership-title">
-    Leadership
-</h2>
-
-<div class="founder-card">
-
-    <h3>
-        Founder & Managing Member
-    </h3>
-
-    <h4>
-        The Vision Behind The Urban Matrix Lab LLC
-    </h4>
-
-    <p>
-        The Urban Matrix Lab LLC was founded with a vision of creating a
-        professional property solutions company built on reliability,
-        innovation, craftsmanship, and intelligent systems.
-
-        Through organized operations and forward-thinking methods, the company
-        develops practical solutions that improve properties and the
-        environments people depend on.
-    </p>
-
-</div>
-
-    </div>
-
-</section>
-    <section id="contact" class="contact">
-
-    <div class="container">
-
-        <h2>
-            Contact The Urban Matrix Lab LLC
-        </h2>
-
-        <p>
-            Ready to discuss your property needs?
-            Contact us for a consultation about services throughout Western Montana.
-        </p>
-
-        <div class="contact-info">
-
-            <p>
-                <strong>Phone:</strong>
-                <a href="tel:4063963737">
-                    (406) 396-3737
-                </a>
-            </p>
-
-            <p>
-                <strong>Email:</strong>
-                <a href="mailto:TheUrbanMatrixLab@gmail.com">
-                    TheUrbanMatrixLab@gmail.com
-                </a>
-            </p>
-
-            <p>
-                <strong>Service Area:</strong>
-                Western Montana
-            </p>
-
-        </div>
-
-        <a href="mailto:TheUrbanMatrixLab@gmail.com" class="primary-btn">
-            Request Consultation
-        </a>
-
-    </div>
-
-    </section>
-<footer>
-
-    <div class="container">
-
-        <p>
-            © 2026 The Urban Matrix Lab LLC
-        </p>
-
-        <p>
-            Property Maintenance • Rehabilitation • Inspections • Technology-Supported Operations
-        </p>
-
-    </div>
-
-</footer>
-
-
-<script src="script.js"></script>
-
-</body>
-
-</html>
+    flex-wrap:wrap;
+    justify-content:center
