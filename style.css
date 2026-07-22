@@ -60,15 +60,64 @@ a {
     opacity: 1;
 }
 
-
 /* ===== NAVIGATION ===== */
 
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 5%;
-    border-bottom: 1px solid #222;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:25px 5%;
+    border-bottom:1px solid #222;
+    flex-wrap:nowrap;
+}
+
+.brand {
+    display:flex;
+    align-items:center;
+    gap:15px;
+    white-space:nowrap;
+}
+
+.logo-mark {
+    color:#d4af37;
+    font-size:35px;
+}
+
+.logo-text {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    white-space:nowrap;
+}
+
+.brand-main {
+    color:#ffffff;
+    font-size:22px;
+    font-weight:700;
+    display:inline-block;
+}
+
+.brand-sub {
+    color:#d4af37;
+    font-size:22px;
+    font-weight:700;
+    display:inline-block;
+}
+
+.nav-links {
+    display:flex;
+    align-items:center;
+    list-style:none;
+    gap:25px;
+    white-space:nowrap;
+}
+
+.nav-links a {
+    color:#ffffff;
+}
+
+.nav-links a:hover {
+    color:#d4af37;
 }
 
 .brand {
