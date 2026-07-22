@@ -1,17 +1,13 @@
-window.addEventListener("load", () => {
+window.addEventListener("load", function () {
 
     const splash = document.getElementById("splash-screen");
-    const site = document.getElementById("website-content");
+    const content = document.getElementById("website-content");
 
-    setTimeout(() => {
+    setTimeout(function () {
 
-        splash.classList.add("hide");
-        site.classList.add("show");
+        splash.style.display = "none";
+        content.style.opacity = "1";
 
-        setTimeout(() => {
-            splash.remove();
-        },1000);
-
-    },2500);
+    }, 2500);
 
 });
