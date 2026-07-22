@@ -333,3 +333,21 @@ footer {
 }
 
 }
+.brand {
+    display:flex;
+    align-items:center;
+    gap:15px;
+    white-space:nowrap;
+}
+
+.logo-text {
+    display:flex;
+    align-items:center;
+}
+
+.brand-full {
+    color:#ffffff;
+    font-size:22px;
+    font-weight:700;
+    white-space:nowrap;
+}
