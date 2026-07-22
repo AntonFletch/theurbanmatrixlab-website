@@ -416,3 +416,56 @@ footer {
 
     flex-wrap:wrap;
     justify-content:center
+/* ===== SPLASH SCREEN ===== */
+
+#splash-screen{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:99999;
+    animation:fadeOut 1s ease forwards;
+    animation-delay:2.5s;
+}
+
+.splash-logo{
+    width:340px;
+    max-width:80%;
+    opacity:0;
+    animation:fadeIn 1s ease forwards;
+}
+
+#website-content{
+    opacity:0;
+    animation:websiteFade 1s ease forwards;
+    animation-delay:2.8s;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:scale(.95);
+    }
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+@keyframes fadeOut{
+    to{
+        opacity:0;
+        visibility:hidden;
+    }
+}
+
+@keyframes websiteFade{
+    to{
+        opacity:1;
+    }
+}
