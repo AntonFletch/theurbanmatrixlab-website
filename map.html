@@ -1,33 +1,38 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-
-<title>UMX Operations Map</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <title>UMX Operations Map</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
-<h1>UMX Operations Map</h1>
-<p>West Missoula Sector</p>
+<header class="header">
+    <img src="master-logo.png" class="logo">
+    <h1>UMX Operations Map</h1>
+    <p>West Missoula Sector</p>
 </header>
 
 
-<div id="map"></div>
+<main>
+
+<div id="filters">
+
+<button onclick="filterBusinesses('ALL')">All</button>
+<button onclick="filterBusinesses('EASY')">Easy</button>
+<button onclick="filterBusinesses('MEDIUM')">Medium</button>
+<button onclick="filterBusinesses('HARD')">Hard</button>
+
+</div>
 
 
-<script src="supabase.js"></script>
+<div id="business-container"></div>
+
+
+</main>
+
+
 <script src="map.js"></script>
-
-
-<script async
-src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_KEY&callback=initMap">
-</script>
-
 
 </body>
 </html>
