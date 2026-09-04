@@ -1,10 +1,3 @@
-const SUPABASE_URL = "https://xdaxbueyftyljsrhabpx.supabase.co";
-
-const SUPABASE_ANON_KEY = "sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ";
-
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
-
-console.log("UMX OS connected to Supabase");
+const UMX_SUPABASE_URL='https://xdaxbueyftyljsrhabpx.supabase.co';
+const UMX_SUPABASE_KEY='sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ';
+const umxDb=window.supabase.createClient(UMX_SUPABASE_URL,UMX_SUPABASE_KEY);

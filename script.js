@@ -1,13 +1,1 @@
-window.addEventListener("load", function () {
-
-    const splash = document.getElementById("splash-screen");
-    const content = document.getElementById("website-content");
-
-    setTimeout(function () {
-
-        splash.style.display = "none";
-        content.style.opacity = "1";
-
-    }, 2500);
-
-});
+window.addEventListener('load',()=>{const splash=document.querySelector('#splash-screen');const content=document.querySelector('#website-content');setTimeout(()=>{if(splash){splash.style.opacity='0';setTimeout(()=>splash.remove(),450)}if(content)content.classList.add('show')},650)});const menu=document.querySelector('.menu-button');if(menu)menu.addEventListener('click',()=>document.querySelector('.nav-links').classList.toggle('open'));
