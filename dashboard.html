@@ -1,3 +1,140 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UMX Employee Command</title><link rel="icon" href="favicon.svg"><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="style.css"></head><body class="dashboard-page"><header class="dashboard-header"><a class="brand" href="dashboard.html"><span class="brand-mark">UMX</span><span><b>Employee Command</b><small>Missoula field portal</small></span></a><div class="dashboard-user"><span>● SECURE SESSION</span><b id="employee-name">Employee</b><button id="sign-out">Sign out</button></div></header><main class="command-main"><section class="command-head"><div><p class="eyebrow">Missoula squad</p><h1>The city is your mission board.</h1><p>Open a pin for approved work or submit a business opportunity for review.</p></div><div class="reward-card"><small>Community builder points</small><b id="reward-points">0</b><span>Contract bonuses post after first cleared customer payment.</span></div></section><section id="command-stats" class="command-stats"></section><section class="mission-shell"><div class="map-side"><div class="map-toolbar"><div class="map-tabs"><button class="map-tab active" data-filter="all">All pins</button><button class="map-tab" data-filter="job">Jobs</button><button class="map-tab" data-filter="opportunity">No job yet</button><button class="map-tab" data-filter="lead">My leads</button></div><button id="propose-lead" class="primary-btn">+ Propose a business</button></div><div id="mission-map"></div><div class="map-legend"><i class="dot" style="background:var(--green)"></i>Job <i class="dot" style="background:var(--gold)"></i>Opportunity <i class="dot" style="background:var(--purple)"></i>My lead</div></div><aside class="mission-feed"><div class="feed-head"><div><small>Live operations</small><h2>Mission feed</h2></div></div><div id="mission-list"></div></aside></section></main>
-<dialog id="detail-dialog"><button class="dialog-close" onclick="this.closest('dialog').close()">×</button><div id="detail-content"></div></dialog><dialog id="lead-dialog"><button class="dialog-close" onclick="this.closest('dialog').close()">×</button><p class="eyebrow">Employee opportunity</p><h2>Propose a business</h2><p class="form-intro">UMX must approve all outreach, pricing, promises, and contracts.</p><form id="lead-form"><div class="form-grid"><label>Business name<input name="business_name" required></label><label>Business type<input name="category" required></label><label class="wide">Address<input name="address" required></label><label>Latitude<input name="latitude" type="number" step="any" value="46.8721" required></label><label>Longitude<input name="longitude" type="number" step="any" value="-113.9940" required></label><label class="wide">Why UMX is a good fit<textarea name="fit_reason" rows="4" required></textarea></label><label class="wide">Possible introduction contact<input name="introduction_contact"></label></div><div class="dialog-actions"><button type="button" class="secondary-btn" onclick="document.querySelector('#lead-dialog').close()">Cancel</button><button class="primary-btn" type="submit">Submit for review</button></div><p id="lead-message" class="login-message" role="status"></p></form></dialog>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="supabase.js"></script><script src="portal.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09070d">
+<title>UMX Employee Command</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="style.css">
+<style>
+:root{--umx-bg:#08060b;--umx-panel:#120d18;--umx-line:rgba(230,189,88,.18);--umx-gold:#e5bd58;--umx-purple:#7b3fb1;--umx-text:#f6f1f8;--umx-muted:#9d91a5}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body.dashboard-page{margin:0;background:radial-gradient(circle at 50% -10%,rgba(121,58,166,.22),transparent 34%),linear-gradient(#07050a,#0a0710 45%,#07050a);color:var(--umx-text)}
+.dashboard-header{position:sticky;top:0;z-index:1200;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:68px;padding:10px clamp(14px,3vw,32px);background:rgba(7,5,10,.91);backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.07)}
+.dashboard-header .brand{display:flex;align-items:center;gap:11px;color:#fff;text-decoration:none}.brand-mark{display:grid;place-items:center;width:46px;height:38px;border:1px solid rgba(229,189,88,.55);border-radius:10px;color:var(--umx-gold);font-weight:1000;letter-spacing:.08em;box-shadow:0 0 20px rgba(229,189,88,.12)}.brand small{display:block;color:#8d8294;font-size:.68rem}.dashboard-user{display:flex;align-items:center;gap:10px;font-size:.72rem}.dashboard-user span{color:#72d89a}.dashboard-user button{border:1px solid rgba(255,255,255,.13);background:transparent;color:#d9d2dd;border-radius:999px;padding:8px 11px}
+.employee-shell{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:calc(100vh - 68px)}.employee-nav{position:sticky;top:68px;height:calc(100vh - 68px);padding:20px 12px;border-right:1px solid rgba(255,255,255,.06);background:rgba(10,7,14,.76);overflow:auto}.employee-nav small{display:block;padding:0 11px 10px;color:#6f6575;font-size:.58rem;font-weight:900;letter-spacing:.14em}.employee-nav button{width:100%;display:flex;align-items:center;gap:10px;border:0;background:transparent;color:#9e94a3;border-radius:11px;padding:11px 12px;margin:2px 0;text-align:left;font-weight:800;cursor:pointer}.employee-nav button:hover,.employee-nav button.active{color:#fff;background:linear-gradient(90deg,rgba(123,63,177,.23),rgba(229,189,88,.05));box-shadow:inset 2px 0 var(--umx-gold)}
+.command-main{width:min(100%,1450px);margin:0 auto;padding:clamp(20px,3vw,40px)}.dashboard-view{display:none}.dashboard-view.active{display:block}.command-head{position:relative;overflow:hidden;border:1px solid var(--umx-line);border-radius:24px;padding:clamp(22px,4vw,42px);margin-bottom:18px;background:linear-gradient(135deg,rgba(19,12,28,.96),rgba(10,7,15,.96))}.command-head:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 74% 12%,rgba(229,189,88,.11),transparent 26%),linear-gradient(125deg,transparent 0 55%,rgba(126,54,176,.11))}.command-head>*{position:relative}.command-head h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(2.2rem,6vw,5rem);line-height:.95;margin:.15em 0}.command-head p{max-width:760px;color:#a398aa}.eyebrow{color:var(--umx-gold)!important;text-transform:uppercase;letter-spacing:.15em;font-size:.68rem!important;font-weight:900}.house-line{position:absolute;right:4%;top:12px;width:min(38vw,390px);height:150px;opacity:.34;filter:drop-shadow(0 0 11px rgba(229,189,88,.55));pointer-events:none}
+.overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0 20px}.dash-card{background:linear-gradient(155deg,rgba(22,15,29,.96),rgba(12,8,17,.96));border:1px solid rgba(255,255,255,.065);border-radius:18px;padding:18px}.dash-card small{display:block;color:#83798a;font-size:.62rem;letter-spacing:.08em;font-weight:900;text-transform:uppercase}.dash-card strong{display:block;color:#fff;font-size:1.55rem;margin-top:8px}.dash-card span,.dash-card p{color:#8f8595;font-size:.75rem}.dash-card.gold{border-color:rgba(229,189,88,.2)}.dash-card.gold strong{color:var(--umx-gold)}
+.section-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.module{background:linear-gradient(155deg,rgba(20,14,27,.96),rgba(12,8,17,.96));border:1px solid rgba(255,255,255,.065);border-radius:20px;padding:20px;margin-top:14px}.module h2{margin:0 0 5px;font-size:1.08rem}.module .sub{margin:0 0 15px;color:#7d7383;font-size:.76rem}.action-row{display:flex;gap:8px;flex-wrap:wrap}.action-btn{border:1px solid rgba(229,189,88,.24);background:rgba(229,189,88,.07);color:#f1d78f;border-radius:10px;padding:10px 13px;font-weight:900;font-size:.72rem;cursor:pointer}.action-btn.secondary{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#c1b8c6}.status-line{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.055)}.status-line:last-child{border-bottom:0}.status-line b{font-size:.82rem}.status-line span{font-size:.7rem;color:#827887}.pill{display:inline-flex;border-radius:999px;padding:5px 8px;background:rgba(78,190,125,.1);border:1px solid rgba(78,190,125,.18);color:#9fe2ba;font-size:.6rem;font-weight:900}.pill.warn{background:rgba(229,189,88,.08);border-color:rgba(229,189,88,.16);color:#efd58f}.pill.purple{background:rgba(123,63,177,.13);border-color:rgba(123,63,177,.22);color:#caa8e2}
+.quick-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.quick-nav button{min-height:78px;text-align:left;border:1px solid rgba(255,255,255,.07);background:#0d0912;color:#d7cfdb;border-radius:15px;padding:14px;cursor:pointer}.quick-nav button b{display:block;color:var(--umx-gold);margin-bottom:5px}.quick-nav button span{font-size:.68rem;color:#766d7b}
+.module-title{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:14px}.module-title h1{margin:0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(2rem,5vw,3.5rem)}.module-title p{margin:5px 0 0;color:#8b818f}.placeholder-list{display:grid;gap:8px}.placeholder-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;border:1px solid rgba(255,255,255,.06);background:#0c0910;border-radius:13px}.placeholder-item div b{display:block}.placeholder-item div span{display:block;color:#817687;font-size:.72rem;margin-top:3px}
+.mobile-tabs{display:none;position:fixed;left:0;right:0;bottom:0;z-index:1300;background:rgba(8,6,11,.95);backdrop-filter:blur(18px);border-top:1px solid rgba(255,255,255,.08);padding:6px max(6px,env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left));grid-template-columns:repeat(5,1fr)}.mobile-tabs button{border:0;background:transparent;color:#8f8496;padding:8px 3px;font-size:.58rem;font-weight:900}.mobile-tabs button.active{color:var(--umx-gold)}
+#mission-map{touch-action:pan-y}
+@media(max-width:1050px){.overview-grid{grid-template-columns:repeat(2,1fr)}.section-grid{grid-template-columns:1fr}.quick-nav{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.employee-shell{display:block}.employee-nav{display:none}.command-main{padding:18px 12px 84px}.dashboard-header{min-height:62px}.dashboard-user span{display:none}.dashboard-user b{max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mobile-tabs{display:grid}.command-head{padding:24px 17px}.house-line{width:55vw;right:-12%;top:2px;opacity:.2}.overview-grid{grid-template-columns:1fr 1fr}.mission-shell{display:block!important}.mission-feed{margin-top:12px}.map-toolbar{align-items:flex-start!important;flex-direction:column}.map-tabs{width:100%;overflow:auto}.quick-nav{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body class="dashboard-page">
+<header class="dashboard-header">
+  <a class="brand" href="#" data-open-view="home"><span class="brand-mark">UMX</span><span><b>Employee Command</b><small>UMX OS · Missoula operations</small></span></a>
+  <div class="dashboard-user"><span>● SECURE SESSION</span><b id="employee-name">Employee</b><button id="sign-out">Sign out</button></div>
+</header>
+<div class="employee-shell">
+  <nav class="employee-nav" aria-label="Employee portal navigation">
+    <small>COMMAND</small>
+    <button class="active" data-view="home">⌂ Dashboard</button>
+    <button data-view="map">⌖ Operations Map</button>
+    <button data-view="jobs">▣ Jobs & Schedule</button>
+    <button data-view="time">◷ Timekeeping</button>
+    <button data-view="chat">✦ Chat</button>
+    <button data-view="training">△ Training & Education</button>
+    <button data-view="rewards">★ Rewards & Leads</button>
+    <button data-view="uniforms">◇ Uniforms</button>
+    <button data-view="profile">◎ Profile</button>
+  </nav>
+
+  <main class="command-main">
+    <section class="dashboard-view active" data-panel="home">
+      <section class="command-head">
+        <svg class="house-line" viewBox="0 0 420 170" fill="none" aria-hidden="true"><path d="M30 130 210 18l180 112M75 100v55h270v-55M142 155V90h136v65M18 139h384" stroke="#e5bd58" stroke-width="3"/><path d="M108 89 210 27l103 64" stroke="#8e4fc2" stroke-width="4"/></svg>
+        <div><p class="eyebrow">Live Missoula Operations</p><h1>Employee Command</h1><p>Your workday in one place: schedule, assigned jobs, timekeeping, communication, training, rewards, uniforms, profile, and the locked Missoula Operations Map.</p></div>
+      </section>
+
+      <div class="overview-grid">
+        <div class="dash-card gold"><small>Today</small><strong>Ready</strong><span>Open schedule and assignments</span></div>
+        <div class="dash-card"><small>Clock status</small><strong id="clock-summary">Off duty</strong><span>GPS presence required on approved jobs</span></div>
+        <div class="dash-card"><small>Training</small><strong>Current</strong><span>Required and optional education</span></div>
+        <div class="dash-card gold"><small>Reward points</small><strong id="reward-points">0</strong><span>Approved lead and contract rewards</span></div>
+      </div>
+
+      <div id="command-stats" class="command-stats"></div>
+
+      <div class="section-grid">
+        <section class="module">
+          <h2>Today’s Command Board</h2><p class="sub">Schedule, assignments, arrival windows and approved scope.</p>
+          <div class="status-line"><div><b>Assigned work</b><span>Open Jobs & Schedule for today’s route.</span></div><button class="action-btn secondary" data-jump="jobs">Open</button></div>
+          <div class="status-line"><div><b>Timekeeping</b><span>Clock in only when you are at the approved work location.</span></div><button class="action-btn secondary" data-jump="time">Open</button></div>
+          <div class="status-line"><div><b>Operations map</b><span>Use one finger to scroll the page and two fingers to move or zoom the map.</span></div><button class="action-btn secondary" data-jump="map">Open</button></div>
+        </section>
+        <section class="module">
+          <h2>Live Feed</h2><p class="sub">Company notices and acknowledgements.</p>
+          <div class="status-line"><div><b>UMX Employee Command is active</b><span>Use this dashboard as your field operations home.</span></div><span class="pill">LIVE</span></div>
+          <div class="status-line"><div><b>Map control</b><span>Two-finger map interaction is required on touch devices.</span></div><span class="pill purple">LOCKED</span></div>
+        </section>
+      </div>
+
+      <div class="quick-nav">
+        <button data-jump="chat"><b>Chat</b><span>Direct, group and squad communication</span></button>
+        <button data-jump="training"><b>Training</b><span>Methods, quizzes, videos and education</span></button>
+        <button data-jump="rewards"><b>Rewards</b><span>Lead points and approved bonuses</span></button>
+        <button data-jump="uniforms"><b>Uniforms</b><span>Selections, sizing and locker status</span></button>
+      </div>
+    </section>
+
+    <section class="dashboard-view" data-panel="map">
+      <div class="module-title"><div><p class="eyebrow">Missoula Operations</p><h1>Operations Map</h1><p>One finger scrolls the webpage. Two fingers control the map on touch devices.</p></div></div>
+      <section class="mission-shell">
+        <div class="map-side">
+          <div class="map-toolbar"><div class="map-tabs"><button class="map-tab active" data-filter="all">All pins</button><button class="map-tab" data-filter="job">Jobs</button><button class="map-tab" data-filter="opportunity">No job yet</button><button class="map-tab" data-filter="lead">My leads</button></div><button id="propose-lead" class="primary-btn">+ Propose a business</button></div>
+          <div id="mission-map"></div>
+          <div class="map-legend"><i class="dot" style="background:var(--green)"></i>Job <i class="dot" style="background:var(--gold)"></i>Opportunity <i class="dot" style="background:var(--purple)"></i>My lead</div>
+        </div>
+        <aside class="mission-feed"><div class="feed-head"><div><small>Live operations</small><h2>Mission feed</h2></div></div><div id="mission-list"></div></aside>
+      </section>
+    </section>
+
+    <section class="dashboard-view" data-panel="jobs"><div class="module-title"><div><p class="eyebrow">Field Operations</p><h1>Jobs & Schedule</h1><p>Assigned work, arrival windows, approved scope and route order.</p></div></div><div class="module"><div class="placeholder-list"><div class="placeholder-item"><div><b>Today’s assignments</b><span>Your active assigned work appears here.</span></div><span class="pill">ACTIVE</span></div><div class="placeholder-item"><div><b>Upcoming schedule</b><span>Future assignments and training dates.</span></div><span class="pill purple">CALENDAR</span></div><div class="placeholder-item"><div><b>Scope control</b><span>Do not change scope, quote final pricing, promise dates or sign agreements without written authorization.</span></div><span class="pill warn">UMX STANDARD</span></div></div></div></section>
+
+    <section class="dashboard-view" data-panel="time"><div class="module-title"><div><p class="eyebrow">GPS Presence</p><h1>Timekeeping</h1><p>Clock-in, clock-out, arrival status and lunch tracking.</p></div></div><div class="module"><div class="dash-card gold" style="max-width:520px;margin:auto;text-align:center"><small>Current status</small><strong id="clock-status">OFF DUTY</strong><p id="clock-note">Clock in when you are physically at the approved work location.</p><div class="action-row" style="justify-content:center"><button class="action-btn" id="clock-in-demo">Clock In</button><button class="action-btn secondary" id="clock-out-demo">Clock Out</button></div></div></div></section>
+
+    <section class="dashboard-view" data-panel="chat"><div class="module-title"><div><p class="eyebrow">Communications</p><h1>Chat</h1><p>Direct, group, private and squad communication.</p></div></div><div class="section-grid"><div class="module"><h2>Squad Chat</h2><p class="sub">Operational messages and crew coordination.</p><div class="placeholder-list"><div class="placeholder-item"><div><b>Squad channel</b><span>Field coordination and active-job updates.</span></div><span class="pill">OPEN</span></div><div class="placeholder-item"><div><b>Direct messages</b><span>Private employee-to-employee or supervisor communication.</span></div><span class="pill purple">PRIVATE</span></div></div></div><div class="module"><h2>Message Rules</h2><p class="sub">Keep job documentation and scope decisions attached to the correct work record.</p></div></div></section>
+
+    <section class="dashboard-view" data-panel="training"><div class="module-title"><div><p class="eyebrow">UMX Education</p><h1>Training & Education</h1><p>Required methods, alternative techniques, quizzes, videos and advancement pathways.</p></div></div><div class="overview-grid"><div class="dash-card gold"><small>Required</small><strong>UMX Standard</strong><span>Locked company methods</span></div><div class="dash-card"><small>Education</small><strong>Skill Paths</strong><span>Optional advancement tracks</span></div><div class="dash-card"><small>Assessment</small><strong>Quizzes</strong><span>Knowledge checks and photo proof</span></div><div class="dash-card"><small>Calendar</small><strong>Training</strong><span>Scheduled sessions and refreshers</span></div></div></section>
+
+    <section class="dashboard-view" data-panel="rewards"><div class="module-title"><div><p class="eyebrow">Growth & Recognition</p><h1>Rewards & Leads</h1><p>Proposed businesses, approved methods, points and earned bonuses.</p></div></div><div class="section-grid"><div class="module"><h2>Lead Rewards</h2><p class="sub">Submit potential businesses through the Operations Map. Contract bonuses post under approved company rules.</p><button class="action-btn" data-jump="map">Open Operations Map</button></div><div class="module"><h2>Technique Rewards</h2><p class="sub">Approved employee methods can be reviewed for recognition or revenue-share eligibility.</p><span class="pill purple">REVIEW REQUIRED</span></div></div></section>
+
+    <section class="dashboard-view" data-panel="uniforms"><div class="module-title"><div><p class="eyebrow">Issued Gear</p><h1>Uniforms</h1><p>Uniform selection, sizing, approved options, nickname etching and locker storage.</p></div></div><div class="overview-grid"><div class="dash-card"><small>Top</small><strong>Uniform Shirt</strong><span>Approved company options</span></div><div class="dash-card"><small>Bottom</small><strong>Choose Fit</strong><span>Pants · shorts · skirt where approved</span></div><div class="dash-card"><small>Personalization</small><strong>Nickname</strong><span>Optional approved etching</span></div><div class="dash-card gold"><small>Storage</small><strong>Locker</strong><span>HQ / trailer-issued storage</span></div></div></section>
+
+    <section class="dashboard-view" data-panel="profile"><div class="module-title"><div><p class="eyebrow">Employee Record</p><h1>Profile</h1><p>Role, contact information, certifications, training status and issued equipment.</p></div></div><div class="section-grid"><div class="module"><h2>Employee Profile</h2><div class="status-line"><div><b>Name</b><span>Loaded from your secure UMX profile.</span></div><span class="pill">VERIFIED SESSION</span></div><div class="status-line"><div><b>Role</b><span>Labor Employee / Squad Leader permissions are controlled by UMX OS.</span></div></div></div><div class="module"><h2>Readiness</h2><div class="status-line"><div><b>Training</b><span>Current required modules</span></div><span class="pill">CURRENT</span></div><div class="status-line"><div><b>Issued gear</b><span>Uniform and equipment records</span></div><span class="pill purple">PROFILE</span></div></div></div></section>
+  </main>
+</div>
+
+<nav class="mobile-tabs" aria-label="Mobile employee navigation"><button class="active" data-view="home">Home</button><button data-view="map">Map</button><button data-view="jobs">Jobs</button><button data-view="time">Clock</button><button data-view="chat">Chat</button></nav>
+
+<dialog id="detail-dialog"><button class="dialog-close" onclick="this.closest('dialog').close()">×</button><div id="detail-content"></div></dialog>
+<dialog id="lead-dialog"><button class="dialog-close" onclick="this.closest('dialog').close()">×</button><p class="eyebrow">Employee opportunity</p><h2>Propose a business</h2><p class="form-intro">UMX must approve all outreach, pricing, promises, and contracts.</p><form id="lead-form"><div class="form-grid"><label>Business name<input name="business_name" required></label><label>Business type<input name="category" required></label><label class="wide">Address<input name="address" required></label><label>Latitude<input name="latitude" type="number" step="any" value="46.8721" required></label><label>Longitude<input name="longitude" type="number" step="any" value="-113.9940" required></label><label class="wide">Why UMX is a good fit<textarea name="fit_reason" rows="4" required></textarea></label><label class="wide">Possible introduction contact<input name="introduction_contact"></label></div><div class="dialog-actions"><button type="button" class="secondary-btn" onclick="document.querySelector('#lead-dialog').close()">Cancel</button><button class="primary-btn" type="submit">Submit for review</button></div><p id="lead-message" class="login-message" role="status"></p></form></dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="supabase.js"></script>
+<script src="portal.js?v=af24b1ad"></script>
+<script>
+(function(){
+  const buttons=[...document.querySelectorAll('[data-view]')];
+  const panels=[...document.querySelectorAll('[data-panel]')];
+  function openView(name){
+    panels.forEach(p=>p.classList.toggle('active',p.dataset.panel===name));
+    buttons.forEach(b=>b.classList.toggle('active',b.dataset.view===name));
+    if(name==='map'&&window.map){setTimeout(()=>window.map.invalidateSize(),80)}
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  buttons.forEach(b=>b.addEventListener('click',()=>openView(b.dataset.view)));
+  document.querySelectorAll('[data-jump]').forEach(b=>b.addEventListener('click',()=>openView(b.dataset.jump)));
+  document.querySelectorAll('[data-open-view]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();openView(b.dataset.openView)}));
+  const cin=document.getElementById('clock-in-demo'),cout=document.getElementById('clock-out-demo'),status=document.getElementById('clock-status'),summary=document.getElementById('clock-summary'),note=document.getElementById('clock-note');
+  cin?.addEventListener('click',()=>{status.textContent='ON DUTY';summary.textContent='On duty';note.textContent='Clocked in on this device. GPS-backed production timekeeping remains subject to UMX authorization.'});
+  cout?.addEventListener('click',()=>{status.textContent='OFF DUTY';summary.textContent='Off duty';note.textContent='Clock in when you are physically at the approved work location.'});
+})();
+</script>
+</body></html>
