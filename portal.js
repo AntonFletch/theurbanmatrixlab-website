@@ -1,61 +1,77 @@
 let sessionUser=null,filter='all',map,markers=[];let targets=[],jobs=[],contracts=[],leads=[];const $=s=>document.querySelector(s);const esc=s=>String(s||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Number(n)||0);
 async function boot(){const {data:{session}}=await umxDb.auth.getSession();if(!session){location.href='login.html';return}sessionUser=session.user;const {data:profile}=await umxDb.from('profiles').select('Full_Name,role').eq('id',sessionUser.id).maybeSingle();$('#employee-name').textContent=profile?.Full_Name||sessionUser.email;initMap();await loadData()}
 function initMap(){
-  map=L.map('mission-map',{zoomControl:false,dragging:!L.Browser.touch,touchZoom:false}).setView([46.8721,-113.994],12);
+  const touchDevice=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
+  map=L.map('mission-map',{zoomControl:false,dragging:!touchDevice,touchZoom:false}).setView([46.8721,-113.994],12);
   L.control.zoom({position:'bottomright'}).addTo(map);
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery © Esri'}).addTo(map);
   L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
 
-  const el=map.getContainer();
-  if(L.Browser.touch){
-    // Cooperative mobile map control:
-    // one finger ALWAYS belongs to the page; two fingers activate the map.
+  if(touchDevice){
     map.dragging.disable();
     map.touchZoom.disable();
+    const el=map.getContainer();
     el.style.touchAction='pan-y';
-    let active=false,lastMid=null,lastDist=0;
+
+    // Dedicated touch shield: one finger is reserved for normal page scrolling.
+    // The map only becomes interactive while TWO fingers are on it.
+    const shield=document.createElement('div');
+    shield.setAttribute('aria-label','Map touch control. Use two fingers to move or zoom.');
+    Object.assign(shield.style,{position:'absolute',inset:'0',zIndex:'700',background:'transparent',touchAction:'pan-y'});
+    el.appendChild(shield);
+
+    let active=false,lastMid=null,lastDist=0,startPoint=null,moved=false;
     const mid=t=>({x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2});
     const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);
 
-    el.addEventListener('touchstart',e=>{
-      if(e.touches.length<2){
-        active=false;lastMid=null;lastDist=0;
-        map.dragging.disable();map.touchZoom.disable();
-        // Do not prevent default: this lets the page scroll even when the finger starts on the map.
-        return;
+    shield.addEventListener('touchstart',e=>{
+      if(e.touches.length===1){
+        active=false;lastMid=null;lastDist=0;moved=false;
+        startPoint={x:e.touches[0].clientX,y:e.touches[0].clientY};
+        return; // IMPORTANT: no preventDefault => the page scrolls over the map.
       }
-      active=true;
-      lastMid=mid(e.touches);
-      lastDist=dist(e.touches);
-      if(e.cancelable)e.preventDefault();
-    },{passive:false,capture:true});
+      if(e.touches.length>=2){
+        active=true;lastMid=mid(e.touches);lastDist=dist(e.touches);moved=true;
+        if(e.cancelable)e.preventDefault();
+      }
+    },{passive:false});
 
-    el.addEventListener('touchmove',e=>{
-      if(!active||e.touches.length<2){
-        active=false;lastMid=null;lastDist=0;
-        // One-finger movement is intentionally left to the browser/page.
-        return;
+    shield.addEventListener('touchmove',e=>{
+      if(e.touches.length===1){
+        if(startPoint){const dx=e.touches[0].clientX-startPoint.x,dy=e.touches[0].clientY-startPoint.y;if(Math.hypot(dx,dy)>8)moved=true;}
+        return; // one finger continues scrolling the PAGE, never the map.
       }
+      if(!active||e.touches.length<2)return;
       if(e.cancelable)e.preventDefault();
+      const rect=el.getBoundingClientRect();
       const nextMid=mid(e.touches),nextDist=dist(e.touches);
-      if(lastMid){
-        map.panBy([lastMid.x-nextMid.x,lastMid.y-nextMid.y],{animate:false});
-      }
+      if(lastMid)map.panBy([lastMid.x-nextMid.x,lastMid.y-nextMid.y],{animate:false});
       if(lastDist>0&&nextDist>0){
         const ratio=nextDist/lastDist;
         if(Math.abs(ratio-1)>.025){
           const delta=Math.log(ratio)/Math.log(1.22);
-          map.setZoomAround(map.containerPointToLatLng([nextMid.x-el.getBoundingClientRect().left,nextMid.y-el.getBoundingClientRect().top]),Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),map.getZoom()+delta)),{animate:false});
+          const center=map.containerPointToLatLng([nextMid.x-rect.left,nextMid.y-rect.top]);
+          const z=Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),map.getZoom()+delta));
+          map.setZoomAround(center,z,{animate:false});
         }
       }
       lastMid=nextMid;lastDist=nextDist;
-    },{passive:false,capture:true});
+    },{passive:false});
 
-    const finish=e=>{
-      if(!e.touches||e.touches.length<2){active=false;lastMid=null;lastDist=0;}
-    };
-    el.addEventListener('touchend',finish,{passive:true,capture:true});
-    el.addEventListener('touchcancel',()=>{active=false;lastMid=null;lastDist=0;},{passive:true,capture:true});
+    shield.addEventListener('touchend',e=>{
+      if(active&&e.touches.length<2){active=false;lastMid=null;lastDist=0;}
+      // Preserve single-finger marker taps without letting a drag control the map.
+      if(!active&&e.touches.length===0&&!moved&&startPoint){
+        const x=startPoint.x,y=startPoint.y;
+        shield.style.pointerEvents='none';
+        const under=document.elementFromPoint(x,y);
+        shield.style.pointerEvents='auto';
+        const target=under?.closest?.('.leaflet-interactive,.leaflet-control a,.leaflet-control button');
+        if(target)target.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,clientX:x,clientY:y}));
+      }
+      if(e.touches.length===0){startPoint=null;moved=false;}
+    },{passive:true});
+    shield.addEventListener('touchcancel',()=>{active=false;lastMid=null;lastDist=0;startPoint=null;moved=false;},{passive:true});
   }
 }
 async function loadData(){const [t,j,c,l]=await Promise.all([umxDb.from('umx_business_targets').select('*'),umxDb.from('umx_jobs').select('*,umx_properties(address,city,state,latitude,longitude),umx_services(name),umx_job_assignments(employee_id)'),umxDb.from('umx_contracts').select('*'),umxDb.from('umx_employee_leads').select('*').eq('employee_id',sessionUser.id)]);targets=t.data||[];jobs=j.data||[];contracts=c.data||[];leads=l.data||[];render()}
