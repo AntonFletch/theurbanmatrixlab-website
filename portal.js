@@ -1,6 +1,27 @@
 let sessionUser=null,filter='all',map,markers=[];let targets=[],jobs=[],contracts=[],leads=[];const $=s=>document.querySelector(s);const esc=s=>String(s||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(Number(n)||0);
 async function boot(){const {data:{session}}=await umxDb.auth.getSession();if(!session){location.href='login.html';return}sessionUser=session.user;const {data:profile}=await umxDb.from('profiles').select('Full_Name,role').eq('id',sessionUser.id).maybeSingle();$('#employee-name').textContent=profile?.Full_Name||sessionUser.email;initMap();await loadData()}
-function initMap(){map=L.map('mission-map',{zoomControl:false}).setView([46.8721,-113.994],12);L.control.zoom({position:'bottomright'}).addTo(map);L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery © Esri'}).addTo(map);L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map)}
+function initMap(){map=L.map('mission-map',{zoomControl:false}).setView([46.8721,-113.994],12);L.control.zoom({position:'bottomright'}).addTo(map);L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'Imagery © Esri'}).addTo(map);L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{maxZoom:19}).addTo(map);
+  const el=map.getContainer();
+  if(L.Browser.touch){
+    map.dragging.disable();
+    el.style.touchAction='pan-y';
+    let lastMid=null;
+    const mid=t=>({x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2});
+    el.addEventListener('touchstart',e=>{
+      if(e.touches.length===2) lastMid=mid(e.touches);
+      else lastMid=null;
+    },{passive:true});
+    el.addEventListener('touchmove',e=>{
+      if(e.touches.length!==2){lastMid=null;return;}
+      if(e.cancelable)e.preventDefault();
+      const next=mid(e.touches);
+      if(lastMid)map.panBy([lastMid.x-next.x,lastMid.y-next.y],{animate:false});
+      lastMid=next;
+    },{passive:false});
+    el.addEventListener('touchend',e=>{if(e.touches.length<2)lastMid=null;},{passive:true});
+    el.addEventListener('touchcancel',()=>{lastMid=null;},{passive:true});
+  }
+}
 async function loadData(){const [t,j,c,l]=await Promise.all([umxDb.from('umx_business_targets').select('*'),umxDb.from('umx_jobs').select('*,umx_properties(address,city,state,latitude,longitude),umx_services(name),umx_job_assignments(employee_id)'),umxDb.from('umx_contracts').select('*'),umxDb.from('umx_employee_leads').select('*').eq('employee_id',sessionUser.id)]);targets=t.data||[];jobs=j.data||[];contracts=c.data||[];leads=l.data||[];render()}
 function items(){const jobItems=jobs.map(j=>({id:j.id,type:'job',name:j.title,status:String(j.status).replaceAll('_',' '),address:j.umx_properties?.address||'Assigned property',lat:Number(j.umx_properties?.latitude),lng:Number(j.umx_properties?.longitude),summary:j.description||j.umx_services?.name||'Open the job record for approved scope.',data:j})).filter(x=>x.lat&&x.lng);const opportunities=targets.map(t=>({id:t.id,type:'opportunity',name:t.business_name,status:t.outreach_status.replaceAll('_',' '),address:t.address||'Missoula',lat:Number(t.latitude),lng:Number(t.longitude),summary:t.summary||'Potential UMX service opportunity.',data:t})).filter(x=>x.lat&&x.lng);const mine=leads.map(l=>({id:l.id,type:'lead',name:l.business_name,status:l.status.replaceAll('_',' '),address:l.address||'Missoula',lat:Number(l.latitude),lng:Number(l.longitude),summary:l.fit_reason,data:l})).filter(x=>x.lat&&x.lng);return [...jobItems,...opportunities,...mine]}
 const color=x=>x.type==='job'?'#43d49b':x.type==='lead'?'#8b5cf6':'#e5bd58';function visible(){return items().filter(x=>filter==='all'||x.type===filter)}
