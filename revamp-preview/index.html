@@ -13,11 +13,11 @@
 </head>
 <body>
 <main class="stage" id="stage">
-  <section class="page home active" data-page="home"><img class="master" data-b64="assets/home-fix.b64" alt="UMX future revamp homepage visual master"><button class="hotspot h-ancestry" data-symbol="ancestry" aria-label="Explain the ancient builder"></button><button class="hotspot h-pillars" data-symbol="pillars" aria-label="Explain the pillars"></button><button class="hotspot h-geometry" data-symbol="geometry" aria-label="Explain sacred geometry"></button><button class="hotspot h-sunrise" data-symbol="sunrise" aria-label="Explain the sunrise"></button><button class="hotspot h-human" data-symbol="human" aria-label="Explain the human"></button><button class="hotspot h-community" data-symbol="community" aria-label="Explain the community"></button><button class="hotspot h-foundation" data-symbol="foundation" aria-label="Explain the foundation"></button></section>
-  <section class="page" data-page="services"><img class="master" data-b64="assets/services-fix.b64" alt="UMX future revamp services page visual master"></section>
-  <section class="page" data-page="story"><img class="master" data-b64="assets/story-fix.b64" alt="UMX future revamp Our Story page visual master"></section>
-  <section class="page" data-page="portals"><img class="master" data-b64="assets/portals-fix.b64" alt="UMX future revamp portals page visual master"></section>
-  <section class="page" data-page="contact"><img class="master" data-b64="assets/contact-fix.b64" alt="UMX future revamp contact page visual master"></section>
+  <section class="page home active" data-page="home"><img class="master" data-b64="assets-compact/home.b64" alt="UMX future revamp homepage visual master"><button class="hotspot h-ancestry" data-symbol="ancestry" aria-label="Explain the ancient builder"></button><button class="hotspot h-pillars" data-symbol="pillars" aria-label="Explain the pillars"></button><button class="hotspot h-geometry" data-symbol="geometry" aria-label="Explain sacred geometry"></button><button class="hotspot h-sunrise" data-symbol="sunrise" aria-label="Explain the sunrise"></button><button class="hotspot h-human" data-symbol="human" aria-label="Explain the human"></button><button class="hotspot h-community" data-symbol="community" aria-label="Explain the community"></button><button class="hotspot h-foundation" data-symbol="foundation" aria-label="Explain the foundation"></button></section>
+  <section class="page" data-page="services"><img class="master" data-b64="assets-compact/services.b64" alt="UMX future revamp services page visual master"></section>
+  <section class="page" data-page="story"><img class="master" data-b64="assets-compact/story.b64" alt="UMX future revamp Our Story page visual master"></section>
+  <section class="page" data-page="portals"><img class="master" data-b64="assets-compact/portals.b64" alt="UMX future revamp portals page visual master"></section>
+  <section class="page" data-page="contact"><img class="master" data-b64="assets-compact/contact.b64" alt="UMX future revamp contact page visual master"></section>
   <div id="clickzones"><button class="clickzone cz-home" data-go="home" aria-label="Home"></button><button class="clickzone cz-services" data-go="services" aria-label="Services"></button><button class="clickzone cz-portals" data-go="portals" aria-label="Portals"></button><button class="clickzone cz-story" data-go="story" aria-label="Our Story"></button><button class="clickzone cz-contact" data-go="contact" aria-label="Contact"></button></div>
 </main>
 <nav class="dock" aria-label="Preview pages"><button class="active" data-go="home" aria-label="Home"></button><button data-go="services" aria-label="Services"></button><button data-go="story" aria-label="Our Story"></button><button data-go="portals" aria-label="Portals"></button><button data-go="contact" aria-label="Contact"></button></nav>
@@ -43,7 +43,7 @@ async function loadMaster(page){
     if(!r.ok)throw new Error('HTTP '+r.status);
     const b64=(await r.text()).replace(/\s+/g,'');
     if(!b64)throw new Error('empty asset');
-    await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src='data:image/webp;base64,'+b64;});
+    await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src='data:image/jpeg;base64,'+b64;});
     img.dataset.loaded='1';
     delete img.dataset.loading;
   }catch(err){
