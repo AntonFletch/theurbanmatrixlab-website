@@ -1,1 +1,1 @@
-UMX deployment trigger — 2026-09-12 23:58 MDT — mobile page publish
+UMX deployment trigger — 2026-09-13 00:31 MDT — automatic mobile routing + mobile-first site
