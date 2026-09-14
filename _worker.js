@@ -8,7 +8,7 @@ export default {
     const isHome = url.pathname === '/' || url.pathname === '/index.html';
 
     if (isHome && !forceDesktop && (isMobile || forceMobile)) {
-      const target = new URL('/mobile.html', url.origin);
+      const target = new URL('/mobile-v2.html', url.origin);
       for (const [key, value] of url.searchParams) {
         if (key !== 'mobile') target.searchParams.set(key, value);
       }
