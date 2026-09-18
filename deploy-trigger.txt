@@ -1,1 +1,1 @@
-deploy bridge com 2026-09-18
+deploy bridge intake function 2026-09-18
