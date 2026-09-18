@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050608">
+<meta name="description" content="Private voluntary intake for Bridge Services in Missoula, Montana.">
+<title>Bridge Access | Secure Intake</title>
+<style>
+:root{--bg:#050608;--panel:#0b0d10;--ink:#f7f4ed;--muted:#aeb4ba;--gold:#e0ad16;--gold2:#f5cd5b;--teal:#67d0c1;--red:#ff8b8b;--line:#252b31;--max:900px}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#050608,#090b0f 60%,#050608);color:var(--ink);font:16px/1.5 Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif}a{color:inherit}.wrap{width:min(var(--max),calc(100% - 30px));margin:auto}
+header{border-bottom:1px solid rgba(224,173,22,.3);background:#040506;position:sticky;top:0;z-index:20}.top{height:70px;display:flex;align-items:center;gap:14px}.logo{width:45px;height:45px;object-fit:contain}.brand{margin-right:auto}.brand strong{display:block;color:var(--gold2);letter-spacing:.14em;font-family:Georgia,serif}.brand span{font-size:.56rem;letter-spacing:.15em;color:#9fa7ac}.top a{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--gold2);text-decoration:none}
+main{padding:42px 0 70px}.intro{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:end;margin-bottom:24px}.eyebrow{color:var(--gold2);font-size:.65rem;font-weight:800;letter-spacing:.18em;text-transform:uppercase}.intro h1{font:500 clamp(2.5rem,6vw,4.7rem)/.95 Georgia,serif;margin:8px 0 10px}.intro p{color:#b6bdc1;max-width:670px}.progress{font-size:.75rem;color:#cdd2d5;border:1px solid var(--line);padding:9px 12px;background:#0a0c0f;white-space:nowrap}
+.notice{border:1px solid rgba(103,208,193,.25);background:rgba(103,208,193,.06);padding:14px 16px;color:#c9d6d4;font-size:.78rem;margin-bottom:18px}.notice b{color:var(--teal)}
+.panel{border:1px solid rgba(224,173,22,.28);background:rgba(8,10,13,.96);padding:27px}.step{display:none}.step.active{display:block}.step h2{font:500 1.9rem Georgia,serif;margin:4px 0 7px}.step .sub{color:#9ea6ab;font-size:.82rem;margin:0 0 23px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.full{grid-column:1/-1}label{display:grid;gap:6px;color:#cbd0d3;font-size:.72rem;font-weight:700;letter-spacing:.02em}input,select,textarea{width:100%;background:#050608;border:1px solid #30363d;color:#fff;padding:12px 13px;border-radius:0;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--gold)}textarea{min-height:95px;resize:vertical}.checks{display:grid;grid-template-columns:1fr 1fr;gap:9px}.check{display:flex;gap:9px;align-items:flex-start;border:1px solid #252b31;background:#090b0e;padding:11px;font-size:.76rem;color:#c6ccd0}.check input{width:auto;margin-top:3px}.check strong{display:block;color:#fff}.hint{font-size:.68rem;color:#848d92;margin-top:5px}.divider{height:1px;background:#20252a;margin:22px 0}.actions{display:flex;gap:10px;justify-content:space-between;margin-top:24px}.btn{min-height:44px;padding:0 18px;border:1px solid var(--gold);background:#080a0d;color:#fff;text-transform:uppercase;font-weight:800;font-size:.68rem;letter-spacing:.07em;cursor:pointer}.btn.primary{background:linear-gradient(#f5cc59,#d8a50e);color:#111}.btn:disabled{opacity:.45;cursor:not-allowed}.error{color:var(--red);font-size:.75rem;margin-top:12px;min-height:1.2em}.success{display:none;text-align:center;padding:40px 15px}.success.show{display:block}.success h2{font:500 2.5rem Georgia,serif;margin:9px 0}.code{display:inline-block;border:1px solid var(--gold);color:var(--gold2);padding:10px 16px;margin:12px 0;font-weight:800;letter-spacing:.08em}.hp{position:absolute;left:-10000px}
+footer{border-top:1px solid var(--line);padding:23px 0;color:#7f888d;font-size:.67rem}.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.foot a{color:var(--gold2)}
+@media(max-width:650px){.intro{grid-template-columns:1fr}.progress{justify-self:start}.grid,.checks{grid-template-columns:1fr}.full{grid-column:auto}.panel{padding:20px}.top{height:64px}.logo{width:38px;height:38px}.brand span{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap top"><img class="logo" src="/master-logo.png" alt="UMX"><div class="brand"><strong>BRIDGE ACCESS</strong><span>PRIVATE VOLUNTARY INTAKE</span></div><a href="/bridge/">Bridge Services</a><a href="/bridge/access/dashboard/">Owner Dashboard</a></div></header>
+<main><div class="wrap">
+<div class="intro"><div><div class="eyebrow">Missoula, Montana · Bridge Services</div><h1>Tell us where you are.<br>We’ll map the next step.</h1><p>This intake covers benefits, phone and digital access, housing barriers, documents, transportation, Veteran/VA support, and optional employment pathways.</p></div><div class="progress" id="progress">Step 1 of 5</div></div>
+<div class="notice"><b>Important:</b> Help is voluntary. Work is always optional. Only authorized staff may review intake records. Bridge does not make government or VA eligibility decisions. Do not enter a private sleeping location. This form is not for emergencies—call 911 when immediate safety is at risk.</div>
+<form class="panel" id="form">
+<input class="hp" name="spam_guard" autocomplete="off" tabindex="-1">
+<section class="step active" data-step="1"><div class="eyebrow">Step 1 of 5 · About you</div><h2>About you</h2><p class="sub">Use the name that appears on your identification when possible.</p><div class="grid">
+<label>Legal name *<input required name="legal_name" autocomplete="name"></label>
+<label>Preferred name<input name="preferred_name"></label>
+<label>Date of birth<input type="date" name="date_of_birth"></label>
+<label>Phone<input type="tel" name="phone" autocomplete="tel"></label>
+<label>Email<input type="email" name="email" autocomplete="email"></label>
+<label>Safe contact method<select name="safe_contact_method"><option value="phone">Phone</option><option value="text">Text</option><option value="email">Email</option><option value="other">Other / discuss privately</option></select></label>
+<label class="full">Safe contact notes<textarea name="safe_contact_notes" placeholder="Best times, voicemail concerns, alternate safe method, etc."></textarea></label>
+<label class="full">Current housing situation *<select required name="housing_status"><option value="">Choose one</option><option>Unsheltered</option><option>Emergency shelter</option><option>Temporary / couch surfing</option><option>At risk of losing housing</option><option>Housed but needs support</option><option>Prefer to discuss privately</option></select></label>
+<label class="full">General location — do not enter a private sleeping location<input name="current_location_general" placeholder="Example: Missoula / Westside / downtown area"></label>
+</div></section>
+
+<section class="step" data-step="2"><div class="eyebrow">Step 2 of 5 · Immediate needs</div><h2>What needs attention first?</h2><p class="sub">Choose only what you want Bridge to help with.</p>
+<div class="checks" data-array="urgent_needs">
+<label class="check"><input type="checkbox" value="Housing"><span><strong>Housing</strong>Applications, documents, appointments, stability.</span></label>
+<label class="check"><input type="checkbox" value="Food"><span><strong>Food / essentials</strong>Benefits or urgent resource navigation.</span></label>
+<label class="check"><input type="checkbox" value="Identification"><span><strong>ID / documents</strong>Identification, vital records, notices, verifications.</span></label>
+<label class="check"><input type="checkbox" value="Phone"><span><strong>Phone / digital access</strong>Communication, email, uploads, online portals.</span></label>
+<label class="check"><input type="checkbox" value="Transportation"><span><strong>Transportation</strong>Appointment and service-access planning.</span></label>
+<label class="check"><input type="checkbox" value="Employment"><span><strong>Employment</strong>Work access, applications, training, optional Bridge work pathway.</span></label>
+<label class="check"><input type="checkbox" value="Benefits"><span><strong>Benefits</strong>SNAP, Medicaid, Social Security, other benefit navigation.</span></label>
+<label class="check"><input type="checkbox" value="VeteranVA"><span><strong>Veteran / VA</strong>VA health, housing, benefits organization, documents, employment, re-entry support.</span></label>
+</div><div class="divider"></div><label>Anything urgent Bridge should know?<textarea name="notes" placeholder="Describe the barrier or the next step you are trying to complete."></textarea></label></section>
+
+<section class="step" data-step="3"><div class="eyebrow">Step 3 of 5 · Benefits & Veterans</div><h2>Benefits and VA navigation</h2><p class="sub">These answers help staff identify the right system. Bridge does not determine eligibility.</p><div class="grid">
+<label>SNAP status<select name="snap"><option value="">Not specified</option><option>Need to apply</option><option>Applied / pending</option><option>Receiving</option><option>Denied / needs follow-up</option><option>Not needed</option></select></label>
+<label>Medicaid status<select name="medicaid"><option value="">Not specified</option><option>Need to apply</option><option>Applied / pending</option><option>Receiving</option><option>Denied / needs follow-up</option><option>Not needed</option></select></label>
+<label>Social Security / SSI / SSDI<select name="social_security"><option value="">Not specified</option><option>Need to apply</option><option>Claim / review pending</option><option>Receiving</option><option>Denied / appeal or follow-up needed</option><option>Not needed</option></select></label>
+<label>Phone support<select name="phone_support_requested"><option value="false">No / not now</option><option value="true">Yes</option></select></label>
+<label>Veteran / former service member?<select name="veteran_status"><option value="">Prefer not to answer / not specified</option><option value="no">No</option><option value="yes">Yes</option></select></label>
+<label>Enrolled in VA health care?<select name="va_health_enrolled"><option value="">Not specified</option><option>No</option><option>Yes</option><option>Unsure</option></select></label>
+<label class="full">Veteran / VA support requested<textarea name="va_support" placeholder="Examples: DD-214, VA health enrollment, SSVF, HUD-VASH, employment, benefits organization, Veterans Justice Outreach, accredited VSO connection."></textarea></label>
+</div><div class="divider"></div><div class="checks" data-array="document_needs">
+<label class="check"><input type="checkbox" value="State ID"><span><strong>State ID / driver ID</strong></span></label>
+<label class="check"><input type="checkbox" value="Birth certificate"><span><strong>Birth certificate</strong></span></label>
+<label class="check"><input type="checkbox" value="Social Security card"><span><strong>Social Security card</strong></span></label>
+<label class="check"><input type="checkbox" value="DD-214"><span><strong>DD-214 / military records</strong></span></label>
+<label class="check"><input type="checkbox" value="Benefit notices"><span><strong>Benefit notices / verification</strong></span></label>
+<label class="check"><input type="checkbox" value="Other documents"><span><strong>Other documents</strong></span></label>
+</div></section>
+
+<section class="step" data-step="4"><div class="eyebrow">Step 4 of 5 · Work & transportation</div><h2>Optional work pathway</h2><p class="sub">Employment is optional and is never required to receive other Bridge support.</p><div class="grid">
+<label>Interested in employment help?<select name="employment_opt_in"><option value="false">No / not now</option><option value="true">Yes</option></select></label>
+<label>Availability<input name="availability" placeholder="Days, hours, one-day work, seasonal, etc."></label>
+<label>Transportation<select name="transportation"><option value="">Not specified</option><option>Reliable personal transportation</option><option>Public transportation</option><option>Bike / walk</option><option>Need transportation planning</option><option>Other</option></select></label>
+<label>Functional capabilities<input name="functional_capabilities" placeholder="Participant-chosen capabilities or limitations relevant to work"></label>
+<label class="full">Skills<input name="work_skills" placeholder="Example: cleaning, grounds, moving, painting, tools, customer service"></label>
+<label class="full">Work interests<input name="work_interests" placeholder="Example: daily labor, seasonal, property work, office support, training"></label>
+</div></section>
+
+<section class="step" data-step="5"><div class="eyebrow">Step 5 of 5 · Consent</div><h2>Review and consent</h2><p class="sub">Bridge only collects information needed to coordinate the support you selected. Separate authorization may be needed before Bridge contacts outside organizations about you.</p>
+<div class="checks">
+<label class="check"><input required type="checkbox" name="consent_privacy"><span><strong>I understand the privacy notice.</strong> I agree that Bridge may securely store the information I submit for navigation and follow-through.</span></label>
+<label class="check"><input required type="checkbox" name="consent_services"><span><strong>I choose to participate.</strong> I understand Bridge is voluntary and I may stop participating.</span></label>
+<label class="check"><input type="checkbox" name="consent_employment"><span><strong>Optional employment consent.</strong> Bridge may use the work information I provided to help with employment navigation.</span></label>
+<label class="check"><input type="checkbox" name="consent_agency_contact"><span><strong>Optional coordination consent.</strong> Bridge may discuss the minimum necessary information with a provider only when needed for my selected goals. Additional releases may still be required.</span></label>
+</div><div class="divider"></div><label>Electronic signature — enter your legal name exactly as entered in Step 1 *<input required name="signed_name"></label><div class="hint">For this intake, your signature must match the legal-name field. If you need another signing arrangement, contact Bridge directly instead of submitting online.</div></section>
+
+<div class="actions"><button type="button" class="btn" id="back" disabled>Back</button><button type="button" class="btn primary" id="next">Continue</button><button type="submit" class="btn primary" id="submit" style="display:none">Submit Intake</button></div><div class="error" id="error"></div>
+</form>
+<div class="panel success" id="success"><div class="eyebrow">Intake received</div><h2>Your Bridge intake was submitted.</h2><p>Keep this case code if you want to reference the submission later.</p><div class="code" id="caseCode">BR-</div><p><a href="/bridge/">Return to Bridge Services</a></p></div>
+</div></main>
+<footer><div class="wrap foot"><span>Bridge Access · Missoula, Montana</span><span><a href="/bridge/">Bridge Services</a> · <a href="/">TheUrbanMatrixLab.com</a></span><span>Do not use this form for emergencies. Call 911 when immediate safety is at risk.</span></div></footer>
+<script>
+const SUPA='https://xdaxbueyftyljsrhabpx.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhkYXhidWV5ZnR5bGpzcmhhYnB4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ0ODk3ODMsImV4cCI6MjEwMDA2NTc4M30.RVOa4x4t51iOYMHbBkn0kz1XHdPRvAAcnnwQ8Cx2K1c';
+const form=document.getElementById('form'),steps=[...document.querySelectorAll('.step')],progress=document.getElementById('progress'),back=document.getElementById('back'),next=document.getElementById('next'),submit=document.getElementById('submit'),err=document.getElementById('error');let step=0;
+function show(){steps.forEach((s,i)=>s.classList.toggle('active',i===step));progress.textContent='Step '+(step+1)+' of 5';back.disabled=step===0;next.style.display=step===4?'none':'inline-flex';submit.style.display=step===4?'inline-flex':'none';err.textContent='';window.scrollTo({top:0,behavior:'smooth'})}
+function validStep(){const req=[...steps[step].querySelectorAll('[required]')];for(const el of req){if(el.type==='checkbox'?!el.checked:!el.value.trim()){el.focus();err.textContent='Please complete the required fields before continuing.';return false}if(el.type==='email'&&el.value&&!el.checkValidity()){el.focus();err.textContent='Enter a valid email address.';return false}}return true}
+back.onclick=()=>{if(step>0){step--;show()}};next.onclick=()=>{if(validStep()&&step<4){step++;show()}};
+function arr(name){return [...document.querySelectorAll('[data-array="'+name+'"] input:checked')].map(x=>x.value)}
+function bool(name){const el=form.elements[name];if(!el)return false;if(el.type==='checkbox')return el.checked;return el.value==='true'}
+form.addEventListener('submit',async e=>{e.preventDefault();if(!validStep())return;if(form.spam_guard.value)return;const fd=new FormData(form),legal=String(fd.get('legal_name')||'').trim(),signed=String(fd.get('signed_name')||'').trim();if(signed!==legal){err.textContent='Electronic signature must match the legal name entered in Step 1 exactly.';form.elements.signed_name.focus();return}
+submit.disabled=true;submit.textContent='Submitting…';err.textContent='';
+const payload={
+organization_id:'0fb21e31-1a61-420d-bd92-eafa1fe1f1ee',
+legal_name:legal,preferred_name:fd.get('preferred_name')||null,date_of_birth:fd.get('date_of_birth')||null,phone:fd.get('phone')||null,email:fd.get('email')||null,
+safe_contact_method:fd.get('safe_contact_method')||'phone',safe_contact_notes:fd.get('safe_contact_notes')||null,housing_status:fd.get('housing_status'),current_location_general:fd.get('current_location_general')||null,
+urgent_needs:arr('urgent_needs'),document_needs:arr('document_needs'),
+benefits_status:{snap:fd.get('snap')||null,medicaid:fd.get('medicaid')||null,social_security:fd.get('social_security')||null,veteran_status:fd.get('veteran_status')||null,va_health_enrolled:fd.get('va_health_enrolled')||null,va_support:fd.get('va_support')||null},
+employment_opt_in:bool('employment_opt_in'),work_skills:String(fd.get('work_skills')||'').split(',').map(x=>x.trim()).filter(Boolean),work_interests:String(fd.get('work_interests')||'').split(',').map(x=>x.trim()).filter(Boolean),availability:fd.get('availability')||null,transportation:fd.get('transportation')||null,functional_capabilities:fd.get('functional_capabilities')||null,
+phone_support_requested:bool('phone_support_requested'),notes:fd.get('notes')||null,
+consent_privacy:form.elements.consent_privacy.checked,consent_services:form.elements.consent_services.checked,consent_employment:form.elements.consent_employment.checked,consent_agency_contact:form.elements.consent_agency_contact.checked,signed_name:signed,spam_guard:''
+};
+try{const r=await fetch(SUPA+'/rest/v1/bridge_intake_submissions?select=case_code',{method:'POST',headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json',Prefer:'return=representation'},body:JSON.stringify(payload)});const data=await r.json();if(!r.ok)throw new Error((data&&data.message)||'Submission failed');document.getElementById('caseCode').textContent=(data[0]&&data[0].case_code)||'Submitted';form.style.display='none';progress.style.display='none';document.getElementById('success').classList.add('show')}catch(ex){err.textContent='The intake could not be submitted. Please check the required fields and try again.';submit.disabled=false;submit.textContent='Submit Intake'}}
+);
+</script>
+</body></html>
