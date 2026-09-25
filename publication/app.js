@@ -35,6 +35,12 @@ function mdParagraphs(md){
       if(body) body.innerHTML=mdParagraphs(p.body_md);
     }
 
+    const teasers=await get('publication_teasers?select=slug,title,excerpt,access_tier&is_visible=eq.true&order=sort_order.asc');
+    const locked=document.getElementById('locked-list');
+    if(locked&&teasers.length){
+      locked.innerHTML=teasers.map(t=>'<article><span>'+esc(t.access_tier).toUpperCase()+'</span><h3>'+esc(t.title)+'</h3><p>'+esc(t.excerpt)+'</p><a href="/publication/library.html">ENTER THE DOOR</a></article>').join('');
+    }
+
     const plans=await get('publication_plans?select=tier,price_cents,billing_interval&is_active=eq.true');
     for(const p of plans){
       const el=document.querySelector('[data-price="'+p.tier+'"]');
