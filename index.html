@@ -3,185 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#050508">
-<meta name="description" content="The Urban Matrix Lab LLC — a Missoula business being built in real time. Systems, equipment, team, operations, and property-service capabilities are currently in development.">
-<title>The Urban Matrix Lab LLC | The Build Is Underway</title>
+<meta name="theme-color" content="#060606">
+<meta name="description" content="The Urban Matrix Lab LLC provides dependable property maintenance, lawn and seasonal care, inspections, cleanup, cleaning, handyman support, and property-manager field services in Missoula, Montana.">
+<title>The Urban Matrix Lab LLC | Building Better Spaces</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style>
-:root{
-  --black:#040405;--black2:#09080b;--panel:#0d0b10;--gold:#d9a94f;--gold2:#f0c96f;
-  --purple:#3d1459;--purple2:#6d278f;--ink:#f6f0e6;--muted:#bbb0bd;--line:rgba(217,169,79,.36);
-  --max:1500px
-}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#030304;color:var(--ink);font-family:Inter,Arial,Helvetica,sans-serif;line-height:1.5;overflow-x:hidden}
-a{color:inherit;text-decoration:none}button{font:inherit}.wrap{width:min(var(--max),calc(100% - 48px));margin:auto}
-.site-header{position:sticky;top:0;z-index:80;background:rgba(3,3,4,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(217,169,79,.24)}
-.nav{height:82px;display:flex;align-items:center;gap:34px}.brand{display:flex;align-items:center;margin-right:auto}.brand img{width:210px;max-height:58px;object-fit:contain;object-position:left center}
-.links{display:flex;gap:30px;align-items:center;font-size:.72rem;letter-spacing:.09em;text-transform:uppercase}.links a{padding:31px 0 27px;border-bottom:2px solid transparent}.links a:hover,.links a.active{color:var(--gold2);border-color:var(--gold)}
-.employee{border:1px solid var(--gold)!important;padding:12px 18px!important;color:var(--gold2);background:linear-gradient(135deg,rgba(61,20,89,.45),rgba(15,9,20,.95))}
-.menu{display:none;margin-left:auto;border:1px solid var(--line);background:#0b0910;color:var(--gold2);padding:9px 12px;border-radius:6px}
-.mobile{display:none;position:fixed;z-index:70;top:82px;left:0;right:0;background:#070609;border-bottom:1px solid var(--gold);padding:10px 20px}.mobile.open{display:grid}.mobile a{padding:13px 3px;border-bottom:1px solid #1d1820;text-transform:uppercase;font-size:.75rem;letter-spacing:.08em}
-
-.hero{position:relative;min-height:680px;overflow:hidden;border-bottom:1px solid var(--gold)}
-.hero::before{content:"";position:absolute;inset:0;background:
- linear-gradient(90deg,rgba(1,1,2,.95) 0%,rgba(4,2,7,.78) 27%,rgba(6,3,8,.25) 56%,rgba(2,2,3,.42) 100%),
- linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.5)),
- url('/revamp-preview/assets/home.webp') center/cover no-repeat;
- filter:saturate(.9) contrast(1.1) brightness(.8);transform:scale(1.02)}
-.hero::after{content:"";position:absolute;inset:0;background:
- radial-gradient(circle at 62% 32%,rgba(244,193,95,.12),transparent 24%),
- repeating-linear-gradient(90deg,transparent 0 89px,rgba(217,169,79,.025) 90px),
- repeating-linear-gradient(0deg,transparent 0 89px,rgba(108,39,143,.018) 90px);
- pointer-events:none}
-.ancient-rail{position:absolute;z-index:3;left:0;top:0;bottom:0;width:min(29vw,420px);padding:88px 34px 40px;background:linear-gradient(90deg,rgba(3,2,4,.96),rgba(3,2,4,.8) 72%,transparent);display:flex;flex-direction:column;justify-content:flex-end}
-.ancient-mark{font-family:"Times New Roman",serif;font-size:5.4rem;line-height:1;color:var(--gold2);text-shadow:0 0 26px rgba(217,169,79,.25);opacity:.94}
-.glyphs{display:flex;gap:12px;align-items:center;margin:8px 0 18px}.glyph{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(217,169,79,.48);color:var(--gold2);background:rgba(18,8,24,.65);cursor:pointer}
-.ancient-list{display:grid;gap:8px;font-family:Georgia,serif;color:#e7bd67;letter-spacing:.12em;font-size:.8rem;text-transform:uppercase}.ancient-list span{display:block}
-.hero-content{position:relative;z-index:4;min-height:680px;display:grid;grid-template-columns:minmax(260px,1fr) minmax(520px,1.45fr) minmax(220px,.7fr);align-items:center;gap:24px;padding:50px 0 62px}
-.hero-center{text-align:center;grid-column:2}.hero-center img{width:min(440px,78%);margin:0 auto 4px;filter:drop-shadow(0 6px 24px rgba(0,0,0,.55))}
-.hero-center h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(2rem,3.4vw,4rem);font-weight:500;letter-spacing:.08em;margin:0;color:#f5e6c3;text-shadow:0 3px 20px #000}.hero-center h1 strong{display:block;font-size:clamp(1.15rem,1.55vw,1.8rem);letter-spacing:.12em;font-weight:500;margin-top:5px}
-.hero-tag{font-family:Georgia,serif;font-size:clamp(1rem,1.4vw,1.35rem);letter-spacing:.08em;margin:16px auto 20px;max-width:720px;color:#f1dfbd}.hero-tag span{display:block}
-.build-badge{display:inline-block;padding:12px 32px;border:1px solid var(--gold);background:linear-gradient(135deg,rgba(56,13,80,.9),rgba(14,7,19,.96));font-family:Georgia,serif;font-size:1.05rem;letter-spacing:.11em;color:#f7d987;box-shadow:0 12px 30px rgba(0,0,0,.35)}
-.build-sub{margin-top:8px;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#ddd1dd}
-.hero-right{grid-column:3;text-align:right;align-self:start;padding-top:46px;font-family:Georgia,serif;letter-spacing:.1em;text-transform:uppercase;color:#f7ead1}.hero-right span{display:block;margin:4px 0}.hero-right small{display:block;margin-top:16px;color:#e1b65b}
-.status-chip{position:absolute;z-index:5;right:30px;bottom:24px;border:1px solid rgba(217,169,79,.45);padding:9px 13px;background:rgba(2,2,3,.72);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:#e8d5ac}
-
-.service-strip{background:#040405;border-bottom:1px solid var(--gold)}.service-grid{display:grid;grid-template-columns:repeat(6,1fr)}.service{min-height:120px;display:grid;place-items:center;text-align:center;padding:18px 10px;border-right:1px solid rgba(109,39,143,.34)}.service:last-child{border-right:0}.service .ico{font-size:2rem;color:var(--gold);line-height:1}.service b{display:block;margin-top:9px;font-size:.72rem;line-height:1.25;text-transform:uppercase;letter-spacing:.05em}.service small{display:block;color:#a99eaa;margin-top:3px;font-size:.58rem}
-.status-band{background:linear-gradient(90deg,#100917,#050506 45%,#09050d);border-top:1px solid #151018;border-bottom:1px solid var(--gold)}.status-row{display:grid;grid-template-columns:260px 1fr auto;align-items:center;gap:28px;min-height:106px}.coming{font-family:Georgia,serif;font-size:1.3rem;color:var(--gold2);letter-spacing:.07em;border-right:1px solid var(--line);padding-right:28px}.coming .gear{font-family:Arial;margin-right:12px}.status-copy b{display:block;font-family:Georgia,serif;font-weight:500;font-size:1.05rem;letter-spacing:.09em}.status-copy span{display:block;color:#c1b7c4;font-size:.82rem;margin-top:3px}.journey-btn{border:1px solid var(--gold);background:linear-gradient(135deg,#3a1054,#190825);color:#f8dc91;padding:14px 24px;text-transform:uppercase;letter-spacing:.08em;font-size:.68rem}
-
-.features{padding:12px 0 18px;background:#050506}.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.feature{min-height:355px;position:relative;overflow:hidden;border:1px solid rgba(217,169,79,.35);display:flex;align-items:flex-end}.feature::before{content:"";position:absolute;inset:0;background-position:center;background-size:cover;filter:saturate(.85) brightness(.68);transition:.35s}.feature:hover::before{transform:scale(1.025);filter:saturate(.95) brightness(.76)}.feature::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.88) 72%,#050506)}
-.f-build::before{background-image:url('/revamp-preview/assets/services.webp')}.f-humanity::before{background-image:url('/revamp-preview/assets/story.webp')}.f-vision::before{background-image:url('/revamp-preview/assets/portals.webp')}
-.feature-body{position:relative;z-index:2;text-align:center;width:100%;padding:26px}.feature h2{font-family:Georgia,serif;font-weight:500;letter-spacing:.08em;margin:0 0 11px;font-size:1.65rem}.feature p{margin:0 auto 17px;max-width:420px;color:#dfd5df;font-size:.8rem}.feature a{display:inline-block;border:1px solid var(--gold);padding:9px 18px;color:#f1ca75;text-transform:uppercase;font-size:.64rem;letter-spacing:.08em}
-.quote-band{min-height:96px;display:flex;align-items:center;justify-content:center;gap:24px;text-align:center;background:linear-gradient(90deg,#100713,#050506 35%,#050506 65%,#110812);border-top:1px solid rgba(217,169,79,.25);border-bottom:1px solid rgba(217,169,79,.3)}.quote-symbol{font-size:2rem;color:var(--gold)}.quote-band blockquote{font-family:Georgia,serif;color:#f0d5a2;letter-spacing:.08em;font-size:1.05rem;margin:0}
-
-.tile-row{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--gold)}.tile{height:190px;position:relative;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;border-right:1px solid rgba(217,169,79,.25)}.tile:last-child{border-right:0}.tile::before{content:"";position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.58) saturate(.75)}.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.8))}
-.t1::before{background-image:url('/revamp-preview/assets/contact.webp')}.t2::before{background-image:url('/revamp-preview/assets/services.webp')}.t3::before{background-image:url('/revamp-preview/assets/story.webp')}.t4::before{background-image:url('/revamp-preview/assets/portals.webp')}.t5::before{background-image:url('/revamp-preview/assets/home.webp')}
-.tile span{position:relative;z-index:2;font-family:Georgia,serif;font-size:1.1rem;letter-spacing:.08em;margin-bottom:28px;text-transform:uppercase}
-footer{background:#020203;border-top:1px solid #131016}.foot{min-height:110px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:30px}.foot img{width:185px}.footlinks{display:flex;gap:18px;font-size:.64rem;color:#b8aeb9;text-transform:uppercase;letter-spacing:.08em}.footright{text-align:right;font-size:.62rem;color:#8e858f}.footright strong{display:block;color:#d6aa56;margin-bottom:4px}.copy{border-top:1px solid #151116;text-align:center;color:#6f6871;font-size:.55rem;padding:10px 20px 15px}
-
-.symbol-modal{position:fixed;z-index:100;inset:0;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;padding:20px}.symbol-modal.open{display:flex}.symbol-card{width:min(520px,100%);background:#09070d;border:1px solid var(--gold);padding:26px;box-shadow:0 25px 70px #000}.symbol-card button{float:right;background:transparent;border:0;color:#fff;font-size:1.4rem}.symbol-card h2{font-family:Georgia,serif;color:var(--gold2);font-weight:500;margin:0 0 12px}.symbol-card p{color:#cfc4d1;font-size:.9rem;line-height:1.65}
-
-@media(max-width:1100px){.links{gap:18px}.hero-content{grid-template-columns:230px 1fr 190px}.ancient-rail{width:260px}.service-grid{grid-template-columns:repeat(3,1fr)}.service:nth-child(-n+3){border-bottom:1px solid rgba(109,39,143,.34)}.status-row{grid-template-columns:210px 1fr auto}.feature{min-height:320px}}
-@media(max-width:780px){.wrap{width:calc(100% - 28px)}.site-header{position:sticky}.nav{height:68px}.brand img{width:170px}.links{display:none}.menu{display:block}.mobile{top:68px}.hero{min-height:690px}.hero::before{background:linear-gradient(180deg,rgba(1,1,2,.5),rgba(2,1,3,.84) 58%,#040405 100%),url('/revamp-preview/assets/home.webp') center top/cover no-repeat}.ancient-rail{display:none}.hero-content{min-height:690px;display:flex;flex-direction:column;justify-content:flex-end;text-align:center;padding:300px 0 48px}.hero-center{grid-column:auto}.hero-center img{width:245px}.hero-center h1{font-size:2rem}.hero-center h1 strong{font-size:.95rem}.hero-tag{font-size:.88rem;max-width:340px;margin:10px auto 15px}.build-badge{font-size:.85rem;padding:10px 17px}.build-sub{font-size:.58rem}.hero-right{display:none}.status-chip{right:14px;bottom:10px;font-size:.52rem}.service-grid{grid-template-columns:repeat(2,1fr)}.service{min-height:105px;border-bottom:1px solid rgba(109,39,143,.34)}.service:nth-child(odd){border-right:1px solid rgba(109,39,143,.34)}.service:nth-child(even){border-right:0}.status-row{grid-template-columns:1fr;gap:12px;padding:22px 0;text-align:center}.coming{border-right:0;border-bottom:1px solid var(--line);padding:0 0 14px}.journey-btn{justify-self:center}.feature-grid{grid-template-columns:1fr}.feature{min-height:300px}.quote-band{padding:22px 20px}.quote-symbol{display:none}.quote-band blockquote{font-size:.9rem}.tile-row{grid-template-columns:1fr 1fr}.tile{height:150px}.tile:last-child{grid-column:1/-1}.foot{grid-template-columns:1fr;text-align:center;padding:24px 0}.foot img{margin:auto}.footlinks{justify-content:center;flex-wrap:wrap}.footright{text-align:center}}
+:root{--gold:#e0ad16;--gold2:#f4c536;--black:#050505;--char:#0d0d0d;--white:#fff;--muted:#b9b9b9;--line:#272727;--max:1180px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--black);color:#fff;font-family:Arial,Helvetica,sans-serif;line-height:1.5}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}.wrap{width:min(var(--max),calc(100% - 40px));margin:auto}
+header{height:76px;background:#020202;position:sticky;top:0;z-index:50;border-bottom:1px solid #131313}.nav{height:100%;display:flex;align-items:center;gap:34px}.brand{display:flex;align-items:center;gap:13px;margin-right:auto}.mark{width:41px;height:48px;display:flex;align-items:flex-end;gap:3px}.mark i{display:block;background:var(--gold);width:8px}.mark i:nth-child(1){height:29px}.mark i:nth-child(2){height:43px}.mark i:nth-child(3){height:35px}.mark i:nth-child(4){height:22px}.brandtext{font-weight:800;letter-spacing:.18em;font-size:.72rem;line-height:1.12}.brandtext small{display:block;font-size:.55rem;letter-spacing:.28em;margin-top:4px;color:#d8d8d8}.links{display:flex;align-items:center;gap:31px;font-size:.69rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}.links a{padding:29px 0 23px;border-bottom:2px solid transparent}.links a:hover,.links a.active{border-color:var(--gold);color:#fff}.quote-top{border:1px solid var(--gold)!important;padding:12px 18px!important;color:var(--gold2)!important}.menu{display:none;background:none;border:0;color:var(--gold2);font-size:1.8rem}.mobile{display:none;position:fixed;z-index:60;top:76px;left:0;right:0;background:#050505;border-bottom:1px solid var(--gold);padding:12px 20px}.mobile.open{display:grid}.mobile a{padding:14px 4px;border-bottom:1px solid #1d1d1d;text-transform:uppercase;font-size:.75rem;letter-spacing:.08em}
+.hero{position:relative;min-height:540px;overflow:hidden;background:#080808}.hero-bg{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.93) 0%,rgba(0,0,0,.80) 42%,rgba(0,0,0,.28) 72%,rgba(0,0,0,.48) 100%),url('https://upload.wikimedia.org/wikipedia/commons/d/d5/Missoula%2C_Montana.jpg') center/cover no-repeat;filter:saturate(.62) contrast(1.08)}.hero:after{content:"";position:absolute;inset:auto 0 0;height:92px;background:linear-gradient(180deg,transparent,#050505)}.hero-copy{position:relative;z-index:2;padding:58px 0 70px;max-width:610px}.kicker{color:var(--gold2);font-size:.69rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.hero h1{font-size:clamp(2.7rem,5.3vw,4.55rem);line-height:.96;margin:15px 0 20px;text-transform:uppercase;letter-spacing:.01em}.hero p{color:#e0e0e0;max-width:560px;font-size:.97rem;line-height:1.65}.actions{display:flex;gap:15px;margin-top:26px;flex-wrap:wrap}.btn{display:inline-flex;align-items:center;justify-content:center;min-width:150px;height:43px;border:1px solid var(--gold);font-size:.7rem;text-transform:uppercase;letter-spacing:.04em;font-weight:800;transition:.18s}.btn.fill{background:linear-gradient(#f0c32a,#d9a90d);color:#0a0a0a}.btn.outline{color:var(--gold2);background:rgba(0,0,0,.35)}.btn:hover{transform:translateY(-2px)}
+.trust{background:#050505;border-top:1px solid #111;border-bottom:1px solid #171717}.trustgrid{display:grid;grid-template-columns:repeat(4,1fr);min-height:102px}.trustitem{display:flex;gap:14px;align-items:center;padding:22px 18px;border-right:1px solid #181818}.trustitem:last-child{border-right:0}.ico{width:39px;height:39px;display:grid;place-items:center;color:var(--gold2);border:1px solid var(--gold);border-radius:50%;font-size:1.05rem;flex:0 0 auto}.trustitem b{display:block;font-size:.78rem;letter-spacing:.04em}.trustitem span{display:block;color:#b3b3b3;font-size:.67rem;margin-top:3px}
+.services{background:#f4f4f2;color:#101010;padding:48px 0 56px}.sectionhead{text-align:center;margin-bottom:28px}.sectionhead .kicker{color:#c49307}.sectionhead h2{font-size:2rem;margin:8px 0 9px;text-transform:uppercase}.goldline{width:42px;height:2px;background:var(--gold);margin:0 auto}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.card{background:#fff;border:1px solid #ddd;box-shadow:0 6px 18px rgba(0,0,0,.05);overflow:hidden}.photo{height:145px;background-position:center;background-size:cover;position:relative}.photo:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(0,0,0,.30))}.p1{background-image:url('https://images.unsplash.com/photo-1581783898377-1c85bf937427?auto=format&fit=crop&w=700&q=80')}.p2{background-image:url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=700&q=80')}.p3{background-image:url('https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=700&q=80')}.p4{background-image:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=700&q=80')}.cardicon{width:50px;height:50px;border-radius:50%;background:#050505;color:var(--gold2);border:2px solid var(--gold);display:grid;place-items:center;font-size:1.1rem;margin:-25px auto 10px;position:relative;z-index:2}.cardbody{padding:0 18px 21px}.card h3{font-size:1.03rem;margin:0 0 8px}.card p{font-size:.76rem;line-height:1.55;color:#3b3b3b;margin:0}.service-note{text-align:center;color:#555;font-size:.73rem;margin-top:20px}
+.lower{display:grid;grid-template-columns:1fr 1fr;background:#0b0b0b;border-top:1px solid #171717}.about,.contact{min-height:430px;padding:48px max(32px,calc((100vw - var(--max))/2));position:relative}.about{background:linear-gradient(90deg,rgba(4,4,4,.98),rgba(5,5,5,.85)),url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=70') center/cover}.contact{background:#0d0d0d}.lower .kicker{color:var(--gold2)}.lower h2{font-size:1.75rem;line-height:1.08;margin:9px 0 12px;text-transform:uppercase}.about .goldbar,.contact .goldbar{width:39px;height:2px;background:var(--gold);margin:0 0 18px}.about p{color:#d0d0d0;max-width:490px;font-size:.84rem;line-height:1.65}.about .btn{margin-top:10px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.contact input,.contact textarea{width:100%;background:#111;border:1px solid #373737;color:#fff;padding:11px 12px;outline:none}.contact input:focus,.contact textarea:focus{border-color:var(--gold)}.contact textarea{min-height:92px;resize:vertical;margin-top:9px}.contact .btn{margin-top:9px;border:0;min-width:175px}.status{font-size:.7rem;color:#bdbdbd;margin-top:8px;min-height:1em}.hp{position:absolute;left:-9999px}
+footer{background:#020202;border-top:1px solid #151515}.foot{min-height:102px;display:grid;grid-template-columns:1.15fr 1fr 1fr auto;gap:22px;align-items:center}.footbrand{display:flex;align-items:center;gap:12px}.foot .brandtext{font-size:.67rem}.footitem{display:flex;gap:9px;align-items:center;color:#d4d4d4;font-size:.69rem}.footitem .dot{color:var(--gold2);font-size:1.15rem}.footright{font-size:.63rem;text-transform:uppercase;color:var(--gold2);letter-spacing:.08em;text-align:right}.copy{text-align:center;color:#777;font-size:.58rem;padding:0 15px 18px}
+@media(max-width:900px){header{height:66px}.nav{gap:12px}.links{display:none}.menu{display:block;margin-left:auto}.mobile{top:66px}.hero{min-height:555px}.hero-copy{padding-top:54px;max-width:540px}.hero h1{font-size:3.25rem}.trustgrid{grid-template-columns:1fr 1fr}.trustitem:nth-child(2){border-right:0}.trustitem:nth-child(-n+2){border-bottom:1px solid #181818}.cards{grid-template-columns:1fr 1fr}.lower{grid-template-columns:1fr}.about,.contact{min-height:0;padding:42px max(20px,calc((100vw - 720px)/2))}.foot{grid-template-columns:1fr 1fr;padding:20px 0}.footbrand{grid-column:1/-1}.footright{text-align:left}}
+@media(max-width:560px){.wrap{width:calc(100% - 28px)}.brandtext{font-size:.62rem}.brandtext small{font-size:.47rem}.mark{width:33px;height:41px}.mark i{width:7px}.hero{min-height:500px}.hero-bg{background-position:64% center}.hero-copy{padding:40px 0 48px}.kicker{font-size:.6rem}.hero h1{font-size:2.55rem;margin:12px 0 15px}.hero p{font-size:.82rem;max-width:345px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{min-width:0;height:41px;font-size:.62rem}.trustgrid{min-height:0}.trustitem{padding:16px 12px;gap:10px}.ico{width:34px;height:34px}.trustitem b{font-size:.68rem}.trustitem span{font-size:.57rem}.services{padding:38px 0 43px}.sectionhead{margin-bottom:22px}.sectionhead h2{font-size:1.55rem}.cards{gap:9px}.photo{height:102px}.cardbody{padding:0 10px 14px}.cardicon{width:42px;height:42px;margin-top:-21px;font-size:.9rem}.card h3{font-size:.82rem;line-height:1.15}.card p{font-size:.62rem;line-height:1.4}.service-note{font-size:.63rem}.lower h2{font-size:1.45rem}.about p{font-size:.75rem}.formgrid{grid-template-columns:1fr}.contact input,.contact textarea{padding:10px;font-size:.78rem}.foot{grid-template-columns:1fr;padding:18px 0;gap:10px}.footbrand{grid-column:auto}.footright{text-align:left}.copy{font-size:.52rem}}
 </style>
 </head>
 <body>
-<header class="site-header" id="home">
-  <div class="wrap nav">
-    <a class="brand" href="#home" aria-label="The Urban Matrix Lab home"><img src="/master-logo.png" alt="UMX — The Urban Matrix Lab LLC"></a>
-    <nav class="links" aria-label="Main navigation">
-      <a class="active" href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#services">Services</a>
-      <a href="#build">The Build</a>
-      <a href="/humanity.html">Humanity</a>
-      <a href="#journey">Journey</a>
-      <a href="#contact">Contact</a>
-      <a class="employee" href="/login.html">Employee Login</a>
-    </nav>
-    <button class="menu" id="menuBtn" aria-label="Open navigation">☰</button>
-  </div>
-</header>
-<nav class="mobile" id="mobileNav" aria-label="Mobile navigation">
-  <a href="#home">Home</a><a href="#about">About</a><a href="#services">Services</a><a href="#build">The Build</a><a href="/humanity.html">Humanity</a><a href="#journey">Journey</a><a href="#contact">Contact</a><a href="/login.html">Employee Login</a>
-</nav>
-
+<header id="home"><div class="wrap nav"><a class="brand" href="#home"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brandtext">THE URBAN<br>MATRIX LAB<small>LLC</small></span></a><nav class="links" aria-label="Main navigation"><a class="active" href="#home">Home</a><a href="#services">Services</a><a href="#about">About</a><a href="#projects">Projects</a><a href="/humanity.html">Humanity</a><a href="#contact">Launch Status</a><a class="quote-top" href="#contact">Coming Soon</a></nav><button class="menu" id="menuBtn" aria-label="Open menu">☰</button></div></header>
+<div class="mobile" id="mobileNav"><a href="#home">Home</a><a href="#services">Services</a><a href="#about">About</a><a href="#projects">Projects</a><a href="/humanity.html">Humanity</a><a href="#contact">Launch Status</a><a href="/login.html">Employee Login</a></div>
 <main>
-<section class="hero" id="about">
-  <aside class="ancient-rail" aria-label="UMX principles">
-    <div class="ancient-mark">𓂀</div>
-    <div class="glyphs">
-      <button class="glyph" data-symbol="wedjat" aria-label="Meaning of Wedjat symbol">𓂀</button>
-      <button class="glyph" data-symbol="djed" aria-label="Meaning of Djed symbol">𓊽</button>
-      <button class="glyph" data-symbol="ankh" aria-label="Meaning of Ankh symbol">𓋹</button>
-      <button class="glyph" data-symbol="geometry" aria-label="Meaning of geometry symbol">△</button>
-    </div>
-    <div class="ancient-list"><span>Discipline</span><span>Creation</span><span>Restoration</span><span>Humanity</span><span>Opportunity</span><span>A Better Tomorrow</span></div>
-  </aside>
-  <div class="wrap hero-content">
-    <div></div>
-    <div class="hero-center">
-      <img src="/master-logo.png" alt="UMX">
-      <h1>THE URBAN MATRIX LAB LLC<strong>Engineering Intelligent Spaces. Restoring Better Living.</strong></h1>
-      <div class="hero-tag"><span>Honor in Every Task.</span><span>Strength in Every Service.</span></div>
-      <a class="build-badge" href="#build">THE BUILD IS UNDERWAY</a>
-      <div class="build-sub">A business being built in real time · Missoula, Montana</div>
-    </div>
-    <div class="hero-right"><span>Real Work</span><span>Real People</span><span>Real Solutions</span><small>Missoula, Montana</small></div>
-  </div>
-  <div class="status-chip">Coming Soon · Not Yet Accepting Service Clients</div>
-</section>
-
-<section class="service-strip" id="services">
-  <div class="service-grid">
-    <div class="service"><div><div class="ico">⌂</div><b>Property<br>Maintenance</b><small>Keep It Strong</small></div></div>
-    <div class="service"><div><div class="ico">♒</div><b>Lawn &amp;<br>Seasonal</b><small>Clean &amp; Ready</small></div></div>
-    <div class="service"><div><div class="ico">▣</div><b>Inspections &amp;<br>Condition Reports</b><small>See the Truth</small></div></div>
-    <div class="service"><div><div class="ico">▥</div><b>Junk Removal<br>&amp; Cleaning</b><small>Clear the Space</small></div></div>
-    <div class="service"><div><div class="ico">⚒</div><b>Handyman<br>Services</b><small>Fix What Matters</small></div></div>
-    <div class="service"><div><div class="ico">♜</div><b>Property Manager<br>Support</b><small>Document &amp; Follow Through</small></div></div>
-  </div>
-</section>
-
-<section class="status-band" id="build">
-  <div class="wrap status-row">
-    <div class="coming"><span class="gear">⚙</span>COMING SOON</div>
-    <div class="status-copy"><b>UMX IS CURRENTLY BEING BUILT.</b><span>We are developing our systems, equipment, team, and operations. We are not yet accepting new service clients.</span></div>
-    <a class="journey-btn" href="#journey">Follow the Journey →</a>
-  </div>
-</section>
-
-<section class="features" id="journey">
-  <div class="wrap feature-grid">
-    <article class="feature f-build"><div class="feature-body"><h2>THE BUILD</h2><p>Follow the real-time build of UMX — from the truck and tools to the systems, team, standards, and first contracts.</p><a href="#services">See the Journey →</a></div></article>
-    <article class="feature f-humanity"><div class="feature-body"><h2>HUMANITY CENTER</h2><p>People. Opportunity. Support. UMX Humanity Center is being developed to create real pathways for work, stability, and better living.</p><a href="/humanity.html">Learn More →</a></div></article>
-    <article class="feature f-vision"><div class="feature-body"><h2>OUR VISION</h2><p>A cleaner, safer, stronger Missoula. Restoring spaces. Creating opportunity. Building a system that actually works.</p><a href="#about">The Bigger Picture →</a></div></article>
-  </div>
-</section>
-
-<section class="quote-band"><span class="quote-symbol">𓅃</span><blockquote>“HONOR IN EVERY TASK. STRENGTH IN EVERY SERVICE.”</blockquote><span class="quote-symbol">𓅃</span></section>
-
-<section class="tile-row" aria-label="UMX pillars">
-  <a class="tile t1" href="#home"><span>Missoula Montana</span></a>
-  <a class="tile t2" href="#services"><span>Services</span></a>
-  <a class="tile t3" href="#build"><span>The Team</span></a>
-  <a class="tile t4" href="#journey"><span>Opportunity</span></a>
-  <a class="tile t5" href="/humanity.html"><span>Community</span></a>
-</section>
+<section class="hero"><div class="hero-bg"></div><div class="wrap"><div class="hero-copy"><div class="kicker">Missoula, Montana</div><h1>Coming<br>Soon.</h1><p>The Urban Matrix Lab LLC is completing its operational launch. We are not accepting new service clients at this time.</p><div class="actions"><a class="btn fill" href="#services">Services Being Prepared</a><a class="btn outline" href="#contact">Launch Status</a></div></div></div></section>
+<section class="trust"><div class="wrap trustgrid"><div class="trustitem"><span class="ico">◇</span><div><b>RELIABLE</b><span>Quality work you can count on.</span></div></div><div class="trustitem"><span class="ico">⌂</span><div><b>EXPERIENCED</b><span>Real-world property support.</span></div></div><div class="trustitem"><span class="ico">⚙</span><div><b>EFFICIENT</b><span>Clear systems and follow-through.</span></div></div><div class="trustitem"><span class="ico">◎</span><div><b>COMMITTED</b><span>Service, integrity, and results.</span></div></div></div></section>
+<section class="services" id="services"><div class="wrap"><div class="sectionhead"><div class="kicker">In Development</div><h2>Services Being Prepared</h2><div class="goldline"></div></div><div class="cards"><article class="card"><div class="photo p1"></div><div class="cardicon">⚒</div><div class="cardbody"><h3>Property Maintenance</h3><p>Routine upkeep, lawful minor repairs, punch lists, turnover support, and preventative property care.</p></div></article><article class="card"><div class="photo p2"></div><div class="cardicon">⌂</div><div class="cardbody"><h3>Lawn &amp; Seasonal</h3><p>Mowing, trimming, cleanup, seasonal preparation, and recurring exterior property support.</p></div></article><article class="card"><div class="photo p3"></div><div class="cardicon">◇</div><div class="cardbody"><h3>Inspections &amp; Field Support</h3><p>Photo-based condition documentation, site checks, observations, and property-manager field support.</p></div></article><article class="card"><div class="photo p4"></div><div class="cardicon">▤</div><div class="cardbody"><h3>Cleaning &amp; Turnovers</h3><p>Move-ready cleaning, junk-removal support, resets, and organized turnover assistance.</p></div></article></div><p class="service-note">These services are being prepared for launch and are not currently available for booking.</p></div></section>
+<section class="lower" id="projects"><div class="about" id="about"><div class="kicker">About Us</div><h2>Built on Integrity.<br>Focused on Impact.</h2><div class="goldbar"></div><p>The Urban Matrix Lab LLC is a Missoula-based property-services company built around dependable work, clear documentation, organized systems, and respectful service. We bring structure, follow-through, and practical problem-solving to every property we support.</p><a class="btn outline" href="#services">Learn More</a></div><div class="contact" id="contact"><div class="kicker">Launch Status</div><h2>Not Accepting Clients</h2><div class="goldbar"></div><p style="color:#d0d0d0;max-width:500px;font-size:.9rem;line-height:1.7">Our systems, equipment, and service operations are being finalized to ensure UMX launches to the standard we expect.</p><p style="color:#d0d0d0;max-width:500px;font-size:.9rem;line-height:1.7"><strong style="color:#efc53b">Service requests are temporarily closed.</strong> Please check back for launch updates.</p><div style="margin-top:28px;color:#efc53b;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Honor in Every Task. Strength in Every Service.</div></div></section>
 </main>
-
-<footer id="contact">
-  <div class="wrap foot">
-    <a href="#home"><img src="/master-logo.png" alt="The Urban Matrix Lab LLC"></a>
-    <div class="footlinks"><a href="/privacy.html">Privacy</a><a href="/terms.html">Terms</a><a href="mailto:theurbanmatrixlab@gmail.com">Contact</a><a href="/login.html">Employee Login</a></div>
-    <div class="footright"><strong>Missoula, Montana</strong>Business build in progress · Service intake closed</div>
-  </div>
-  <div class="copy">© 2026 The Urban Matrix Lab LLC. All rights reserved.</div>
-</footer>
-
-<div class="symbol-modal" id="symbolModal" aria-hidden="true">
-  <div class="symbol-card">
-    <button id="symbolClose" aria-label="Close">×</button>
-    <h2 id="symbolTitle"></h2>
-    <p id="symbolText"></p>
-  </div>
-</div>
-
+<footer><div class="wrap foot"><div class="footbrand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brandtext">THE URBAN<br>MATRIX LAB<small>LLC</small></span></div><div class="footitem"><span class="dot">●</span><span>Missoula, Montana<br>launch coming soon</span></div><div class="footitem"><span class="dot">↗</span><span>Service requests<br>temporarily closed</span></div><div class="footright"><a href="/login.html">Employee Login</a></div></div><div class="copy">© 2026 The Urban Matrix Lab LLC. All rights reserved. · Hero photo: Missoula, Montana — Quintin Soloviev, CC BY 4.0.</div></footer>
 <script>
-const menuBtn=document.getElementById('menuBtn'),mobileNav=document.getElementById('mobileNav');
-menuBtn.addEventListener('click',()=>mobileNav.classList.toggle('open'));
-mobileNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobileNav.classList.remove('open')));
-const symbolData={
- wedjat:['The Wedjat — Restoration & Wholeness','The ancient Egyptian Wedjat, or Eye of Horus, was associated with protection, restoration and wholeness. Within UMX it represents awareness, accountability and learning from what humanity built before us.'],
- djed:['The Djed — Stability & Endurance','The djed pillar represented stability and endurance in ancient Egypt. Within UMX it represents structure: the idea that lasting opportunity requires a dependable foundation.'],
- ankh:['The Ankh — Life & Human Responsibility','The ankh is one of the best-known ancient Egyptian signs associated with life. Within UMX it points back to the living person — the people who work, serve, build, learn and act.'],
- geometry:['Geometry — Order & Intention','Geometric forms have expressed measurement, proportion, balance and order across many traditions. Within UMX the idea is simple: understand relationships, then build with intention.']
-};
-const modal=document.getElementById('symbolModal'),title=document.getElementById('symbolTitle'),text=document.getElementById('symbolText');
-document.querySelectorAll('[data-symbol]').forEach(b=>b.addEventListener('click',()=>{const d=symbolData[b.dataset.symbol];title.textContent=d[0];text.textContent=d[1];modal.classList.add('open');modal.setAttribute('aria-hidden','false')}));
-document.getElementById('symbolClose').addEventListener('click',()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true')});
-modal.addEventListener('click',e=>{if(e.target===modal){modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){modal.classList.remove('open');modal.setAttribute('aria-hidden','true')}});
+const mb=document.getElementById('menuBtn'),mn=document.getElementById('mobileNav');mb.addEventListener('click',()=>mn.classList.toggle('open'));mn.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mn.classList.remove('open')));
 </script>
 </body>
 </html>
