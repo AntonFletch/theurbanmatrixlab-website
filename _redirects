@@ -1,1 +1,3 @@
+/publication /publication/index.html 200
+/publication/* /publication/:splat 200
 /* /index.html 200
