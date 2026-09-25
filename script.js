@@ -1,1 +1,1 @@
-window.addEventListener('load',()=>{const splash=document.querySelector('#splash-screen');const content=document.querySelector('#website-content');setTimeout(()=>{if(splash){splash.style.opacity='0';setTimeout(()=>splash.remove(),450)}if(content)content.classList.add('show')},650)});const menu=document.querySelector('.menu-button');if(menu)menu.addEventListener('click',()=>document.querySelector('.nav-links').classList.toggle('open'));
+/* Public access temporarily disabled. */
