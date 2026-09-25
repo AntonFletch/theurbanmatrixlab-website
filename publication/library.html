@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#060407">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<title>NO TITLE REQUIRED — Reader</title>
+<link rel="stylesheet" href="/publication/style.css">
+</head>
+<body>
+<header class="top"><a class="wordmark" href="/publication/">NO TITLE REQUIRED</a><div class="status" id="accountState">READER ACCESS</div></header>
+<main>
+<section class="hero" style="min-height:auto;padding-bottom:40px">
+  <div class="eyebrow">THE READER DOOR</div>
+  <h1 style="font-size:clamp(2.8rem,6vw,5.8rem)">Enter without a public name.</h1>
+  <p class="lede">Your email is used for access. It is not displayed as the author or owner of the publication.</p>
+</section>
+
+<section class="free-read" style="padding-top:20px">
+  <div id="authBox" class="story-card">
+    <h2>Reader sign-in</h2>
+    <p>Enter your email and we will send a secure sign-in link.</p>
+    <form id="loginForm">
+      <input id="email" type="email" autocomplete="email" required placeholder="you@example.com" style="width:100%;padding:14px;background:#070509;border:1px solid rgba(216,173,89,.35);color:#fff;margin:10px 0">
+      <button class="primary" type="submit">SEND SIGN-IN LINK</button>
+    </form>
+    <p id="loginMessage" style="color:#d8ad59"></p>
+  </div>
+
+  <div id="libraryBox" style="display:none">
+    <div class="section-label">YOUR LIBRARY</div>
+    <div id="posts" class="plan-grid"></div>
+    <button id="signOut" class="primary" type="button">SIGN OUT</button>
+  </div>
+</section>
+</main>
+<footer><span>NO TITLE REQUIRED</span><span>PRIVATE READER ACCESS</span></footer>
+<script type="module" src="/publication/member.js"></script>
+</body>
+</html>
