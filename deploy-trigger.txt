@@ -1,1 +1,1 @@
-deploy private lock 2026-09-24
+deploy full private lock 2026-09-24
