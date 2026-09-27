@@ -1,0 +1,10 @@
+<resources>
+    <color name="umx_bg">#0A0710</color>
+    <color name="umx_panel">#17111F</color>
+    <color name="umx_gold">#D5AD4C</color>
+    <color name="umx_purple">#6D3AC7</color>
+    <color name="umx_text">#F8F5FF</color>
+    <color name="umx_muted">#B9B0C7</color>
+    <color name="umx_red">#D84343</color>
+    <color name="umx_green">#46C97B</color>
+</resources>
