@@ -1,0 +1,10 @@
+<resources>
+    <style name="AppTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:statusBarColor">@color/umx_bg</item>
+        <item name="android:navigationBarColor">@color/umx_bg</item>
+        <item name="android:colorAccent">@color/umx_gold</item>
+        <item name="android:windowBackground">@color/umx_bg</item>
+    </style>
+</resources>
