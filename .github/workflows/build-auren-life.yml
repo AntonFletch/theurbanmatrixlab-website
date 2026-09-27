@@ -1,7 +1,8 @@
 name: Build Auren Life APK
 on:
   push:
-    branches: ["auren-life-app"]
+    branches:
+      - auren-life-app
   workflow_dispatch:
 
 jobs:
@@ -21,14 +22,17 @@ jobs:
           distribution: temurin
           java-version: '17'
       - name: Accept Android licenses
-        run: yes | "$SDKMANAGER" --licenses >/dev/null || true
+        run: |
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
       - name: Install Android SDK 35
-        run: "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+        run: |
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0" "platform-tools"
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
       - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace
+        run: |
+          gradle :app:assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: auren-life-debug-apk
