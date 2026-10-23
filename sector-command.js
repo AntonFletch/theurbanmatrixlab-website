@@ -11,7 +11,7 @@ function label(t){return escapeText(t)||'(Unnamed county address)'}
 function statusKey(id){return String(id)}
 function flagFor(id){return state.flags.get(statusKey(id))||{}}
 function classify(type){const t=Number(type);if(t>=1000&&t<=1020)return'home';if((t>=5000&&t<6000)||t===2001)return'biz';return'other'}
-function pointInRing(pt,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a[1]>pt[1])!==(b[1]>pt[1])&&pt[0]<(b[0]-a[0])*(pt[1]-a[1])/(b[1]-a[1])+a[0]))inside=!inside}return inside}
+function pointInRing(pt,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a[1]>pt[1])!==(b[1]>pt[1])&&pt[0]<(b[0]-a[0])*(pt[1]-a[1])/(b[1]-a[1])+a[0])inside=!inside}return inside}
 function contains(geo,pt){const polys=geo.type==='Polygon'?[geo.coordinates]:geo.coordinates;return polys.some(poly=>pointInRing(pt,poly[0])&&!poly.slice(1).some(r=>pointInRing(pt,r)))}
 function rings(geo){return geo.type==='Polygon'?geo.coordinates:geo.coordinates.flatMap(p=>p)}
 function getStats(row){const f=flagFor(row.id);return {declined:!!f.declined,excluded:!!f.excluded||row.type===2001,contacted:!!f.contacted,active:!!f.active_business&&row.kind==='biz',vip:!!f.vip,postal:row.postal===1}}
