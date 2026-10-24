@@ -2,13 +2,19 @@
 
 Updated October 24, 2026. The rebuild includes current main and preserves the October 23 neighborhood-map work. It replaces the fictional, browser-only winter prototype with an empty authenticated workspace. Real customers, contracts and boundaries are never inferred from county GIS.
 
-## Corrected field workflow
-- Winter Command now follows the approved one-neighborhood layout: all 20 official city boundaries, a clipped map, neighborhood selector and three sector cards immediately below the map.
-- The review map restores actual county residential and commercial address pins, address search, clickable popups and a paged address list. It uses the county’s official MCGISData hosted service because the older county server rejects this environment. Queries paginate completely, filter against the exact selected neighborhood (including holes), cancel stale selections and expose failures with retry. Company records remain protected; this does not bypass account acceptance.
+## Locked map and entry point
+- `/map` is the original color-coded Sector Command. Its approved `map.html` and `sector-command.css` are unchanged by this repair: Homes/Businesses, green operating businesses, gold contacted, bright red declined, gray excluded, orange postal ring, independent VIP stars, three neighborhood cards, and the UMX contract emblem remain in place.
+- The alternate `/winter-command-preview/map-check` page redirects to `/map`; it is no longer presented as the finished workspace. The HTML fallback forwards there too. Sign-in and MFA still protect the actual workspace.
+- Repaired the original map's county address loader using the county’s official MCGISData hosted service. Loads all pages, filters exact neighborhood geometry, uses verified saved city boundaries, cancels stale requests and preserves source errors.
+- New outreach writes use canonical county GlobalIDs rather than an unverified mapping from a hosted numeric object ID to the former server. The database has zero outreach rows; no stored statuses were changed or deleted. Invalid/missing GlobalIDs block that inventory rather than associating a flag with the wrong address.
+- Original color precedence and hospital exclusion are tested. VIP remains independent of declined/excluded status. The map template, colors and layout are preserved.
+
+## Corrected winter field workflow
+- Winter Command uses all 20 official city boundaries, a clipped map, neighborhood selector and three sector cards below the map.
 - Service setup uses map drawing with start/undo/clear/finish controls. No raw GeoJSON is requested from the operator.
 - Service geometry is validated by PostGIS in the non-public `extensions` schema. A contracted sidewalk/parking scope may exclude the building/address point. Invalid crossings and misplaced holes are rejected.
 - Disable an incorrect scope and verify a replacement under the same agreement; old geometry, audit and field records are retained. Only one enabled scope per property/agreement is permitted.
-- Added unsaved-entry discard confirmation.
+- Unsaved-entry discard confirmation protects in-progress entries.
 
 ## Implemented
 - Existing UMX sign-in and server-verified staff/worker roles; explicit authenticator setup and two-step sign-in. New winter RLS requires AAL2, independently of frontend visibility.
@@ -27,12 +33,12 @@ UMX OS is ACTIVE_HEALTHY. Applied additive migrations correspond to `db/winter_c
 `db/sector_security.sql` is deliberately staged: apply it only alongside the updated Sector Command frontend, after final acceptance. Applying it to the old live frontend would require MFA that that frontend cannot collect. Winter tables already enforce MFA. This remaining coordinated rollout is a release gate, not completed production hardening of the old map.
 
 ## Evidence
-- `node --test tests/winter.test.mjs`: twelve domain tests, including validation, independent deicer chronology/corrections, Mercator tiles, CSV formulas, contract checks and geography/timezone handling, all 20 neighborhood names, clipping holes/islands, drawn boundary validation, address filtering and address-service pagination/error/cancellation.
+- `node --test tests/winter.test.mjs tests/sector-status.test.mjs`: fifteen tests, including validation, independent deicer chronology/corrections, Mercator tiles, CSV formulas, contract checks and geography/timezone handling, all 20 neighborhood names, clipping holes/islands, drawn boundary validation, address filtering and address-service pagination/error/cancellation.
 - `tests/winter_rls.sql`: actual database integration tests for staff/MFA, assigned vs unassigned workers, immutable records, actor spoofing, treatment/future-time validation, correction concurrency, scope audit, inactive/paused contracts and anonymous privileges. All fixtures roll back.
 - `tests/results/database.json`: recorded pass and unchanged zero client/record counts.
 - `python scripts/check-live-services.py`: real image/parcel/weather downloads; `tests/results/live-services.json` retains the NAIP error alongside passing Esri, Montana parcel and NWS checks. The script returns failure while any required source is broken; a fallback is never relabeled as a passing NAIP test.
 - `node scripts/check-addresses.mjs`: actual county-hosted responses through the production address loader passed for all 20 neighborhoods; counts are in `tests/results/addresses.json`. These are address records, not occupied-house or operating-company counts.
-- `map-check.html` is a public-data-only diagnostic using the same map module. It cannot read UMX records or bypass sign-in.
+- The former public map diagnostic routes to the locked `/map` workspace. Earlier public-map browser evidence is historical; it does not establish signed-in Sector Command acceptance.
 - Connected browser: actual Esri fallback tiles, actual Montana reference polygons, layer controls and signed-out record gate tested. Authenticated editing/MFA and multi-device acceptance are still required; an SQL role test is not a real sign-in.
 - GitHub workflow runs domain/syntax checks on this PR. A successful Cloudflare build only confirms deployment, not operational acceptance.
 
@@ -45,7 +51,7 @@ UMX OS is ACTIVE_HEALTHY. Applied additive migrations correspond to `db/winter_c
 Do not merge or publish as an operational dispatch system until these gates are recorded as passed. The public marketing homepage is not changed by this PR.
 
 ## Local checks
-Run syntax/domain checks and build with `python scripts/build-preview.py`. `sites-preview start <checkout>` serves the resulting static files for internal QA; this does not register a new Site or change Cloudflare hosting.
+Run the two test files above, syntax checks and build with `python scripts/build-preview.py`. `sites-preview start <checkout>` serves the resulting static files for internal QA; this does not register a new Site or change Cloudflare hosting.
 
 ## Data references
 - https://msl.mt.gov/geoinfo/data/Aerial_Photos/NAIP_2025

@@ -1,8 +1,8 @@
 {
-  "checked_at": "2026-10-24T17:14:44.245Z",
+  "checked_at": "2026-10-24T18:14:36.535Z",
   "source": "https://services1.arcgis.com/NQWYt9dWr9BlL9QE/arcgis/rest/services/AddressStructurePoint/FeatureServer/0",
   "source_item": "https://www.arcgis.com/home/item.html?id=2cc878f55cbb492c9388026aec382e58",
-  "method": "Actual paginated HTTPS responses passed through the production loader; exact city polygon filtering including holes.",
+  "method": "Actual paginated HTTPS responses through the production loader; exact city polygon filtering including holes; every returned address has a stable GlobalID for private outreach status.",
   "results": [
     {
       "neighborhood": "Captain John Mullan",

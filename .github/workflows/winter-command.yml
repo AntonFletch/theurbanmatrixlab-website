@@ -15,9 +15,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node --test tests/winter.test.mjs
+      - run: node --test tests/winter.test.mjs tests/sector-status.test.mjs
       - name: Parse application modules
         run: |
           node --check umx-auth.js
           node --check sector-command.js
+          node --check sector-status.mjs
           for file in winter-command-preview/*.mjs; do node --check "$file"; done
