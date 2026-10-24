@@ -20,6 +20,6 @@ test('private outreach status uses stable county GlobalIDs and never guesses leg
 test('Sector Command keeps its locked controls and the obsolete preview routes to that workspace',async()=>{
  const html=await readFile(new URL('../map.html',import.meta.url),'utf8'),css=await readFile(new URL('../sector-command.css',import.meta.url),'utf8');
  for(const id of ['flag-contacted','flag-declined','flag-excluded','flag-active','flag-vip','sector-cards','print-contract'])assert.ok(html.includes('id="'+id+'"'));
- assert.ok(html.includes('class="stamp"'));assert.ok(css.includes('.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))'));
+ assert.ok(html.includes('class="stamp umx-stamp"'));assert.ok(css.includes('.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))'));
  const routes=await readFile(new URL('../_redirects',import.meta.url),'utf8');assert.ok(routes.includes('/winter-command-preview/map-check /map 302'));assert.ok(routes.includes('/winter-command-preview/map-check.html /map 302'));
 });

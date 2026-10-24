@@ -2,8 +2,8 @@
 
 ## Verified
 - [x] Reconciled PR with current main; preserved neighborhood-map work and marketing homepage.
-- [x] JavaScript syntax and fifteen domain/sector validation tests.
-- [x] Real Supabase RLS integration tests; MFA, staff/worker authorization, append-only records, correction conflicts, actor attribution and scope audit.
+- [x] JavaScript syntax and eighteen domain/sector/password-access validation tests.
+- [x] Real Supabase RLS integration tests; email/password sessions, anonymous denial, staff/worker authorization, append-only records, correction conflicts, actor attribution and scope audit.
 - [x] Test fixtures rolled back; real property/contract/winter counts remain zero.
 - [x] Real Montana parcel GeoJSON response and browser rendering (300-feature cap).
 - [x] Real Esri image bytes and complete browser fallback rendering with source attribution.
@@ -16,12 +16,12 @@
 
 - [x] Actual hosted county address responses for all 20 neighborhoods; exact polygon filtering and complete pagination. The same paginated loader now repairs the original locked Sector Command; county GlobalIDs validated for saved statuses.
 
-- [x] Original map HTML/CSS unchanged; status color precedence, VIP independence, hospital exclusion and stable IDs covered by tests. Alternate preview routes back to the original `/map` workspace.
+- [x] Approved map layout and controls preserved; requested stamp logo applied; status color precedence, VIP independence, hospital exclusion and stable IDs covered by tests. Alternate preview routes back to the original `/map` workspace.
 
 ## Exact production gates
-- [ ] Actual owner MFA, authenticated form/CSV/correction/retry tests and same-account phone/desktop persistence.
+- [ ] Actual owner email/password sign-in, authenticated form/CSV/correction/retry tests and same-account phone/desktop persistence.
 - [ ] Actual assigned-worker account/session-revocation test (only one account currently exists).
-- [ ] Coordinated updated sector frontend plus `db/sector_security.sql`; verify current per-user status ownership and MFA afterward.
+- [ ] Coordinated updated sector frontend plus `db/sector_security.sql`; verify current per-user status ownership afterward.
 - [ ] Dashboard security/recovery: compromised-password protection, PostgreSQL security upgrade, backup retention and restore drill.
 - [ ] First real property coordinates, executed contract, approved service geometry and operator field trial.
 - [ ] Full 2025 NAIP imagery works, or owner accepts labeled fallback; primary provider failures remain recorded.

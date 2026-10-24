@@ -2,3 +2,5 @@
 .shell[hidden]{display:none!important}
 
 [hidden]{display:none!important}.mfa-panel{display:grid;gap:14px;text-align:left;margin:18px 0}.mfa-panel form{display:grid;gap:10px}.mfa-panel img{display:block;background:white;margin:auto}.mfa-panel code{overflow-wrap:anywhere}.primarynav button{margin:10px;padding:10px;color:#e5bd66;background:#171d27;border:1px solid #354050;border-radius:6px}
+
+.umx-stamp{border:0;box-shadow:none;object-fit:contain;display:block;flex-shrink:0;background:transparent}
