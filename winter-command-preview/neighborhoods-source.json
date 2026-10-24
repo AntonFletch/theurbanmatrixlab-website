@@ -1,0 +1,7 @@
+{
+  "source": "https://services.arcgis.com/HfwHS0BxZBQ1E5DY/ArcGIS/rest/services/Neighborhoods_mso/FeatureServer/0/query?where=1%3D1&outFields=FeatureName&returnGeometry=true&outSR=4326&f=geojson",
+  "retrieved_at": "2026-10-24T10:54:55.189327+00:00",
+  "coordinate_system": "EPSG:4326",
+  "feature_count": 20,
+  "purpose": "City neighborhood reference boundaries; not client or service-area approval"
+}

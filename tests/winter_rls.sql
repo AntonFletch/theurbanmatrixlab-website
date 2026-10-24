@@ -1,0 +1,81 @@
+-- Integration test against the real database. Every fixture is rolled back.
+-- Keep BEGIN / ROLLBACK. No test user, customer, or agreement is committed.
+begin;
+do $$
+declare owner_id uuid; worker_id uuid:=gen_random_uuid(); outsider_id uuid:=gen_random_uuid(); customer uuid:=gen_random_uuid(); property uuid:=gen_random_uuid(); target uuid:=gen_random_uuid(); contract uuid:=gen_random_uuid(); area uuid:=gen_random_uuid(); reading uuid:=gen_random_uuid(); correction uuid:=gen_random_uuid(); worked boolean; n integer; actor uuid; replacement uuid:=gen_random_uuid();
+begin
+  select id into owner_id from public.profiles where lower(role) in ('owner','admin') limit 1;
+  if owner_id is null then raise exception 'Test needs an existing staff profile'; end if;
+  insert into auth.users(id,email,aud,role) values(worker_id,'umx-rollback-worker-'||worker_id||'@example.invalid','authenticated','authenticated'),(outsider_id,'umx-rollback-outsider-'||outsider_id||'@example.invalid','authenticated','authenticated');
+  insert into public.profiles(id,role) values(worker_id,'employee'),(outsider_id,'employee') on conflict(id) do update set role='employee';
+  insert into public.umx_customers(id,contact_name) values(customer,'ROLLBACK TEST ONLY');
+  insert into public.umx_properties(id,customer_id,name,address,latitude,longitude) values(property,customer,'ROLLBACK TEST ONLY','ROLLBACK TEST ONLY',46.8788,-113.9972);
+  insert into public.umx_business_targets(id,business_name) values(target,'ROLLBACK TEST ONLY');
+  insert into public.umx_contracts(id,target_id,contract_title,status,signature_status,executed_at,customer_signed_at,umx_signed_at,executed_document_sha256) values(contract,target,'ROLLBACK TEST ONLY','active','executed',now(),now(),now(),repeat('a',64));
+  perform set_config('request.jwt.claims',json_build_object('sub',owner_id,'role','authenticated','aal','aal2')::text,true);
+  execute 'set local role authenticated';
+  insert into public.winter_service_areas(id,property_id,contract_id,geometry,geometry_source,service_scope,verified_by) values(area,property,contract,'{"type":"Polygon","coordinates":[[[-113.998,46.8793],[-113.996,46.8793],[-113.996,46.8797],[-113.998,46.8797],[-113.998,46.8793]]]}','ROLLBACK source verified for test only','ROLLBACK service scope for test only',owner_id);
+  if (select count(*) from public.winter_area_status where id=area and contract_active)<>1 then raise exception 'Staff cannot read current area'; end if;
+  -- MFA is enforced in the database, even when frontend controls are bypassed.
+  perform set_config('request.jwt.claims',json_build_object('sub',owner_id,'role','authenticated','aal','aal1')::text,true);
+  if (select count(*) from public.winter_service_areas)<>0 then raise exception 'AAL1 leaked service areas'; end if;
+  if (select count(*) from public.winter_area_status)<>0 then raise exception 'AAL1 leaked invoker view'; end if;
+  perform set_config('request.jwt.claims',json_build_object('sub',owner_id,'role','authenticated','aal','aal2')::text,true);
+  insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method,material,quantity,unit,area_sqft) values(reading,area,now()-interval '1 hour',24,'Ice','Ice treatment','ROLLBACK test IR','CMA',3,'lb',600);
+  worked:=false; begin update public.winter_records set ground_f=99 where id=reading; worked:=true; exception when insufficient_privilege then null; end;
+  if worked then raise exception 'History UPDATE allowed'; end if;
+  worked:=false; begin delete from public.winter_records where id=reading; worked:=true; exception when insufficient_privilege then null; end;
+  if worked then raise exception 'History DELETE allowed'; end if;
+  worked:=false; begin truncate public.winter_records; worked:=true; exception when insufficient_privilege then null; end;
+  if worked then raise exception 'History TRUNCATE allowed'; end if;
+  worked:=false; begin insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method) values(gen_random_uuid(),area,now()+interval '1 day',25,'Dry','Inspection','ROLLBACK'); worked:=true; exception when raise_exception then null; end;
+  if worked then raise exception 'Future measurement accepted'; end if;
+  worked:=false; begin insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method) values(gen_random_uuid(),area,now(),25,'Ice','Ice treatment','ROLLBACK'); worked:=true; exception when check_violation then null; end;
+  if worked then raise exception 'Treatment without material accepted'; end if;
+  insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method,correction_of,notes) values(correction,area,now()-interval '1 hour',25,'Ice','Inspection','ROLLBACK test IR',reading,'Correcting a test entry');
+  worked:=false; begin insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method,correction_of,notes) values(gen_random_uuid(),area,now(),25,'Ice','Inspection','ROLLBACK',reading,'Second concurrent correction'); worked:=true; exception when unique_violation then null; end;
+  if worked then raise exception 'Duplicate correction accepted'; end if;
+  -- A worker cannot read an unassigned area, even with valid MFA.
+  perform set_config('request.jwt.claims',json_build_object('sub',worker_id,'role','authenticated','aal','aal2')::text,true);
+  if (select count(*) from public.winter_service_areas)<>0 or (select count(*) from public.winter_records)<>0 then raise exception 'Unassigned worker leaked records'; end if;
+  perform set_config('request.jwt.claims',json_build_object('sub',owner_id,'role','authenticated','aal','aal2')::text,true);
+  insert into public.winter_assignments(area_id,user_id) values(area,worker_id);
+  perform set_config('request.jwt.claims',json_build_object('sub',worker_id,'role','authenticated','aal','aal2')::text,true);
+  if (select count(*) from public.winter_area_status where id=area)<>1 then raise exception 'Assigned worker cannot read scope'; end if;
+  if (select count(*) from public.winter_records where area_id=area)<>2 then raise exception 'Assigned worker cannot read history'; end if;
+  insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method,recorded_by) values(gen_random_uuid(),area,now(),26,'Wet','Follow-up','ROLLBACK field IR',owner_id) returning recorded_by into actor;
+  if actor<>worker_id then raise exception 'Actor spoof accepted'; end if;
+  perform set_config('request.jwt.claims',json_build_object('sub',outsider_id,'role','authenticated','aal','aal2')::text,true);
+  if (select count(*) from public.winter_area_status)<>0 or (select count(*) from public.winter_records)<>0 then raise exception 'Other worker leaked records'; end if;
+  -- Changing user-editable metadata does not grant staff authorization.
+  perform set_config('request.jwt.claims',json_build_object('sub',outsider_id,'role','authenticated','aal','aal2','user_metadata',json_build_object('role','owner'))::text,true);
+  if coalesce(private.winter_staff(),false) then raise exception 'User metadata granted staff rights'; end if;
+  perform set_config('request.jwt.claims',json_build_object('sub',owner_id,'role','authenticated','aal','aal2')::text,true);
+  worked:=false; begin update public.winter_service_areas set service_scope='Overwritten' where id=area; worked:=true; exception when raise_exception then null; end;
+  if worked then raise exception 'Verified scope overwritten'; end if;
+  update public.winter_service_areas set enabled=false where id=area;
+  if (select count(*) from public.winter_area_audit where area_id=area)<>2 then raise exception 'Area audit missing'; end if;
+  worked:=false; begin insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method) values(gen_random_uuid(),area,now(),25,'Dry','Inspection','ROLLBACK'); worked:=true; exception when raise_exception then null; end;
+  if worked then raise exception 'Inactive area accepted record'; end if;
+  insert into public.winter_service_areas(id,property_id,contract_id,geometry,geometry_source,service_scope,verified_by) values(replacement,property,contract,'{"type":"Polygon","coordinates":[[[-113.998,46.8793],[-113.996,46.8793],[-113.996,46.8797],[-113.998,46.8797],[-113.998,46.8793]]]}','ROLLBACK replacement source','ROLLBACK newly verified replacement scope',owner_id);
+  worked:=false;begin update public.winter_service_areas set enabled=true where id=area;worked:=true;exception when unique_violation then null;end;
+  if worked then raise exception 'Two current scopes for same contract allowed';end if;
+  if (select count(*) from public.winter_records where area_id=area)<>3 then raise exception 'Replacement lost original history';end if;
+  update public.winter_service_areas set enabled=false where id=replacement;
+  update public.winter_service_areas set enabled=true where id=area;
+  execute 'reset role';
+  update public.umx_contracts set status='paused' where id=contract;
+  execute 'set local role authenticated';
+  if (select contract_active from public.winter_area_status where id=area) then raise exception 'Paused contract still current'; end if;
+  worked:=false; begin insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method) values(gen_random_uuid(),area,now(),25,'Dry','Inspection','ROLLBACK'); worked:=true; exception when raise_exception then null; end;
+  if worked then raise exception 'Paused contract accepted record'; end if;
+  execute 'reset role';
+  if has_table_privilege('anon','public.winter_records','SELECT') or has_table_privilege('anon','public.winter_area_status','SELECT') then raise exception 'Anonymous grants exposed private data'; end if;
+  if has_table_privilege('authenticated','public.winter_records','TRUNCATE') then raise exception 'Authenticated truncate grant remains'; end if;
+  if not private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,46],[-113,47],[-114,47],[-114,46]]]}',-113.5,46.5) then raise exception 'Valid geometry rejected'; end if;
+  if not private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,46],[-113,47],[-114,47],[-114,46]]]}',-110,45) then raise exception 'Valid service area outside address point rejected';end if;
+  if private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,47],[-114,47],[-113,46],[-114,46]]]}',-114,46) then raise exception 'Crossing boundary accepted';end if;
+  if private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,46],[-113,47],[-114,47],[-114,46]],[[-112,46],[-111,46],[-111,47],[-112,47],[-112,46]]]}',-114,46) then raise exception 'Hole outside outer boundary accepted';end if;
+end $$;
+rollback;
+select 'PASS — database authorization, MFA, worker isolation, history immutability, actor attribution, validation, correction conflicts, current contracts, valid sidewalk scopes and replacement history; all fixtures rolled back' as result;

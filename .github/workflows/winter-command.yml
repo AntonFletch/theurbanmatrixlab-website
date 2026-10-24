@@ -1,0 +1,24 @@
+name: Winter Command checks
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/winter-command-review-20261018]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --test tests/winter.test.mjs tests/sector-status.test.mjs
+      - name: Parse application modules
+        run: |
+          node --check umx-auth.js
+          node --check sector-command.js
+          node --check sector-status.mjs
+          for file in winter-command-preview/*.mjs; do node --check "$file"; done

@@ -1,0 +1,37 @@
+{
+  "checked_at": "2026-10-24T06:40:10.598854+00:00",
+  "origin_header": "https://theurbanmatrixlab.com",
+  "tests": {
+    "esri_fallback": {
+      "status": "pass",
+      "http": 200,
+      "dimensions": [
+        256,
+        256
+      ],
+      "provider": "Esri, Vantor, Earthstar Geographics, GIS User Community",
+      "capture_date": "varies; not represented as 2025",
+      "service": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+    },
+    "naip_image": {
+      "status": "failed",
+      "error": "ImageServer returned JSON instead of an image: {\"code\": 400, \"extendedCode\": -2147467259, \"message\": \"Unable to complete operation.\", \"details\": [\"General function failure\"]}"
+    },
+    "montana_parcels": {
+      "status": "pass",
+      "http": 200,
+      "features": 300,
+      "limit": 300,
+      "cors": "https://theurbanmatrixlab.com",
+      "service": "https://gisservice.mt.gov/arcgis/rest/services/msdi_cadastral_map_v1/MapServer/1/query"
+    },
+    "nws_air": {
+      "status": "pass",
+      "http": 200,
+      "observed_at": "2026-10-24T05:53:00+00:00",
+      "age_minutes": 47,
+      "temperature_c": 5,
+      "kind": "air observation; not pavement"
+    }
+  }
+}
