@@ -1,0 +1,37 @@
+{
+  "checked_on": "2026-10-24",
+  "environment": "UMX OS production database, transaction rollback fixtures",
+  "result": "pass",
+  "checks": [
+    "MFA enforced by RLS",
+    "invoker view preserves RLS",
+    "staff access",
+    "assigned worker access",
+    "unassigned worker isolation",
+    "user metadata cannot elevate roles",
+    "anonymous grants revoked",
+    "history UPDATE DELETE TRUNCATE denied",
+    "future time rejected",
+    "treatments require amounts and materials",
+    "one correction per original",
+    "actor identity cannot be forged",
+    "verified service scope immutable",
+    "disabled area rejected",
+    "paused contract rejected",
+    "area changes audited",
+    "PostGIS rejects crossing boundaries and invalid holes",
+    "valid sidewalk scope can exclude building point",
+    "replacement scope preserves old records",
+    "one enabled scope per property and agreement"
+  ],
+  "fixtures_committed": false,
+  "after_rollback": {
+    "auth_users": 1,
+    "properties": 0,
+    "contracts": 0,
+    "service_areas": 0,
+    "records": 0,
+    "area_audits": 0
+  },
+  "limitation": "Database role/claim integration tests are not an actual browser sign-in or multi-device acceptance test."
+}

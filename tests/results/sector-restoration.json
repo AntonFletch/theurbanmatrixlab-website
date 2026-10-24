@@ -1,0 +1,29 @@
+{
+  "checked_at": "2026-10-24T18:17:21.272356+00:00",
+  "baseline": "45a0260a9127ee0c85eeaeca74caba088c882ddf",
+  "layout_files_unchanged": {
+    "map.html": "050a4473ee2712740f42a6e1d3a69d13e6db55efc86aa0e5678d87cbf6a9987d",
+    "sector-command.css": "e4f63b5c23ab9730a8be3ddbe4e42f2410c0de576464e0a5b23b1e8522a1b6bc"
+  },
+  "automated_tests": {
+    "passed": 15,
+    "command": "node --test tests/winter.test.mjs tests/sector-status.test.mjs"
+  },
+  "county_addresses": "Actual responses verified in all 20 neighborhoods, including a stable county GlobalID for every plotted address. See addresses.json.",
+  "original_controls": [
+    "green operating business",
+    "gold contacted",
+    "red declined / no approach",
+    "gray excluded",
+    "orange county postal-unverified ring",
+    "independent VIP stars",
+    "three sector cards",
+    "UMX contract emblem"
+  ],
+  "private_records": "Supabase inspection returned zero sector_property_statuses rows. No statuses were deleted, seeded or migrated. New writes use canonical county GlobalIDs; legacy numeric IDs are not guessed.",
+  "browser": {
+    "local_obsolete_preview": "Redirects to original map.html / Sector Command access gate",
+    "authenticated_save_reload_multi_device": "Not run. Explicit account sign-in authorization remains required."
+  },
+  "release_state": "PR remains draft and unmerged; existing operational acceptance gates remain."
+}

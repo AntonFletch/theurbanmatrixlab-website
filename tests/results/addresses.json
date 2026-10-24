@@ -1,0 +1,128 @@
+{
+  "checked_at": "2026-10-24T18:14:36.535Z",
+  "source": "https://services1.arcgis.com/NQWYt9dWr9BlL9QE/arcgis/rest/services/AddressStructurePoint/FeatureServer/0",
+  "source_item": "https://www.arcgis.com/home/item.html?id=2cc878f55cbb492c9388026aec382e58",
+  "method": "Actual paginated HTTPS responses through the production loader; exact city polygon filtering including holes; every returned address has a stable GlobalID for private outreach status.",
+  "results": [
+    {
+      "neighborhood": "Captain John Mullan",
+      "status": "pass",
+      "homes": 2252,
+      "commercial": 155
+    },
+    {
+      "neighborhood": "Farviews / Pattee Canyon",
+      "status": "pass",
+      "homes": 1236,
+      "commercial": 34
+    },
+    {
+      "neighborhood": "Franklin to the Fort",
+      "status": "pass",
+      "homes": 3090,
+      "commercial": 200
+    },
+    {
+      "neighborhood": "Grant Creek",
+      "status": "pass",
+      "homes": 1018,
+      "commercial": 259
+    },
+    {
+      "neighborhood": "Heart of Missoula",
+      "status": "pass",
+      "homes": 606,
+      "commercial": 433
+    },
+    {
+      "neighborhood": "Lewis & Clark",
+      "status": "pass",
+      "homes": 861,
+      "commercial": 71
+    },
+    {
+      "neighborhood": "Lower Rattlesnake",
+      "status": "pass",
+      "homes": 826,
+      "commercial": 6
+    },
+    {
+      "neighborhood": "Marshall Canyon",
+      "status": "pass",
+      "homes": 190,
+      "commercial": 3
+    },
+    {
+      "neighborhood": "Miller Creek",
+      "status": "pass",
+      "homes": 1681,
+      "commercial": 20
+    },
+    {
+      "neighborhood": "Moose Can Gully",
+      "status": "pass",
+      "homes": 1483,
+      "commercial": 9
+    },
+    {
+      "neighborhood": "Northside",
+      "status": "pass",
+      "homes": 1084,
+      "commercial": 44
+    },
+    {
+      "neighborhood": "River Road",
+      "status": "pass",
+      "homes": 1175,
+      "commercial": 80
+    },
+    {
+      "neighborhood": "Riverfront",
+      "status": "pass",
+      "homes": 1013,
+      "commercial": 134
+    },
+    {
+      "neighborhood": "Rose Park",
+      "status": "pass",
+      "homes": 1919,
+      "commercial": 315
+    },
+    {
+      "neighborhood": "South 39th Street",
+      "status": "pass",
+      "homes": 933,
+      "commercial": 6
+    },
+    {
+      "neighborhood": "Southgate Triangle",
+      "status": "pass",
+      "homes": 1007,
+      "commercial": 248
+    },
+    {
+      "neighborhood": "Two Rivers",
+      "status": "pass",
+      "homes": 345,
+      "commercial": 60
+    },
+    {
+      "neighborhood": "University District",
+      "status": "pass",
+      "homes": 1866,
+      "commercial": 53
+    },
+    {
+      "neighborhood": "Upper Rattlesnake",
+      "status": "pass",
+      "homes": 1426,
+      "commercial": 8
+    },
+    {
+      "neighborhood": "Westside",
+      "status": "pass",
+      "homes": 1363,
+      "commercial": 308
+    }
+  ]
+}

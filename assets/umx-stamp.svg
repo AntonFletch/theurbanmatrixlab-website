@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">UMX stamp</title>
+  <desc id="desc">Gold circular stamp for The Urban Matrix Lab LLC, Missoula, Montana.</desc>
+  <defs>
+    <path id="top" d="M 34,128 A 94,94 0 0 1 222,128"/>
+    <path id="bottom" d="M 43,147 A 93,93 0 0 0 213,147"/>
+  </defs>
+  <circle cx="128" cy="128" r="123" fill="#101923"/>
+  <g fill="none" stroke="#e5bd66">
+    <circle cx="128" cy="128" r="120" stroke-width="3"/>
+    <circle cx="128" cy="128" r="112" stroke-width="1"/>
+    <circle cx="128" cy="128" r="84" stroke-width="1.4"/>
+    <path d="M 90,161 H 166" stroke-width="1"/>
+  </g>
+  <g fill="#e5bd66" font-family="Georgia, 'Times New Roman', serif" text-anchor="middle">
+    <text font-size="12" letter-spacing="2.1"><textPath href="#top" startOffset="50%">THE URBAN MATRIX LAB LLC</textPath></text>
+    <text font-size="11" letter-spacing="2.6"><textPath href="#bottom" startOffset="50%">MISSOULA · MONTANA</textPath></text>
+    <text x="128" y="148" font-size="69" font-weight="700" letter-spacing="-2">UMX</text>
+  </g>
+  <g fill="#e5bd66"><path d="m 26,124 4,4 -4,4 -4,-4 z"/><path d="m 230,124 4,4 -4,4 -4,-4 z"/></g>
+</svg>
