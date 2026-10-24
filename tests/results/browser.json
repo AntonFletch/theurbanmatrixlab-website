@@ -8,7 +8,17 @@
     "street_switch": "OpenStreetMap layer and attribution selected",
     "signed_out_access": "Winter workspace hidden; UMX sign-in shown",
     "phone_map": "390px iframe; 375px available content width after scrollbar, no horizontal overflow; real fallback imagery loaded",
-    "phone_access_gate": "390px content width, no horizontal overflow; workspace hidden"
+    "phone_access_gate": "390px content width, no horizontal overflow; workspace hidden",
+    "neighborhoods": "All 20 official saved boundaries; selection switches the clipped map and keeps three cards below it",
+    "phone_sectors": "390px iframe / 375px available content, no horizontal overflow, exactly three sector cards",
+    "scope_drawing_component": "Actual map clicks create four corners; undo reduces to three; finish closes the boundary; clear removes it. No authentication or company data involved."
   },
-  "remaining": ["Exact Cloudflare candidate/domain verification", "Real owner sign-in/MFA", "Authenticated mobile form/history/CSV/retry/corrections", "Multi-device persistence", "Actual assigned-worker account and revocation", "First approved real property/contract and boundary"]
+  "remaining": [
+    "Exact Cloudflare candidate/domain verification",
+    "Real owner sign-in/MFA",
+    "Authenticated mobile form/history/CSV/retry/corrections",
+    "Multi-device persistence",
+    "Actual assigned-worker account and revocation",
+    "First approved real property/contract and boundary"
+  ]
 }

@@ -2,7 +2,7 @@
 -- Keep BEGIN / ROLLBACK. No test user, customer, or agreement is committed.
 begin;
 do $$
-declare owner_id uuid; worker_id uuid:=gen_random_uuid(); outsider_id uuid:=gen_random_uuid(); customer uuid:=gen_random_uuid(); property uuid:=gen_random_uuid(); target uuid:=gen_random_uuid(); contract uuid:=gen_random_uuid(); area uuid:=gen_random_uuid(); reading uuid:=gen_random_uuid(); correction uuid:=gen_random_uuid(); worked boolean; n integer; actor uuid;
+declare owner_id uuid; worker_id uuid:=gen_random_uuid(); outsider_id uuid:=gen_random_uuid(); customer uuid:=gen_random_uuid(); property uuid:=gen_random_uuid(); target uuid:=gen_random_uuid(); contract uuid:=gen_random_uuid(); area uuid:=gen_random_uuid(); reading uuid:=gen_random_uuid(); correction uuid:=gen_random_uuid(); worked boolean; n integer; actor uuid; replacement uuid:=gen_random_uuid();
 begin
   select id into owner_id from public.profiles where lower(role) in ('owner','admin') limit 1;
   if owner_id is null then raise exception 'Test needs an existing staff profile'; end if;
@@ -14,7 +14,7 @@ begin
   insert into public.umx_contracts(id,target_id,contract_title,status,signature_status,executed_at,customer_signed_at,umx_signed_at,executed_document_sha256) values(contract,target,'ROLLBACK TEST ONLY','active','executed',now(),now(),now(),repeat('a',64));
   perform set_config('request.jwt.claims',json_build_object('sub',owner_id,'role','authenticated','aal','aal2')::text,true);
   execute 'set local role authenticated';
-  insert into public.winter_service_areas(id,property_id,contract_id,geometry,geometry_source,service_scope,verified_by) values(area,property,contract,'{"type":"Polygon","coordinates":[[[-113.998,46.878],[-113.996,46.878],[-113.996,46.880],[-113.998,46.880],[-113.998,46.878]]]}','ROLLBACK source verified for test only','ROLLBACK service scope for test only',owner_id);
+  insert into public.winter_service_areas(id,property_id,contract_id,geometry,geometry_source,service_scope,verified_by) values(area,property,contract,'{"type":"Polygon","coordinates":[[[-113.998,46.8793],[-113.996,46.8793],[-113.996,46.8797],[-113.998,46.8797],[-113.998,46.8793]]]}','ROLLBACK source verified for test only','ROLLBACK service scope for test only',owner_id);
   if (select count(*) from public.winter_area_status where id=area and contract_active)<>1 then raise exception 'Staff cannot read current area'; end if;
   -- MFA is enforced in the database, even when frontend controls are bypassed.
   perform set_config('request.jwt.claims',json_build_object('sub',owner_id,'role','authenticated','aal','aal1')::text,true);
@@ -57,6 +57,11 @@ begin
   if (select count(*) from public.winter_area_audit where area_id=area)<>2 then raise exception 'Area audit missing'; end if;
   worked:=false; begin insert into public.winter_records(id,area_id,measured_at,ground_f,surface_condition,event_type,method) values(gen_random_uuid(),area,now(),25,'Dry','Inspection','ROLLBACK'); worked:=true; exception when raise_exception then null; end;
   if worked then raise exception 'Inactive area accepted record'; end if;
+  insert into public.winter_service_areas(id,property_id,contract_id,geometry,geometry_source,service_scope,verified_by) values(replacement,property,contract,'{"type":"Polygon","coordinates":[[[-113.998,46.8793],[-113.996,46.8793],[-113.996,46.8797],[-113.998,46.8797],[-113.998,46.8793]]]}','ROLLBACK replacement source','ROLLBACK newly verified replacement scope',owner_id);
+  worked:=false;begin update public.winter_service_areas set enabled=true where id=area;worked:=true;exception when unique_violation then null;end;
+  if worked then raise exception 'Two current scopes for same contract allowed';end if;
+  if (select count(*) from public.winter_records where area_id=area)<>3 then raise exception 'Replacement lost original history';end if;
+  update public.winter_service_areas set enabled=false where id=replacement;
   update public.winter_service_areas set enabled=true where id=area;
   execute 'reset role';
   update public.umx_contracts set status='paused' where id=contract;
@@ -68,7 +73,9 @@ begin
   if has_table_privilege('anon','public.winter_records','SELECT') or has_table_privilege('anon','public.winter_area_status','SELECT') then raise exception 'Anonymous grants exposed private data'; end if;
   if has_table_privilege('authenticated','public.winter_records','TRUNCATE') then raise exception 'Authenticated truncate grant remains'; end if;
   if not private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,46],[-113,47],[-114,47],[-114,46]]]}',-113.5,46.5) then raise exception 'Valid geometry rejected'; end if;
-  if private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,46],[-113,47],[-114,47],[-114,46]]]}',-110,45) then raise exception 'Out-of-scope property accepted'; end if;
+  if not private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,46],[-113,47],[-114,47],[-114,46]]]}',-110,45) then raise exception 'Valid service area outside address point rejected';end if;
+  if private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,47],[-114,47],[-113,46],[-114,46]]]}',-114,46) then raise exception 'Crossing boundary accepted';end if;
+  if private.winter_geometry_valid('{"type":"Polygon","coordinates":[[[-114,46],[-113,46],[-113,47],[-114,47],[-114,46]],[[-112,46],[-111,46],[-111,47],[-112,47],[-112,46]]]}',-114,46) then raise exception 'Hole outside outer boundary accepted';end if;
 end $$;
 rollback;
-select 'PASS — database authorization, MFA, worker isolation, history immutability, actor attribution, validation, correction conflicts, current contracts and audit; all fixtures rolled back' as result;
+select 'PASS — database authorization, MFA, worker isolation, history immutability, actor attribution, validation, correction conflicts, current contracts, valid sidewalk scopes and replacement history; all fixtures rolled back' as result;

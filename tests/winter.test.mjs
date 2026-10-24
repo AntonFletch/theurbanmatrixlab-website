@@ -49,3 +49,21 @@ test('geographic scope needs closed finite rings; display uses Denver timezone',
   assert.equal(validGeometry({ type: 'Polygon', coordinates: [[[Infinity, 46], ...ring]] }), false);
   assert.ok(denverTime('2026-10-24T00:00:00Z').includes('Oct 23'));
 });
+
+import {readFile} from 'node:fs/promises';
+import {sectorNames,containsPoint,sectorMask,closedScope} from '../winter-command-preview/geography.mjs';
+test('all twenty approved neighborhood names resolve to the official saved boundaries',async()=>{
+ const data=JSON.parse(await readFile(new URL('../winter-command-preview/neighborhoods.geojson',import.meta.url),'utf8'));
+ assert.equal(data.features.length,20);assert.deepEqual(new Set(data.features.map(f=>f.properties.FeatureName)),new Set(sectorNames));
+ for(const feature of data.features){const mask=sectorMask(feature.geometry);assert.equal(mask.type,'MultiPolygon');assert.ok(mask.coordinates[0].length>=2);}
+});
+test('sector point selection respects islands, interior holes and exterior edges',()=>{
+ const geo={type:'MultiPolygon',coordinates:[[[[0,0],[4,0],[4,4],[0,4],[0,0]],[[1,1],[2,1],[2,2],[1,2],[1,1]]],[[[6,0],[7,0],[7,1],[6,1],[6,0]]]]};
+ assert.equal(containsPoint(geo,[.5,.5]),true);assert.equal(containsPoint(geo,[1.5,1.5]),false);assert.equal(containsPoint(geo,[6.5,.5]),true);assert.equal(containsPoint(geo,[5,.5]),false);assert.equal(sectorMask(geo).coordinates.length,2);
+});
+test('drawn scopes close automatically and reject crossing edges or collapsed areas',()=>{
+ assert.equal(closedScope([[0,0],[1,0]]),null);
+ const drawn=closedScope([[-114,46],[-113.99,46],[-113.99,46.01]]);assert.equal(validGeometry(drawn),true);assert.deepEqual(drawn.coordinates[0][0],drawn.coordinates[0].at(-1));
+ assert.equal(validGeometry(closedScope([[0,0],[1,1],[0,1],[1,0]])),false);
+ assert.equal(validGeometry(closedScope([[0,0],[1,0],[2,0]])),false);
+});

@@ -2,13 +2,17 @@
 
 ## Verified
 - [x] Reconciled PR with current main; preserved neighborhood-map work and marketing homepage.
-- [x] JavaScript syntax and seven domain/validation tests.
+- [x] JavaScript syntax and ten domain/validation tests.
 - [x] Real Supabase RLS integration tests; MFA, staff/worker authorization, append-only records, correction conflicts, actor attribution and scope audit.
 - [x] Test fixtures rolled back; real property/contract/winter counts remain zero.
 - [x] Real Montana parcel GeoJSON response and browser rendering (300-feature cap).
 - [x] Real Esri image bytes and complete browser fallback rendering with source attribution.
 - [x] Real NWS air observation response; timestamp/unit/freshness validation implemented.
 - [x] Signed-out browser cannot open winter records; map diagnostic exposes only public reference data.
+
+- [x] All 20 city neighborhood names and boundaries verified against the source; three cards and clipping restored in Winter Command.
+- [x] Connected browser: neighborhood selection, three-card count, phone overflow, start/undo/finish/clear drawing component (no account or company records involved).
+- [x] Real database: valid sidewalk scope outside building point accepted; crossing polygons and invalid holes rejected; replacement preserves original history.
 
 ## Exact production gates
 - [ ] Actual owner MFA, authenticated form/CSV/correction/retry tests and same-account phone/desktop persistence.

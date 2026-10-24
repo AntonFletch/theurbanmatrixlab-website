@@ -1,15 +1,18 @@
 import { supabase, authorize } from '../umx-auth.js';
 import { escapeHTML as esc, denverTime, summarize, currentHistory, validateRecord, exportCSV, activeContract, validGeometry } from './core.mjs';
 import { createMap } from './map.mjs';
+import {containsPoint,closedScope} from './geography.mjs';
+import {sectorPicker} from './sectors.mjs';
 const $ = id => document.getElementById(id);
-const state = { auth: null, areas: [], records: [], selected: null, map: null, busy: false, ready: false, locked: false, draft: null, pending: null };
+const state = { auth: null, areas: [], records: [], selected: null, map: null, busy: false, ready: false, locked: false, draft: null, pending: null, sector:null, sectorPicker:null, scopeMap:null, setupProperties:[] };
 const areaActive = a => Boolean(a?.enabled && a.contract_active);
 const selected = () => state.areas.find(a => a.id === state.selected);
 const history = id => state.records.filter(r => r.area_id === id);
 function lock() {
   state.locked = true; state.areas = []; state.records = []; state.auth = null; state.ready = false; state.draft = null; state.pending = null;
+  state.scopeMap?.stopDraw(); state.scopeMap?.map.remove(); state.scopeMap=null; state.setupProperties=[];
   state.map?.clients.clearLayers(); state.map?.map.remove(); state.map = null;
-  document.querySelectorAll('dialog').forEach(d => d.close()); $('record-form').reset();
+  document.querySelectorAll('dialog').forEach(d => d.close()); $('record-form').reset(); $('area-form').reset();
   $('property-list').replaceChildren(); $('history').replaceChildren(); $('summary').replaceChildren();
   $('selected-name').textContent = 'Select a service area'; $('selected-address').textContent = '';
   $('app').hidden = true; $('lock').hidden = false;
@@ -41,7 +44,7 @@ function tooltip(area) {
 function render() {
   $('area-count').textContent = state.areas.filter(areaActive).length; $('record-count').textContent = state.records.length;
   const query = $('search').value.toLowerCase().trim(), filter = $('status-filter').value;
-  const areas = state.areas.filter(a => (!query || (a.property_name + ' ' + a.address).toLowerCase().includes(query)) && (filter === 'all' || areaActive(a) === (filter === 'active')));
+  const areas = state.areas.filter(a => !state.sector || containsPoint(state.sector.geometry,[Number(a.longitude),Number(a.latitude)])).filter(a => (!query || (a.property_name + ' ' + a.address).toLowerCase().includes(query)) && (filter === 'all' || areaActive(a) === (filter === 'active')));
   $('property-list').replaceChildren(); state.map?.clients.clearLayers();
   for (const area of areas) {
     const button = document.createElement('button'); button.className = 'property';
@@ -60,7 +63,7 @@ function render() {
 }
 function choose(id) { state.selected = id; const a = selected(); if (state.map && a) state.map.map.fitBounds(L.geoJSON(a.geometry).getBounds(), { maxZoom: 19, padding: [35, 35] }); render(); }
 function renderDetails() {
-  const a = selected(); $('summary').replaceChildren(); $('history').replaceChildren();
+  let a=selected(); if(a&&state.sector&&!containsPoint(state.sector.geometry,[Number(a.longitude),Number(a.latitude)])){state.selected=null;a=null;} $('summary').replaceChildren(); $('history').replaceChildren();
   $('selected-name').textContent = a?.property_name || 'Select a service area'; $('selected-address').textContent = a?.address || '';
   $('log-check').disabled = !a || !areaActive(a) || !state.ready;
   if (!a) return;
@@ -112,9 +115,11 @@ async function saveRecord(event) {
   finally { button.disabled = false; }
 }
 async function setupArea() {
-  $('area-form').reset(); $('area-status').textContent = 'Loading existing properties and executed contracts…'; $('area-dialog').showModal();
+  state.scopeMap?.stopDraw(); state.scopeMap?.map.remove(); state.scopeMap=null;state.setupProperties=[];
+  $('area-form').reset(); $('draw-status').textContent='No boundary drawn.'; $('area-status').textContent = 'Loading existing properties and executed contracts…'; $('area-dialog').showModal();
   try {
     const properties = await pages('umx_properties', 'id,name,address,latitude,longitude'), contracts = (await pages('umx_contracts')).filter(c => activeContract(c));
+    if(state.locked||!$('area-dialog').open)return; state.setupProperties=properties;
     for (const [id, rows, label] of [['setup-property', properties.filter(p => p.latitude != null && p.longitude != null), p => p.name + ' · ' + p.address], ['setup-contract', contracts, c => c.contract_title + ' · ' + (c.service_location || 'scope must be verified')]]) {
       $(id).replaceChildren(); const first = document.createElement('option'); first.value = ''; first.textContent = 'Select…'; $(id).append(first);
       rows.forEach(row => { const option = document.createElement('option'); option.value = row.id; option.textContent = label(row); $(id).append(option); });
@@ -122,11 +127,17 @@ async function setupArea() {
     $('area-status').textContent = !properties.length || !contracts.length ? 'Create a property with verified coordinates and an executed current contract in Owner Command first. No examples will be imported.' : 'Confirm the property matches the signed contract and exact service scope.';
   } catch (error) { $('area-status').textContent = 'Setup unavailable. ' + error.message; }
 }
+function openScopeMap(){
+  state.scopeMap?.stopDraw();state.scopeMap?.map.remove();state.scopeMap=null;$('area-form').elements.geometry.value='';$('draw-status').textContent='No boundary drawn.';
+  const property=state.setupProperties.find(p=>p.id===$('setup-property').value);if(!property)return;
+  state.scopeMap=createMap('scope-map',text=>$('scope-map-status').textContent=text);state.scopeMap?.focus([Number(property.latitude),Number(property.longitude)]);
+}
 async function saveArea(event) {
   event.preventDefault(); const form = $('area-form'), button = form.querySelector('[type=submit]'); if (button.disabled) return;
   try {
-    const values = Object.fromEntries(new FormData(form)), geometry = JSON.parse(values.geometry);
-    if (!validGeometry(geometry)) throw Error('Enter a closed GeoJSON Polygon or MultiPolygon in longitude/latitude order.');
+    const values=Object.fromEntries(new FormData(form)); if(!values.geometry)throw Error('Draw and finish the contracted service area on the map.');const geometry=JSON.parse(values.geometry);
+    if (!validGeometry(geometry)) throw Error('Draw and finish a valid service boundary first.');
+    if(!values.confirmed)throw Error('Confirm the contract, service scope and boundary first.');
     button.disabled = true;
     const { error } = await supabase.from('winter_service_areas').insert({ property_id: $('setup-property').value, contract_id: $('setup-contract').value, geometry, geometry_source: values.geometry_source.trim(), service_scope: values.service_scope.trim(), verified_by: state.auth.user.id });
     if (error) throw error; $('area-dialog').close(); await refresh();
@@ -161,13 +172,21 @@ async function start() {
   state.auth = await authorize($('lock'), { onLost: lock }); if (!state.auth) return;
   $('lock').hidden = true; $('app').hidden = false; $('setup-area').hidden = !state.auth.staff;
   state.map = createMap('winter-map', text => $('map-status').textContent = text);
+  if(state.map)try{state.sectorPicker=await sectorPicker({cards:$('winter-sector-cards'),select:$('winter-sector-select'),previous:$('winter-sector-prev'),next:$('winter-sector-next'),label:$('winter-sector-page'),onSelect:feature=>{if(state.locked||!state.map)return;state.sector=feature;$('winter-sector-name').textContent=feature.properties.FeatureName;state.map.selectSector(feature);render();}});}catch(error){$('map-status').textContent=error.message;}
+  $('setup-property').onchange=()=>openScopeMap();
+  $('draw-start').onclick=()=>{if(!state.scopeMap)return;$('area-form').elements.geometry.value='';state.scopeMap.beginDraw(points=>{$('draw-status').textContent=points.length+' corners marked. Tap more corners, then Finish boundary.';});$('draw-status').textContent='Tap each corner on the map. Use Undo corner to correct a point.';};
+  $('draw-undo').onclick=()=>state.scopeMap?.undoDraw();$('draw-clear').onclick=()=>{state.scopeMap?.clearDraw();$('area-form').elements.geometry.value='';$('draw-status').textContent='No boundary drawn.';};
+  $('draw-finish').onclick=()=>{const geometry=closedScope(state.scopeMap?.drawing());if(!validGeometry(geometry)){$('draw-status').textContent='Mark at least three corners without crossing the boundary.';return;}$('area-form').elements.geometry.value=JSON.stringify(geometry);state.scopeMap.stopDraw();state.scopeMap.clients.clearLayers();L.geoJSON(geometry,{style:{color:'#4be99d',weight:3,fillOpacity:.2}}).addTo(state.scopeMap.clients);$('draw-status').textContent='Boundary drawn. Review it against the service agreement before saving.';};
+  $('area-dialog').addEventListener('close',()=>{state.scopeMap?.stopDraw();state.scopeMap?.map.remove();state.scopeMap=null;state.setupProperties=[];});
   $('search').oninput = render; $('status-filter').onchange = render; $('refresh').onclick = refresh; $('log-check').onclick = () => openRecord();
   $('record-form').onsubmit = saveRecord; $('setup-area').onclick = setupArea; $('area-form').onsubmit = saveArea;
   $('sign-out').onclick = async () => { lock(); await supabase.auth.signOut(); };
   for (const [id, mode] of [['aerial', 'aerial'], ['streets', 'street']]) $(id).onclick = () => { state.map?.setBase(mode); $('aerial').setAttribute('aria-pressed', String(mode === 'aerial')); $('streets').setAttribute('aria-pressed', String(mode === 'street')); };
   $('parcels').onchange = e => state.map?.toggleParcels(e.target.checked); $('retry-map').onclick = () => state.map?.retry(); $('reset').onclick = () => state.map?.reset();
   $('export').onclick = () => { if (!state.ready) { $('sync').textContent = 'Refresh successfully before exporting current history.'; return; } const url = URL.createObjectURL(new Blob(['\uFEFF' + exportCSV(state.records, state.areas)], { type: 'text/csv;charset=utf-8' })); const a = document.createElement('a'); a.href = url; a.download = 'UMX-winter-history-' + new Date().toISOString().slice(0, 10) + '.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); };
-  document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
+  const mayClose=dialog=>!(dialog.id==='record-dialog'&&state.draft)&&!(dialog.id==='area-dialog'&&$('area-form').elements.geometry.value)||window.confirm('Discard this unsaved entry?');
+  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{const d=b.closest('dialog');if(mayClose(d))d.close();});
+  for(const dialog of [$('record-dialog'),$('area-dialog')])dialog.addEventListener('cancel',event=>{if(!mayClose(dialog))event.preventDefault();});
   $('record-dialog').addEventListener('close', () => { state.draft = null; state.pending = null; $('record-form').reset(); });
   window.addEventListener('beforeunload', e => { if (state.draft) { e.preventDefault(); e.returnValue = ''; } });
   window.addEventListener('offline', () => { state.ready = false; $('sync').textContent = 'Offline · displayed records may be stale. Keep an open unsaved check to retry when connected.'; $('log-check').disabled = true; });

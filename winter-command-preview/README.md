@@ -2,6 +2,14 @@
 
 Updated October 24, 2026. The rebuild includes current main and preserves the October 23 neighborhood-map work. It replaces the fictional, browser-only winter prototype with an empty authenticated workspace. Real customers, contracts and boundaries are never inferred from county GIS.
 
+## Corrected field workflow
+- Winter Command now follows the approved one-neighborhood layout: all 20 official city boundaries, a clipped map, neighborhood selector and three sector cards immediately below the map.
+- The review map uses the same map/sector modules and only public reference geometry. Company records remain protected; this does not bypass account acceptance.
+- Service setup uses map drawing with start/undo/clear/finish controls. No raw GeoJSON is requested from the operator.
+- Service geometry is validated by PostGIS in the non-public `extensions` schema. A contracted sidewalk/parking scope may exclude the building/address point. Invalid crossings and misplaced holes are rejected.
+- Disable an incorrect scope and verify a replacement under the same agreement; old geometry, audit and field records are retained. Only one enabled scope per property/agreement is permitted.
+- Added unsaved-entry discard confirmation.
+
 ## Implemented
 - Existing UMX sign-in and server-verified staff/worker roles; explicit authenticator setup and two-step sign-in. New winter RLS requires AAL2, independently of frontend visibility.
 - Shared Supabase service areas, assignments, manual pavement checks, treatments and correction history. Workers can access only assigned areas. Every write records the authenticated actor and server creation time.
@@ -14,12 +22,12 @@ Updated October 24, 2026. The rebuild includes current main and preserves the Oc
 - The existing neighborhood-only sector maps, Homes/Businesses tabs, three sector cards, VIP flags and contract preview are preserved. Fixed tooltip HTML injection, truncated flag loading, stale neighborhood saves, active-business color precedence, unavailable-tile handling and status-sync errors.
 
 ## Database state
-UMX OS is ACTIVE_HEALTHY. Applied additive migrations correspond to `db/winter_command.sql` and `db/winter_hardening.sql`. No existing records or accounts were deleted. Real properties, contracts and winter records remain empty. Transactional integration fixtures were fully rolled back; the existing account count remains one.
+UMX OS is ACTIVE_HEALTHY. Applied additive migrations correspond to `db/winter_command.sql`, `db/winter_hardening.sql` and `db/winter_service_geometry.sql` (in that order). No existing records or accounts were deleted. Real properties, contracts and winter records remain empty. Transactional integration fixtures were fully rolled back; the existing account count remains one.
 
 `db/sector_security.sql` is deliberately staged: apply it only alongside the updated Sector Command frontend, after final acceptance. Applying it to the old live frontend would require MFA that that frontend cannot collect. Winter tables already enforce MFA. This remaining coordinated rollout is a release gate, not completed production hardening of the old map.
 
 ## Evidence
-- `node --test tests/winter.test.mjs`: seven domain tests, including validation, independent deicer chronology/corrections, Mercator tiles, CSV formulas, contract checks and geography/timezone handling.
+- `node --test tests/winter.test.mjs`: ten domain tests, including validation, independent deicer chronology/corrections, Mercator tiles, CSV formulas, contract checks and geography/timezone handling, all 20 neighborhood names, clipping holes/islands, and drawn boundary validation.
 - `tests/winter_rls.sql`: actual database integration tests for staff/MFA, assigned vs unassigned workers, immutable records, actor spoofing, treatment/future-time validation, correction concurrency, scope audit, inactive/paused contracts and anonymous privileges. All fixtures roll back.
 - `tests/results/database.json`: recorded pass and unchanged zero client/record counts.
 - `python scripts/check-live-services.py`: real image/parcel/weather downloads; `tests/results/live-services.json` retains the NAIP error alongside passing Esri, Montana parcel and NWS checks. The script returns failure while any required source is broken; a fallback is never relabeled as a passing NAIP test.

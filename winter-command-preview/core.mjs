@@ -30,8 +30,25 @@ export function exportCSV(rows, areas) {
   const fields = ['id', 'area_id', 'property', 'address', 'measured_at', 'ground_f', 'air_f', 'surface_condition', 'event_type', 'method', 'material', 'quantity', 'unit', 'area_sqft', 'rate_per_1000_sqft', 'recorded_by', 'created_at', 'correction_of', 'notes'];
   return [fields.map(csvCell).join(','), ...rows.map(r => fields.map(k => csvCell(k === 'property' ? areas.find(a => a.id === r.area_id)?.property_name : k === 'address' ? areas.find(a => a.id === r.area_id)?.address : k === 'rate_per_1000_sqft' ? (r.quantity > 0 && r.area_sqft > 0 ? (r.quantity * 1000 / r.area_sqft).toFixed(3) : '') : r[k])).join(','))].join('\r\n');
 }
-export function validGeometry(g) {
-  if (!g || !['Polygon', 'MultiPolygon'].includes(g.type)) return false;
-  const polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
-  return Array.isArray(polys) && polys.length > 0 && polys.every(poly => Array.isArray(poly) && poly.length > 0 && poly.every(ring => Array.isArray(ring) && ring.length >= 4 && ring.every(p => Array.isArray(p) && p.length >= 2 && Number.isFinite(p[0]) && Number.isFinite(p[1]) && p[0] >= -180 && p[0] <= 180 && p[1] >= -85 && p[1] <= 85) && ring[0][0] === ring.at(-1)[0] && ring[0][1] === ring.at(-1)[1]));
+function edgesCross(a,b,c,d){
+  const side=(p,q,r)=>(q[0]-p[0])*(r[1]-p[1])-(q[1]-p[1])*(r[0]-p[0]);
+  const on=(p,q,r)=>Math.abs(side(p,q,r))<1e-14&&r[0]>=Math.min(p[0],q[0])&&r[0]<=Math.max(p[0],q[0])&&r[1]>=Math.min(p[1],q[1])&&r[1]<=Math.max(p[1],q[1]);
+  const abC=side(a,b,c),abD=side(a,b,d),cdA=side(c,d,a),cdB=side(c,d,b);
+  return ((abC>0)!==(abD>0)&&(cdA>0)!==(cdB>0))||on(a,b,c)||on(a,b,d)||on(c,d,a)||on(c,d,b);
+}
+export function validGeometry(g){
+  if(!g||!['Polygon','MultiPolygon'].includes(g.type))return false;
+  const polygons=g.type==='Polygon'?[g.coordinates]:g.coordinates;
+  if(!Array.isArray(polygons)||!polygons.length)return false;
+  return polygons.every(p=>Array.isArray(p)&&p.length&&p.every(ring=>{
+    if(!Array.isArray(ring)||ring.length<4||ring.length>2001||!ring.every(v=>Array.isArray(v)&&v.length===2&&Number.isFinite(v[0])&&Number.isFinite(v[1])&&v[0]>=-180&&v[0]<=180&&v[1]>=-85&&v[1]<=85))return false;
+    if(ring[0][0]!==ring.at(-1)[0]||ring[0][1]!==ring.at(-1)[1])return false;
+    const edges=ring.length-1;let area=0;
+    for(let i=0;i<edges;i++){
+      if(ring[i][0]===ring[i+1][0]&&ring[i][1]===ring[i+1][1])return false;
+      area+=ring[i][0]*ring[i+1][1]-ring[i+1][0]*ring[i][1];
+      for(let j=i+2;j<edges;j++){if(i===0&&j===edges-1)continue;if(edgesCross(ring[i],ring[i+1],ring[j],ring[j+1]))return false;}
+    }
+    return Math.abs(area)>1e-12;
+  }));
 }
