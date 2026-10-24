@@ -1,24 +1,22 @@
-# UMX Winter Command — aerial upgrade verification
+# Release checklist — October 24, 2026
 
-Build date: October 18, 2026.
+## Verified
+- [x] Reconciled PR with current main; preserved neighborhood-map work and marketing homepage.
+- [x] JavaScript syntax and seven domain/validation tests.
+- [x] Real Supabase RLS integration tests; MFA, staff/worker authorization, append-only records, correction conflicts, actor attribution and scope audit.
+- [x] Test fixtures rolled back; real property/contract/winter counts remain zero.
+- [x] Real Montana parcel GeoJSON response and browser rendering (300-feature cap).
+- [x] Real Esri image bytes and complete browser fallback rendering with source attribution.
+- [x] Real NWS air observation response; timestamp/unit/freshness validation implemented.
+- [x] Signed-out browser cannot open winter records; map diagnostic exposes only public reference data.
 
-## Verified through local automated testing
-- JavaScript syntax: pass (`node --check`).
-- EPSG:3857 tile bounding box conversion around Missoula: pass.
-- URL construction for Montana 2025 NAIP 30cm ArcGIS image service: pass (network-independent test).
-- Default aerial map mode, street/demo switch, parcel reference toggle, zoom and reset: pass (mocked map-library/service responses).
-- Both active green and noncontract red crossed-out demo features: pass.
-- Live-map hover formatting preserves latest ground temperature and latest deicer application independently: pass.
-- New manual ground measurement displayed in property record, worker field, historical display, CSV download: pass.
-- 390px mobile layout without horizontal overflow: pass.
-- No JavaScript errors in the simulated online desktop/mobile test: pass.
-- Mapping library offline fallback to usable illustrated view: pass.
+## Exact production gates
+- [ ] Actual owner MFA, authenticated form/CSV/correction/retry tests and same-account phone/desktop persistence.
+- [ ] Actual assigned-worker account/session-revocation test (only one account currently exists).
+- [ ] Coordinated updated sector frontend plus `db/sector_security.sql`; verify current per-user status ownership and MFA afterward.
+- [ ] Dashboard security/recovery: compromised-password protection, PostgreSQL security upgrade, backup retention and restore drill.
+- [ ] First real property coordinates, executed contract, approved service geometry and operator field trial.
+- [ ] Full 2025 NAIP imagery works, or owner accepts labeled fallback; primary provider failures remain recorded.
+- [ ] Merge/publish only the exact candidate that passed the outstanding acceptance gates.
 
-## Pending live network acceptance
-- Actual raster image tiles returned by Montana State Library ImageServer under browser CORS/connectivity conditions.
-- Actual GeoJSON parcel geometry query, scale/accuracy and public service availability.
-- Weather.gov observation API cross-origin availability from the deployed domain.
-- Official cadastral geometry alignment with individual real client contracts.
-- Authentication, access control, realtime database, routing and sensor data integration.
-
-This is a private-development review build, not a live operational service. All sample service records and colored client areas are fictional.
+An HTTP 200/Cloudflare success is deployment evidence, not proof of authentication, boundary approval, or field readiness. No sample record is an actual client.

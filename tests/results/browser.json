@@ -1,0 +1,14 @@
+{
+  "checked_on": "2026-10-24",
+  "environment": "Connected Chrome, managed local static preview",
+  "network_stubs": false,
+  "verified": {
+    "real_aerial_fallback": "18 Esri tiles loaded, zero fallback tile failures; 2025 source failure visibly labeled",
+    "real_parcel_overlay": "300 Montana State Library reference polygons rendered; visible feature cap",
+    "street_switch": "OpenStreetMap layer and attribution selected",
+    "signed_out_access": "Winter workspace hidden; UMX sign-in shown",
+    "phone_map": "390px iframe; 375px available content width after scrollbar, no horizontal overflow; real fallback imagery loaded",
+    "phone_access_gate": "390px content width, no horizontal overflow; workspace hidden"
+  },
+  "remaining": ["Exact Cloudflare candidate/domain verification", "Real owner sign-in/MFA", "Authenticated mobile form/history/CSV/retry/corrections", "Multi-device persistence", "Actual assigned-worker account and revocation", "First approved real property/contract and boundary"]
+}
