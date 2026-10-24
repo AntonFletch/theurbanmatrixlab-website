@@ -67,3 +67,23 @@ test('drawn scopes close automatically and reject crossing edges or collapsed ar
  assert.equal(validGeometry(closedScope([[0,0],[1,1],[0,1],[1,0]])),false);
  assert.equal(validGeometry(closedScope([[0,0],[1,0],[2,0]])),false);
 });
+
+import {addressRows,addressQueryURL,loadAddresses} from '../winter-command-preview/addresses.mjs';
+const addressGeo={type:'Polygon',coordinates:[[[0,0],[4,0],[4,4],[0,4],[0,0]],[[1,1],[2,1],[2,2],[1,2],[1,1]]]};
+const addressFeature=(id,point,type=1001,extra={})=>({type:'Feature',geometry:{type:'Point',coordinates:point},properties:{OBJECTID:id,fulladdress:id+' TEST ST',structtype:type,status:2,...extra}});
+test('public address pins exclude retired, unclassified, invalid and out-of-neighborhood points',()=>{
+ const home=addressFeature(1,[.5,.5]);
+ const rows=addressRows([home,home,addressFeature(2,[3,3],5085),addressFeature(3,[1.5,1.5]),addressFeature(4,[5,5]),addressFeature(5,[.5,.5],6000),addressFeature(6,[NaN,.5]),addressFeature(7,[.5,.5],1001,{status:4})],addressGeo);
+ assert.deepEqual(rows.map(r=>[r.id,r.kind]),[['1','home'],['2','biz']]);
+ const url=new URL(addressQueryURL(addressGeo,1000));assert.equal(url.searchParams.get('outSR'),'4326');assert.equal(url.searchParams.get('resultOffset'),'1000');
+ assert.deepEqual(JSON.parse(url.searchParams.get('geometry')),{xmin:0,ymin:0,xmax:4,ymax:4,spatialReference:{wkid:4326}});
+});
+test('public inventory loads later pages and rejects repeated pages, errors and cancelled requests',async()=>{
+ const pages=[[addressFeature(1,[.5,.5]),addressFeature(2,[3,3],5085)],[addressFeature(3,[.6,.6])]],offsets=[];
+ const fetcher=async url=>{offsets.push(new URL(url).searchParams.get('resultOffset'));return{ok:true,json:async()=>({type:'FeatureCollection',features:pages.shift()})};};
+ const rows=await loadAddresses(addressGeo,{fetcher,pageSize:2});assert.equal(rows.length,3);assert.deepEqual(offsets,['0','2']);
+ const repeat=async()=>({ok:true,json:async()=>({type:'FeatureCollection',features:[addressFeature(1,[.5,.5])],exceededTransferLimit:true})});
+ await assert.rejects(loadAddresses(addressGeo,{fetcher:repeat,pageSize:1}),/pagination is incomplete/);
+ await assert.rejects(loadAddresses(addressGeo,{fetcher:async()=>({ok:true,json:async()=>({error:{code:400}})})}),/invalid response/);
+ const controller=new AbortController();controller.abort();await assert.rejects(loadAddresses(addressGeo,{signal:controller.signal,fetcher:()=>{throw Error('must not fetch');}}),{name:'AbortError'});
+});

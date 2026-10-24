@@ -1,1 +1,25 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>UMX | Missoula neighborhood maps</title><link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css"><link rel="stylesheet" href="winter.css"></head><body><main><div class="review-intro"><div><p class="eyebrow">THE URBAN MATRIX LAB / MISSOULA</p><h1>Neighborhood maps</h1><p>One neighborhood at a time. Aerial imagery and official parcel references.</p></div><a href="./">Open private Winter Command →</a></div><section class="review-card"><div class="maphead"><div><p class="eyebrow">SELECTED NEIGHBORHOOD</p><h2 id="sector-name">Loading neighborhood…</h2></div><div><button id="aerial">Aerial</button><button id="street">Streets</button><button id="reset">Reset sector</button></div></div><div id="winter-map" aria-label="Map clipped to the selected Missoula neighborhood"></div><div class="mapfoot"><label><input id="parcel-toggle" type="checkbox">Parcel outlines</label><p id="map-status" role="status">Loading imagery…</p></div><section class="sector-picker" aria-label="Missoula neighborhoods"><div class="sector-picker-head"><label>Neighborhood<select id="sector-select" aria-label="Choose neighborhood"></select></label><div><span id="sector-page"></span><button id="sector-prev" aria-label="Previous three neighborhoods">‹</button><button id="sector-next" aria-label="Next three neighborhoods">›</button></div></div><div id="sector-cards" class="sector-cards"></div></section><div class="review-source"><p>City of Missoula neighborhood boundaries · Historical aerial imagery · Parcel outlines are references, not approved UMX service areas. Company records require sign-in.</p><details><summary>Map source</summary><p id="counts"></p></details></div></section></main><script src="../assets/vendor/leaflet/leaflet.js"></script><script type="module" src="map-check.mjs"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow">
+  <title>UMX | Missoula neighborhood maps</title>
+  <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css"><link rel="stylesheet" href="winter.css">
+</head>
+<body><main>
+  <div class="review-intro"><div><p class="eyebrow">THE URBAN MATRIX LAB / MISSOULA</p><h1>Neighborhood maps</h1><p>Homes and businesses plotted at their county GIS coordinates.</p></div><a href="./">Open private Winter Command →</a></div>
+  <section class="review-card">
+    <div class="maphead"><div><p class="eyebrow">SELECTED NEIGHBORHOOD</p><h2 id="sector-name">Loading neighborhood…</h2></div><div><button id="aerial">Aerial</button><button id="street">Streets</button><button id="reset">Reset sector</button></div></div>
+    <div class="address-toolbar">
+      <div class="address-tabs" role="group" aria-label="Address type"><button id="homes" aria-pressed="true">Homes</button><button id="businesses" aria-pressed="false">Businesses</button></div>
+      <label>Find an address<input id="address-search" type="search" placeholder="Search this neighborhood" autocomplete="off"></label>
+      <p id="address-count" role="status">Loading address pins…</p>
+    </div>
+    <div id="winter-map" aria-label="Address pins within the selected Missoula neighborhood"></div>
+    <div class="mapfoot"><label><input id="parcel-toggle" type="checkbox">Parcel outlines</label><p id="map-status" role="status">Loading imagery…</p></div>
+    <div class="address-feedback"><p id="address-status" role="status">Loading county address inventory…</p><button id="address-retry" hidden>Retry addresses</button><span class="address-legend"><i></i>Homes <i class="business-dot"></i>Commercial-coded addresses</span></div>
+    <section class="sector-picker" aria-label="Missoula neighborhoods"><div class="sector-picker-head"><label>Neighborhood<select id="sector-select" aria-label="Choose neighborhood"></select></label><div><span id="sector-page"></span><button id="sector-prev" aria-label="Previous three neighborhoods">‹</button><button id="sector-next" aria-label="Next three neighborhoods">›</button></div></div><div id="sector-cards" class="sector-cards"></div></section>
+    <section class="address-inventory" aria-label="Plotted addresses"><h3 id="address-list-title">Homes</h3><div id="address-list" class="address-list"></div><button id="address-more" hidden>Show more addresses</button></section>
+    <div class="review-source"><p>City of Missoula neighborhood boundaries · Missoula County GIS address inventory. Address points and parcel outlines are reference data; contracted UMX service areas and private statuses require sign-in.</p><details><summary>Map sources</summary><p><a id="address-source" target="_blank" rel="noopener">County address source</a></p><p id="counts"></p></details></div>
+  </section>
+</main><script src="../assets/vendor/leaflet/leaflet.js"></script><script type="module" src="map-check.mjs"></script></body>
+</html>

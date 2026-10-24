@@ -1,0 +1,18 @@
+{
+  "checked_at": "2026-10-24T17:17:22Z",
+  "environment": "Connected Chrome, managed local static preview",
+  "network_stubs": false,
+  "verified": {
+    "northside": "1,084 residential / 44 commercial-coded address pins from actual paginated county responses",
+    "westside": "1,363 residential / 308 commercial-coded address pins",
+    "address_selection": "102 N 2ND ST W and 101 S TRAVOIS open map pin popups at their county coordinates",
+    "search": "Exact address query reduces Northside to one residential pin",
+    "tabs": "Homes and Businesses select independent pin sets",
+    "latest_selection": "Rapid Rose Park then Westside selection settles on Westside with its own 1,363 residential pins",
+    "phone": "390px iframe / 375px available content; 375px total content, no horizontal overflow; residential and business pins load",
+    "screenshot": "house-pins.jpg"
+  },
+  "limits": [
+    "Public address-layer acceptance only; no signed-in company records or private status writes tested."
+  ]
+}

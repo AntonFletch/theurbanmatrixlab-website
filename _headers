@@ -6,4 +6,4 @@
   X-Frame-Options: DENY
 
 /winter-command-preview/*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://gisservice.mt.gov https://tile.openstreetmap.org https://server.arcgisonline.com; connect-src 'self' https://esm.sh https://xdaxbueyftyljsrhabpx.supabase.co wss://xdaxbueyftyljsrhabpx.supabase.co https://gisservice.mt.gov https://api.weather.gov; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://gisservice.mt.gov https://tile.openstreetmap.org https://server.arcgisonline.com; connect-src 'self' https://esm.sh https://xdaxbueyftyljsrhabpx.supabase.co wss://xdaxbueyftyljsrhabpx.supabase.co https://gisservice.mt.gov https://api.weather.gov https://services1.arcgis.com; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'

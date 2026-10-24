@@ -4,7 +4,7 @@ Updated October 24, 2026. The rebuild includes current main and preserves the Oc
 
 ## Corrected field workflow
 - Winter Command now follows the approved one-neighborhood layout: all 20 official city boundaries, a clipped map, neighborhood selector and three sector cards immediately below the map.
-- The review map uses the same map/sector modules and only public reference geometry. Company records remain protected; this does not bypass account acceptance.
+- The review map restores actual county residential and commercial address pins, address search, clickable popups and a paged address list. It uses the county’s official MCGISData hosted service because the older county server rejects this environment. Queries paginate completely, filter against the exact selected neighborhood (including holes), cancel stale selections and expose failures with retry. Company records remain protected; this does not bypass account acceptance.
 - Service setup uses map drawing with start/undo/clear/finish controls. No raw GeoJSON is requested from the operator.
 - Service geometry is validated by PostGIS in the non-public `extensions` schema. A contracted sidewalk/parking scope may exclude the building/address point. Invalid crossings and misplaced holes are rejected.
 - Disable an incorrect scope and verify a replacement under the same agreement; old geometry, audit and field records are retained. Only one enabled scope per property/agreement is permitted.
@@ -27,10 +27,11 @@ UMX OS is ACTIVE_HEALTHY. Applied additive migrations correspond to `db/winter_c
 `db/sector_security.sql` is deliberately staged: apply it only alongside the updated Sector Command frontend, after final acceptance. Applying it to the old live frontend would require MFA that that frontend cannot collect. Winter tables already enforce MFA. This remaining coordinated rollout is a release gate, not completed production hardening of the old map.
 
 ## Evidence
-- `node --test tests/winter.test.mjs`: ten domain tests, including validation, independent deicer chronology/corrections, Mercator tiles, CSV formulas, contract checks and geography/timezone handling, all 20 neighborhood names, clipping holes/islands, and drawn boundary validation.
+- `node --test tests/winter.test.mjs`: twelve domain tests, including validation, independent deicer chronology/corrections, Mercator tiles, CSV formulas, contract checks and geography/timezone handling, all 20 neighborhood names, clipping holes/islands, drawn boundary validation, address filtering and address-service pagination/error/cancellation.
 - `tests/winter_rls.sql`: actual database integration tests for staff/MFA, assigned vs unassigned workers, immutable records, actor spoofing, treatment/future-time validation, correction concurrency, scope audit, inactive/paused contracts and anonymous privileges. All fixtures roll back.
 - `tests/results/database.json`: recorded pass and unchanged zero client/record counts.
 - `python scripts/check-live-services.py`: real image/parcel/weather downloads; `tests/results/live-services.json` retains the NAIP error alongside passing Esri, Montana parcel and NWS checks. The script returns failure while any required source is broken; a fallback is never relabeled as a passing NAIP test.
+- `node scripts/check-addresses.mjs`: actual county-hosted responses through the production address loader passed for all 20 neighborhoods; counts are in `tests/results/addresses.json`. These are address records, not occupied-house or operating-company counts.
 - `map-check.html` is a public-data-only diagnostic using the same map module. It cannot read UMX records or bypass sign-in.
 - Connected browser: actual Esri fallback tiles, actual Montana reference polygons, layer controls and signed-out record gate tested. Authenticated editing/MFA and multi-device acceptance are still required; an SQL role test is not a real sign-in.
 - GitHub workflow runs domain/syntax checks on this PR. A successful Cloudflare build only confirms deployment, not operational acceptance.
@@ -54,3 +55,5 @@ Run syntax/domain checks and build with `python scripts/build-preview.py`. `site
 - https://api.weather.gov/stations/KMSO/observations/latest
 - https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection
 - https://supabase.com/changelog/postgres-15-19-17-11-breaking-changes
+
+County address source: https://www.arcgis.com/home/item.html?id=2cc878f55cbb492c9388026aec382e58 (MCGISData, Missoula County). Only public address/classification/coordinate fields are requested; this layer does not import clients or expose private status notes.
