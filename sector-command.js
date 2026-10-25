@@ -140,7 +140,7 @@ function drawPins(){
  const m=state.map;if(!m?.getSource('umx-points'))return;
  const list=visibleRows();
  const features=list.map(x=>{const s=getStats(x);return {type:'Feature',geometry:{type:'Point',coordinates:[x.lng,x.lat]},properties:{
-  id:x.id,color:pointColor(x),vip:s.vip,postalUnverified:!s.postal,declined:s.declined,excluded:s.excluded,kind:x.kind
+  id:x.id,color:pointColor(x),vip:s.vip&&!s.declined&&!s.excluded,postalUnverified:!s.postal,declined:s.declined,excluded:s.excluded,kind:x.kind
  }}});
  m.getSource('umx-points').setData({type:'FeatureCollection',features});
  const all=state.cache.get(state.sector)||[];
