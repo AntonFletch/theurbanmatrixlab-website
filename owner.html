@@ -434,6 +434,8 @@ supabase.channel('owner-ops')
   .subscribe();
 
 await loadAll();
+const initialSection=location.hash.replace('#','');
+if(initialSection){const tab=document.querySelector('.portal-sidebar button[data-tab="'+initialSection+'"]');if(tab)tab.click();}
 
 </script>
 </body></html>
