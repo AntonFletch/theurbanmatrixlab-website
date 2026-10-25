@@ -24,7 +24,7 @@ function setNotice(t){$('loading-map').textContent=t}
 async function getJSON(url){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),28000);try{const r=await fetch(url,{signal:controller.signal,mode:'cors'});if(!r.ok)throw Error('County GIS HTTP '+r.status);const j=await r.json();if(j.error)throw Error(j.error.message||'GIS service error');return j}finally{clearTimeout(timer)}}
 function params(obj){return new URLSearchParams(obj).toString()}
 async function bootstrap(){try{const {data:{session},error}=await supabase.auth.getSession();if(error||!session){$('auth-message').textContent='Owner sign-in required. Redirecting to UMX Access…';setTimeout(()=>location.replace('login.html'),600);return}
-const {data:profile,error:pErr}=await supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle();if(pErr)throw Error('Could not verify staff permissions');const role=String(profile?.role||'').toLowerCase();if(!['owner','admin','dispatcher','manager'].includes(role)){$('auth-message').textContent='Owner/staff access required. Your account cannot view this map.';return}state.user=session.user;$('lock').hidden=true;$('app').hidden=false;await init();}catch(e){$('auth-message').textContent='UMX database is unavailable or access could not be verified. '+e.message}}
+const {data:profile,error:pErr}=await supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle();if(pErr)throw Error('Could not verify staff permissions');const role=String(profile?.role||'').toLowerCase();if(!['owner','admin','dispatcher','manager'].includes(role)){$('auth-message').textContent='Owner/staff access required. Your account cannot view this map.';return}state.user=session.user;$('lock').hidden=true;$('app').hidden=false;await init();}catch(e){const msg='UMX could not finish loading: '+e.message;if($('app').hidden){$('auth-message').textContent=msg}else{setNotice(msg);console.error(msg)}}}
 async function init(){
  buildList();connectEvents();
  if(typeof maplibregl.supported==='function'&&!maplibregl.supported())throw Error('3D WebGL map unavailable in this browser. Enable hardware acceleration or use an updated Chrome.');
@@ -78,7 +78,7 @@ function installMapLayers(){
  },labels);
  try{if(typeof m.setLight==='function')m.setLight({anchor:'viewport',color:'#a6bce2',intensity:0.62,position:[1.3,225,32]})}catch(e){}
  const blank={type:'FeatureCollection',features:[]};
- if(!m.getSource('umx-zone-mask'))m.addSource('umx-zone-mask',{type:'geojson',data:blank});
+ if(!m.getSource('umx-zone-mask'))m.addSource('umx-zone-mask',{type:'geojson',data:{type:'Feature',properties:{},geometry:{type:'Polygon',coordinates:[[[-180,-85],[180,-85],[180,85],[-180,85],[-180,-85]]]}}});
  if(!m.getLayer('umx-zone-mask'))m.addLayer({id:'umx-zone-mask',type:'fill',source:'umx-zone-mask',paint:{'fill-color':'#080d16','fill-opacity':0.995}});
  if(!m.getSource('umx-zone'))m.addSource('umx-zone',{type:'geojson',data:blank});
  if(!m.getLayer('umx-zone-glow'))m.addLayer({id:'umx-zone-glow',type:'line',source:'umx-zone',paint:{'line-color':'#dfb95e','line-width':6,'line-blur':7,'line-opacity':0.68}});
