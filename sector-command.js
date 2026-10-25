@@ -40,7 +40,7 @@ async function init(){
   state.map.once('load',()=>{clearTimeout(timeout);resolve()});
   state.map.once('error',e=>{if(!state.map.isStyleLoaded()){clearTimeout(timeout);reject(Error(e.error?.message||'Map tile service error'))}});
  });
- installMapLayers();
+ installMapLayers();state.loadedBase='street';
  state.map.on('click',e=>{
   if(!state.map.getLayer('umx-pins'))return;
   const hits=state.map.queryRenderedFeatures(e.point,{layers:['umx-pins']});
@@ -65,7 +65,7 @@ function makeSatelliteStyle(){return {version:8,sources:{
  },layers:[{id:'sat-bg',type:'background',paint:{'background-color':'#07121e'}},{id:'satellite',type:'raster',source:'satellite',paint:{'raster-brightness-max':0.62,'raster-saturation':-0.5}}]};}
 function installMapLayers(){
  const m=state.map;
- if(!m.isStyleLoaded())return;
+ /* install after the MapLibre style.load event */
  if(!m.getSource('openmaptiles'))m.addSource('openmaptiles',{type:'vector',url:'https://tiles.openfreemap.org/planet'});
  // Geometry heights come from actual OSM/OpenMapTiles features, with a modest fallback for unmapped buildings.
  const labels=m.getStyle().layers.find(l=>l.type==='symbol'&&l.layout?.['text-field'])?.id;
@@ -116,8 +116,9 @@ function setTiles(t){
  $('streets').classList.toggle('on',t==='street');$('satellite').classList.toggle('on',t==='satellite');
  const m=state.map;if(!m)return;
  setNotice('Switching map imagery…');
+ if(t===state.loadedBase&&m.getLayer('umx-zone-line')){setNotice('');return;}
+ m.once('style.load',()=>{try{installMapLayers();state.loadedBase=t;setNotice('')}catch(e){setNotice('Map style unavailable: '+e.message)}});
  m.setStyle(t==='satellite'?makeSatelliteStyle():'https://tiles.openfreemap.org/styles/dark');
- m.once('style.load',()=>{try{installMapLayers();setNotice('')}catch(e){setNotice('Map style unavailable: '+e.message)}});
 }
 async function loadSector(n){if(!state.boundaries[n]){setNotice('Boundary not available: '+n);return}const token=++state.serial;state.sector=n;state.kind='home';state.search='';state.visible=8;state.selection=null;$('profile').hidden=true;$('search-address').value='';const i=NAMES.indexOf(n);$('sector-number').textContent=String(i+1).padStart(2,'0');$('sector-name').textContent=n;document.querySelectorAll('.tabs button').forEach(b=>{const on=b.dataset.kind==='home';b.classList.toggle('on',on);b.setAttribute('aria-selected',String(on))});renderStrip();setNotice('Loading '+n+' from county GIS…');drawSectorBoundary(n);if(state.cache.has(n)){await loadFlags(n);if(token!==state.serial)return;refresh();setNotice('');return}
 try{const rows=await loadGIS(state.boundaries[n]);if(token!==state.serial)return;state.cache.set(n,rows);await loadFlags(n);if(token!==state.serial)return;refresh();setNotice('')}catch(e){if(token!==state.serial)return;state.cache.set(n,[]);refresh();setNotice('County GIS data unavailable for '+n+'. '+e.message)}}
