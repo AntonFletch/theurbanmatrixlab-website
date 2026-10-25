@@ -10,7 +10,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL='https://xdaxbueyftyljsrhabpx.supabase.co';const SUPABASE_KEY='sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ';
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const login=document.getElementById('login-form'),setPassword=document.getElementById('password-form'),recovery=document.getElementById('recovery-form');const status=document.getElementById('status');
-const routeForRole=r=>{r=String(r||'').toLowerCase();if(['owner','admin','dispatcher','manager'].includes(r))return'owner.html';if(['employee','staff','worker'].includes(r))return'employee.html';return'customer.html'};
+const routeForRole=r=>{r=String(r||'').toLowerCase();if(['owner','admin','dispatcher','manager'].includes(r))return'map.html';if(['employee','staff','worker'].includes(r))return'employee.html';return'customer.html'};
 async function route(){const {data:{session}}=await supabase.auth.getSession();if(!session)return;const {data:profile}=await supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle();location.replace(routeForRole(profile?.role));}
 const params=new URLSearchParams(location.search);const authMode=params.get('mode')||'';let invited=authMode==='invite'||authMode==='recovery'||location.hash.includes('type=invite')||location.hash.includes('type=recovery');
 // Give Supabase a moment to exchange an invite/recovery callback for a session.
