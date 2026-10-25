@@ -1,4 +1,5 @@
 import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+import * as maplibregl from 'https://unpkg.com/maplibre-gl@6.15.0/dist/maplibre-gl.mjs';
 const DB='https://xdaxbueyftyljsrhabpx.supabase.co';
 const KEY='sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ';
 const supabase=createClient(DB,KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
@@ -26,7 +27,7 @@ async function bootstrap(){try{const {data:{session},error}=await supabase.auth.
 const {data:profile,error:pErr}=await supabase.from('profiles').select('role').eq('id',session.user.id).maybeSingle();if(pErr)throw Error('Could not verify staff permissions');const role=String(profile?.role||'').toLowerCase();if(!['owner','admin','dispatcher','manager'].includes(role)){$('auth-message').textContent='Owner/staff access required. Your account cannot view this map.';return}state.user=session.user;$('lock').hidden=true;$('app').hidden=false;await init();}catch(e){$('auth-message').textContent='UMX database is unavailable or access could not be verified. '+e.message}}
 async function init(){
  buildList();connectEvents();
- if(!window.maplibregl||!maplibregl.supported())throw Error('3D WebGL map unavailable in this browser. Enable hardware acceleration or use an updated Chrome.');
+ if(typeof maplibregl.supported==='function'&&!maplibregl.supported())throw Error('3D WebGL map unavailable in this browser. Enable hardware acceleration or use an updated Chrome.');
  state.map=new maplibregl.Map({
   container:'map',style:'https://tiles.openfreemap.org/styles/dark',
   center:[-113.995,46.881],zoom:13,pitch:50,bearing:-19,
