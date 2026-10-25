@@ -31,3 +31,6 @@
 @media(max-width:1100px){.workarea{grid-template-columns:minmax(0,1fr) 235px}.mapstage{height:475px}}
 @media(max-width:780px){.mapstage{height:55vh;min-height:340px;max-height:560px}.sector-overlay{top:10px;left:10px;padding:7px;min-width:160px;font-size:9px}.sector-overlay small{font-size:7px}.map-tools{bottom:13px;right:10px}.map-message{bottom:65px;left:9px;max-width:92%;font-size:11px}.map-tools button{font-size:10px}.sector-insights{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px}.insights-title,.sector-insights p{grid-column:1/-1}.insight-row{display:flex;flex-direction:column;gap:0}.contractcard{padding:12px}.maplibregl-ctrl-top-right{top:68px}}
 @media(prefers-reduced-motion:reduce){.beacon{box-shadow:none}}
+
+/* Status controls wrap on narrow employee phones. */
+.recordbar,.savebar{flex-wrap:wrap}.recordbar>div{flex:1 1 180px}.recordbar input{flex:1 1 140px;min-width:0}

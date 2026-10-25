@@ -1,0 +1,179 @@
+{
+  "checkedDate": "October 25, 2026",
+  "checkedAt": "2026-10-25T22:40:41.078Z",
+  "source": "https://services1.arcgis.com/NQWYt9dWr9BlL9QE/arcgis/rest/services/AddressStructurePoint/FeatureServer/0",
+  "boundarySource": "https://services.arcgis.com/HfwHS0BxZBQ1E5DY/ArcGIS/rest/services/Neighborhoods_mso/FeatureServer/0",
+  "method": "Complete object-ID manifest, 400-record batches checked against manifest, exact point-in-polygon filtering including holes; stable county GlobalIDs; citywide totals deduplicated.",
+  "sourceRecords": 35928,
+  "totals": {
+    "homes": 25374,
+    "businesses": 2446,
+    "countyStructureVerified": 26034,
+    "postalVerified": 844,
+    "parcelReferences": 27786
+  },
+  "sectors": [
+    {
+      "name": "Northside",
+      "homes": 1084,
+      "businesses": 44,
+      "countyStructureVerified": 1046,
+      "postalVerified": 21,
+      "parcelReferences": 1126
+    },
+    {
+      "name": "Westside",
+      "homes": 1363,
+      "businesses": 308,
+      "countyStructureVerified": 1602,
+      "postalVerified": 49,
+      "parcelReferences": 1670
+    },
+    {
+      "name": "Captain John Mullan",
+      "homes": 2252,
+      "businesses": 155,
+      "countyStructureVerified": 2093,
+      "postalVerified": 79,
+      "parcelReferences": 2398
+    },
+    {
+      "name": "Grant Creek",
+      "homes": 1018,
+      "businesses": 259,
+      "countyStructureVerified": 1203,
+      "postalVerified": 142,
+      "parcelReferences": 1263
+    },
+    {
+      "name": "Upper Rattlesnake",
+      "homes": 1426,
+      "businesses": 8,
+      "countyStructureVerified": 1404,
+      "postalVerified": 50,
+      "parcelReferences": 1434
+    },
+    {
+      "name": "Lower Rattlesnake",
+      "homes": 826,
+      "businesses": 6,
+      "countyStructureVerified": 817,
+      "postalVerified": 76,
+      "parcelReferences": 832
+    },
+    {
+      "name": "Marshall Canyon",
+      "homes": 190,
+      "businesses": 3,
+      "countyStructureVerified": 176,
+      "postalVerified": 23,
+      "parcelReferences": 193
+    },
+    {
+      "name": "Heart of Missoula",
+      "homes": 606,
+      "businesses": 433,
+      "countyStructureVerified": 986,
+      "postalVerified": 28,
+      "parcelReferences": 1039
+    },
+    {
+      "name": "Riverfront",
+      "homes": 1013,
+      "businesses": 134,
+      "countyStructureVerified": 1013,
+      "postalVerified": 28,
+      "parcelReferences": 1144
+    },
+    {
+      "name": "River Road",
+      "homes": 1175,
+      "businesses": 80,
+      "countyStructureVerified": 1158,
+      "postalVerified": 7,
+      "parcelReferences": 1253
+    },
+    {
+      "name": "Two Rivers",
+      "homes": 345,
+      "businesses": 60,
+      "countyStructureVerified": 392,
+      "postalVerified": 8,
+      "parcelReferences": 405
+    },
+    {
+      "name": "Franklin to the Fort",
+      "homes": 3090,
+      "businesses": 200,
+      "countyStructureVerified": 3091,
+      "postalVerified": 34,
+      "parcelReferences": 3289
+    },
+    {
+      "name": "Rose Park",
+      "homes": 1919,
+      "businesses": 315,
+      "countyStructureVerified": 2170,
+      "postalVerified": 28,
+      "parcelReferences": 2234
+    },
+    {
+      "name": "University District",
+      "homes": 1866,
+      "businesses": 53,
+      "countyStructureVerified": 1502,
+      "postalVerified": 42,
+      "parcelReferences": 1919
+    },
+    {
+      "name": "Lewis & Clark",
+      "homes": 861,
+      "businesses": 71,
+      "countyStructureVerified": 920,
+      "postalVerified": 17,
+      "parcelReferences": 932
+    },
+    {
+      "name": "Southgate Triangle",
+      "homes": 1007,
+      "businesses": 248,
+      "countyStructureVerified": 1231,
+      "postalVerified": 16,
+      "parcelReferences": 1255
+    },
+    {
+      "name": "South 39th Street",
+      "homes": 933,
+      "businesses": 6,
+      "countyStructureVerified": 932,
+      "postalVerified": 1,
+      "parcelReferences": 939
+    },
+    {
+      "name": "Moose Can Gully",
+      "homes": 1483,
+      "businesses": 9,
+      "countyStructureVerified": 1472,
+      "postalVerified": 22,
+      "parcelReferences": 1492
+    },
+    {
+      "name": "Miller Creek",
+      "homes": 1681,
+      "businesses": 20,
+      "countyStructureVerified": 1573,
+      "postalVerified": 172,
+      "parcelReferences": 1699
+    },
+    {
+      "name": "Farviews / Pattee Canyon",
+      "homes": 1236,
+      "businesses": 34,
+      "countyStructureVerified": 1253,
+      "postalVerified": 1,
+      "parcelReferences": 1270
+    }
+  ],
+  "umxFieldVerification": false,
+  "umxClientAuthorization": false
+}
