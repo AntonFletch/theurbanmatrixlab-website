@@ -1,3 +1,5 @@
+/zoom https://us05web.zoom.us/j/3724811504 302
+/zoom/ https://us05web.zoom.us/j/3724811504 302
 /publication /publication/index.html 200
 /publication/* /publication/:splat 200
 /* /index.html 200
