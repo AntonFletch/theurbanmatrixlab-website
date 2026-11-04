@@ -1,19 +1,25 @@
-// The locked Sector Command colors and status precedence.
-export const statusColors = Object.freeze({ home:'#49a9ff', biz:'#a876ed', active:'#08df8b', contacted:'#f5c75c', declined:'#ff273b', excluded:'#7c8798' });
+// UMX Northside outreach colors and priorities.
+// The existing active_business database flag is also used for residential active clients
+// so current records remain compatible without a schema migration.
+export const statusColors = Object.freeze({
+ home:'#9199a7', biz:'#9199a7', active:'#35bb7b',
+ contacted:'#f0bd3e', declined:'#e76168', excluded:'#7c8798'
+});
 import {countyPropertyId as stableCountyId} from './sector-data.mjs';
 export const countyPropertyId = row => stableCountyId(row.id);
-export function propertyFlags(row, saved = {}) {
-  return { declined:!!saved.declined, excluded:!!saved.excluded || row.type === 2001, contacted:!!saved.contacted, active:!!saved.active_business && row.kind === 'biz', vip:!!saved.vip, postal:row.postal === 1 };
+export function propertyFlags(row,saved={}) {
+ return {declined:!!saved.declined,excluded:!!saved.excluded||row.type===2001,
+ contacted:!!saved.contacted,active:!!saved.active_business,vip:!!saved.vip,postal:row.postal===1};
 }
-export function propertyColor(row, saved = {}) {
-  const flags = propertyFlags(row, saved);
-  if (flags.declined) return statusColors.declined;
-  if (flags.excluded) return statusColors.excluded;
-  if (flags.active) return statusColors.active;
-  if (flags.contacted) return statusColors.contacted;
-  return statusColors[row.kind];
+export function propertyColor(row,saved={}) {
+ const f=propertyFlags(row,saved);
+ if(f.declined)return statusColors.declined;
+ if(f.excluded)return statusColors.excluded;
+ if(f.active)return statusColors.active;
+ if(f.contacted)return statusColors.contacted;
+ return statusColors[row.kind];
 }
-export function propertyStatus(row, saved = {}) {
-  const flags = propertyFlags(row, saved);
-  return flags.declined ? 'Declined' : flags.excluded ? 'Excluded' : flags.vip ? '★ VIP' : flags.active ? 'Operating confirmed' : flags.contacted ? 'Contacted' : flags.postal ? 'County postal verified' : 'Postal unverified';
+export function propertyStatus(row,saved={}) {
+ const f=propertyFlags(row,saved);
+ return f.declined?'Declined':f.excluded?'Excluded':f.active?'Active':f.contacted?'Contacted':'Unverified';
 }

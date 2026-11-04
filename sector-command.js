@@ -43,7 +43,7 @@ async function init(){
  if(typeof maplibregl.supported==='function'&&!maplibregl.supported())throw Error('3D WebGL map unavailable in this browser. Enable hardware acceleration or use an updated Chrome.');
  state.map=new maplibregl.Map({
   container:'map',style:'https://tiles.openfreemap.org/styles/dark',
-  center:[-113.995,46.881],zoom:13,pitch:50,bearing:-19,
+  center:[-113.995,46.881],zoom:13,pitch:0,bearing:0,
   antialias:true,renderWorldCopies:false,maxPitch:70,attributionControl:true
  });
  state.map.addControl(new maplibregl.NavigationControl({showCompass:true}),'top-right');
@@ -174,7 +174,37 @@ async function syncCurrent(){
  }catch(e){if(serial===state.serial)lockSector(e.message)}finally{state.syncing=false}
 }
 function visibleRows(){const list=state.cache.get(state.sector)||[];return list.filter(x=>x.kind===state.kind).filter(x=>!state.search||x.address.toLowerCase().includes(state.search))}
-function refresh(){const n=state.sector;const list=visibleRows();$('records-title').textContent=(state.kind==='home'?'Homes':'Businesses')+' · '+n;$('data-source').textContent='County GIS checked '+(state.checks.get(n)?new Date(state.checks.get(n).checkedAt).toLocaleTimeString([], {hour:'numeric',minute:'2-digit'}):'when loaded')+' · '+(state.dbReady?'private status synced':'private status sync unavailable');$('record-count').textContent=list.length.toLocaleString()+' address records';$('show-more').hidden=list.length<=state.visible;const root=$('record-list');root.replaceChildren();for(const row of list.slice(0,state.visible)){const b=document.createElement('button');b.className='record';const a=document.createElement('span');const pin=document.createElement('i');pin.style.background=pointColor(row);pin.style.outline=row.postal===1?'none':'2px solid #ffae39';a.append(pin,document.createTextNode(row.address));const status=document.createElement('em');status.textContent=statusText(row);b.append(a,status);b.onclick=()=>selectRow(row);root.append(b)}if(!list.length){const p=document.createElement('p');p.style.padding='14px';p.style.color='#a7b1bd';p.textContent='No matching county address records for this sector / tab.';root.append(p)}drawPins();renderStrip();}
+function refresh(){
+ const n=state.sector,list=visibleRows(),root=$('record-list'),profile=$('profile');
+ $('records-title').textContent=(state.kind==='home'?'Houses':'Businesses')+' · '+n;
+ $('data-source').textContent='County GIS checked '+(state.checks.get(n)?new Date(state.checks.get(n).checkedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'when loaded')+' · '+(state.dbReady?'private status synced':'private status sync unavailable');
+ $('record-count').textContent=list.length.toLocaleString()+' address records';
+ $('show-more').hidden=list.length<=state.visible;
+ root.replaceChildren();
+ const rows=list.slice(0,state.visible);
+ if(state.selection&&!rows.some(row=>row.id===state.selection.id)){state.selection=null;state.dirty=false;}
+ for(const row of rows){
+  const open=state.selection?.id===row.id;
+  const item=document.createElement('div');item.className='property-row'+(open?' selected':'');
+  const button=document.createElement('button');button.type='button';button.className='record';button.setAttribute('aria-expanded',String(open));
+  const left=document.createElement('span');left.className='record-address';
+  const pin=document.createElement('i');pin.style.background=pointColor(row);
+  const address=document.createElement('strong');address.textContent=row.address;
+  left.append(pin,address);
+  if(getStats(row).vip){const star=document.createElement('b');star.className='vipicon';star.textContent='★';star.title='VIP property';left.append(star);}
+  const right=document.createElement('span');right.className='record-right';
+  const status=document.createElement('em');status.textContent=statusText(row);
+  const chevron=document.createElement('b');chevron.className='record-chevron';chevron.textContent='⌄';
+  right.append(status,chevron);button.append(left,right);button.onclick=()=>selectRow(row);
+  item.append(button);
+  if(open){profile.hidden=false;item.append(profile);}
+  root.append(item);
+ }
+ if(!list.length){const p=document.createElement('p');p.className='no-records';p.textContent='No matching county addresses in Northside.';root.append(p);}
+ if(!state.selection){profile.hidden=true;root.after(profile);}
+ drawPins();renderStrip();
+}
+
 function drawPins(){
  const m=state.map;if(!m?.getSource('umx-points'))return;
  const list=visibleRows();
@@ -192,18 +222,25 @@ function drawPins(){
 function fillProfile(row){
  state.editVersion++;
  $('profile-address').textContent=row.address;
+ $('profile-status').textContent=statusText(row);
  $('profile-detail').textContent=(row.kind==='home'?'Residential address':'Commercial-coded address')+' • County postal: '+(row.postal===1?'Verified':'Unverified')+' • County structure: '+(row.countyStatus===2?'Field verified by county':'Unverified')+(row.parcelId?' • Parcel reference: '+row.parcelId:'')+' • UMX service measurements and client authorization pending.'+(row.type===2001?' • Hospital: automatically excluded.':'');
  const f=flagFor(row.id);for(const [name,prop] of [['contacted','contacted'],['declined','declined'],['excluded','excluded'],['active','active_business'],['vip','vip']])$('flag-'+name).checked=!!f[prop];
- $('flag-active').disabled=row.kind!=='biz';$('flag-excluded').disabled=row.type===2001;$('flag-excluded').checked=!!f.excluded||row.type===2001;$('flag-reason').value=f.notes||'';
+ $('flag-active').disabled=false;$('flag-excluded').disabled=row.type===2001;$('flag-excluded').checked=!!f.excluded||row.type===2001;$('flag-reason').value=f.notes||'';
  $('save-message').textContent=state.dbReady?'Private status synced · updates every 30 seconds':'Private status sync unavailable — reload data before saving';
  $('save-flags').disabled=!state.dbReady||!navigator.onLine;
  $('reload-status').disabled=!navigator.onLine;
 }
-function selectRow(row){state.selection=row;state.dirty=false;$('profile').hidden=false;fillProfile(row);state.map.easeTo({center:[row.lng,row.lat],zoom:Math.max(15,state.map.getZoom()),duration:480});$('profile').scrollIntoView({behavior:'smooth',block:'nearest'})}
+function selectRow(row){
+ if(state.selection?.id===row.id){
+  state.selection=null;state.dirty=false;$('profile').hidden=true;refresh();return;
+ }
+ state.selection=row;state.dirty=false;fillProfile(row);refresh();
+ state.map.easeTo({center:[row.lng,row.lat],zoom:Math.max(16,state.map.getZoom()),pitch:0,bearing:0,duration:480});
+}
 async function saveFlags(){
  if(!state.selection||!state.user||!state.dbReady||state.saving)return;
  const row=state.selection,sector=state.sector,serial=state.serial,editVersion=state.editVersion;
- const f={user_id:state.user.id,property_id:row.id,sector,contacted:$('flag-contacted').checked,declined:$('flag-declined').checked,excluded:$('flag-excluded').checked||row.type===2001,active_business:row.kind==='biz'&&$('flag-active').checked,vip:$('flag-vip').checked,notes:$('flag-reason').value.trim(),updated_at:new Date().toISOString()};
+ const f={user_id:state.user.id,property_id:row.id,sector,contacted:$('flag-contacted').checked,declined:$('flag-declined').checked,excluded:$('flag-excluded').checked||row.type===2001,active_business:$('flag-active').checked,vip:$('flag-vip').checked,notes:$('flag-reason').value.trim(),updated_at:new Date().toISOString()};
  state.flagSerial++;state.saving=true;$('save-flags').disabled=true;$('save-message').textContent='Saving…';
  try{
   if(!navigator.onLine)throw Error('Device is offline. Your changes remain on screen; reconnect and save again.');
@@ -222,5 +259,5 @@ function connectEvents(){
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncCurrent()});
  window.addEventListener('online',()=>{if(state.selection)$('save-flags').disabled=!state.dbReady;syncCurrent()});
  window.addEventListener('offline',()=>{if(state.selection){$('save-flags').disabled=true;$('save-message').textContent='Offline — changes are not saved. Reconnect to save.'}});
- document.querySelectorAll('.tabs [data-kind]').forEach(b=>b.onclick=()=>{state.kind=b.dataset.kind;state.visible=8;state.search='';$('search-address').value='';$('profile').hidden=true;document.querySelectorAll('.tabs button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',String(x===b))});refresh()});$('streets').onclick=()=>setTiles('street');$('satellite').onclick=()=>setTiles('satellite');$('tilt-view').onclick=()=>{const flat=state.map.getPitch()>10;state.map.easeTo({pitch:flat?0:52,bearing:flat?0:-19,duration:600});$('tilt-view').textContent=flat?'3D View':'2D View'};$('sector-prev').onclick=()=>{state.page=Math.max(0,state.page-1);renderStrip()};$('sector-next').onclick=()=>{state.page=Math.min(Math.ceil(NAMES.length/3)-1,state.page+1);renderStrip()};$('all-sectors-toggle').onclick=()=>{$('all-sectors').hidden=!$('all-sectors').hidden};$('sector-select').onchange=e=>{state.page=Math.floor(NAMES.indexOf(e.target.value)/3);loadSector(e.target.value)};$('search-address').oninput=e=>{state.search=e.target.value.trim().toLowerCase();state.visible=8;refresh()};$('show-more').onclick=()=>{state.visible+=24;refresh()};$('profile-close').onclick=()=>{$('profile').hidden=true};$('save-flags').onclick=saveFlags;$('print-contract').onclick=()=>window.print()}
+ document.querySelectorAll('.tabs [data-kind]').forEach(b=>b.onclick=()=>{state.kind=b.dataset.kind;state.visible=8;state.search='';$('search-address').value='';$('profile').hidden=true;document.querySelectorAll('.tabs button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',String(x===b))});refresh()});$('streets').onclick=()=>setTiles('street');$('satellite').onclick=()=>setTiles('satellite');$('tilt-view').onclick=()=>{const flat=state.map.getPitch()>10;state.map.easeTo({pitch:flat?0:52,bearing:flat?0:-19,duration:600});$('tilt-view').textContent=flat?'3D View':'2D View'};$('sector-prev').onclick=()=>{state.page=Math.max(0,state.page-1);renderStrip()};$('sector-next').onclick=()=>{state.page=Math.min(Math.ceil(NAMES.length/3)-1,state.page+1);renderStrip()};$('all-sectors-toggle').onclick=()=>{$('all-sectors').hidden=!$('all-sectors').hidden};$('sector-select').onchange=e=>{state.page=Math.floor(NAMES.indexOf(e.target.value)/3);loadSector(e.target.value)};$('search-address').oninput=e=>{state.search=e.target.value.trim().toLowerCase();state.visible=8;refresh()};$('show-more').onclick=()=>{state.visible+=24;refresh()};$('profile-close').onclick=()=>{state.selection=null;state.dirty=false;$('profile').hidden=true;refresh()};$('save-flags').onclick=saveFlags;$('print-contract').onclick=()=>window.print()}
 bootstrap();
