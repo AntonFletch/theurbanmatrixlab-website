@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow"><title>UMX | Northside Command Map</title>
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.15.0/dist/maplibre-gl.css"><link rel="stylesheet" href="sector-command.css?v=20261103-northside">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.15.0/dist/maplibre-gl.css"><link rel="stylesheet" href="sector-command.css?v=20261104-command-nav">
 </head><body>
-<div id="lock" class="gate"><div class="gate-inner"><div class="seal">UMX</div><h1>Sector Command</h1><p id="auth-message">Verifying authorized UMX access…</p><a href="login.html">UMX Sign in</a></div></div>
+<div id="lock" class="gate"><div class="gate-inner"><div class="seal">UMX</div><h1>UMX Command Access</h1><p id="auth-message">Verifying authorized UMX access…</p><a href="login.html">UMX Sign in</a></div></div>
 <div class="shell" id="app" hidden>
 <aside class="sidebar"><div class="brand"><span class="brandmark">UMX</span><span><strong>UMX</strong><small>CITY FIELD COMMAND</small></span></div>
 <nav class="primarynav" aria-label="UMX operations"><a class="navactive" href="map.html">◈ Sector Command</a><a href="owner.html?operations=1">▣ Operations Dashboard</a><a href="owner.html?operations=1#jobs">▤ Properties & Jobs</a><a href="owner.html?operations=1#contracts">▧ Contracts</a><a href="owner.html?operations=1">◷ Reports</a><a href="index.html">↗ Public site</a></nav><div class="sidebar-note">20 official Missoula neighborhoods<br><small>County GIS • private UMX workspace</small></div></aside>
-<main class="main"><div class="eyeline"><span>THE URBAN MATRIX LAB / NORTHSIDE COMMAND MAP</span><span class="badge">● PRIVATE STAFF VIEW</span></div>
+<main class="main"><nav class="command-nav" aria-label="Private UMX navigation"><a href="owner.html" class="command-link command-main">▣ Command Center</a><a href="map.html" aria-current="page" class="command-link current">◈ Northside Map</a><a href="owner.html#targets" class="command-link">⌖ Outreach</a><a href="index.html" class="command-link">Public Site</a></nav><div class="eyeline"><span>THE URBAN MATRIX LAB / NORTHSIDE COMMAND MAP</span><span class="badge">● PRIVATE STAFF VIEW</span></div>
 <header class="hero"><p class="kicker">UMX PROPERTY INTELLIGENCE · CITYWIDE EXPANSION</p><h1>Northside <em>Command Map</em></h1><p>One neighborhood at a time. Separate homes and businesses, maintain outreach history, protect your VIP clients, and restrict maps to the selected sector.</p></header>
 <div class="metrics"><div><strong>20</strong><small>OFFICIAL NEIGHBORHOODS</small></div><div><strong id="audit-homes">—</strong><small>RESIDENTIAL ADDRESS RECORDS*</small></div><div><strong id="audit-businesses">—</strong><small>COMMERCIAL-CODED ADDRESS RECORDS*</small></div></div><p class="method" id="audit-method">County GIS inventory loads from the current published source. Address records are not verified occupied homes or operating companies.</p>
 

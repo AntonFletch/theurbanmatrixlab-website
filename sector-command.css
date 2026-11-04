@@ -109,3 +109,14 @@ body{background:#11151c}
  .contact-grid{grid-template-columns:1fr 1fr}
  .profile .checkgrid{grid-template-columns:1fr}
 }
+
+
+/* Visible private navigation for the Northside map (desktop + mobile).
+   Previously all map navigation was hidden with the legacy sidebar. */
+.command-nav{display:flex;gap:7px;flex-wrap:wrap;align-items:stretch;padding:12px 0 9px;border-bottom:1px solid #303643}
+.command-link{border:1px solid #555066;border-radius:8px;display:flex;align-items:center;justify-content:center;text-decoration:none;color:#ddd5e7;background:#23202d;padding:10px 13px;font-size:12px;font-weight:700;flex:1 1 120px;min-width:0}
+.command-link.current{background:#644677;border-color:#ae82bd;color:#fff}
+.command-link.command-main{color:#e9ce88;border-color:#927449}
+.command-link:hover,.command-link:focus-visible{background:#393046}
+@media(max-width:780px){.command-nav{padding:10px 0 8px;gap:6px}.command-link{flex:1 1 42%;padding:10px 6px;font-size:11px}}
+@media print{.command-nav{display:none!important}}
