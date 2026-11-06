@@ -1,4 +1,4 @@
-name: Publish MX Continuity Investor Preview
+name: Publish MX Continuity Business Website
 on:
   push:
     branches: [main]
