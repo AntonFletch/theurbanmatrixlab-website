@@ -45,6 +45,23 @@ for(const file of ["contact.html","support.html"]){
 for(const file of ["project-order.html","monthly-care-authorization.html"]){
  check(read(file).includes('Customer signature:'),"printable customer form blank: "+file);
 }
+// Legal-content consistency checks catch stale drafts and mismatches before publishing.
+const legalPages=["terms.html","ownership.html","refunds.html","cancellation.html","privacy.html"];
+for(const file of legalPages){
+ const html=read(file);
+ check(html.includes("November 9, 2026"),"policy lacks current effective/update date: "+file);
+ check(!/Version 1\.0|Version 2\.0|Before publishing this notice|temporary business contact|draft for review|must be verified before this agreement/i.test(html),
+   "policy has draft instructions or temporary information: "+file);
+}
+check(read("terms.html").includes("Basic includes one contact form"),"contract excludes advertised Basic form");
+check(read("terms.html").includes("MX will test the agreed form delivery"),"form delivery acceptance not specified");
+check(read("terms.html").includes("signed the Project Order"),"copyright signature condition missing");
+check(read("ownership.html").includes("Project Order signed by an authorized MX representative"),"assignment execution ambiguous");
+check(read("project-order.html").includes("It incorporates the"),"project order doesn't incorporate legal terms");
+check(read("monthly-care-authorization.html").includes("Recurring-billing disclosure"),"monthly consent missing recurring terms");
+check(read("cancellation.html").includes("Cancel%20MX%20monthly%20care"),"direct cancellation route missing");
+check(read("refunds.html").includes("Refund%20Request"),"direct refund contact missing");
+check(read("privacy.html").includes("email application"),"email collection disclosure missing");
 const htmls=fs.readdirSync(root).filter(f=>f.endsWith(".html"));
 let references=0;
 for(const file of htmls){
