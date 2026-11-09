@@ -65,6 +65,13 @@ for(const phrase of ["Change Order &amp; Additional Work Authorization","Origina
  check(changeOrder.includes(phrase),"Change Order missing "+phrase);
 }
 
+for(const phrase of ["Customer pays MX","MX issues a credit/refund","Consent to electronic records","signer authentication and audit reference","Signed document delivery method","change-order work actually completed","not automatically applied to a separate Change Order","rights that applicable law independently recognizes"]){
+ check(changeOrder.includes(phrase),"revised #10 missing "+phrase);
+}
+check(read("terms.html").includes("signed Change Order procedure"),"contract amendment rule disagrees with Change Order");
+check(read("refunds.html").includes("not automatically applied"),"refund rule does not distinguish change-only work");
+check(read("refunds.html").includes('href="change-order.html"'),"refund policy lacks Change Order link");
+check(read("cancellation.html").includes('href="change-order.html"'),"cancellation policy lacks Change Order link");
 check(read("monthly-care-authorization.html").includes("Recurring-billing disclosure"),"monthly consent missing recurring terms");
 check(read("cancellation.html").includes("Cancel%20MX%20monthly%20care"),"direct cancellation route missing");
 check(read("refunds.html").includes("Refund%20Request"),"direct refund contact missing");
