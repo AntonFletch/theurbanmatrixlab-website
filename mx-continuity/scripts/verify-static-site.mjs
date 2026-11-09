@@ -7,7 +7,7 @@ function check(ok,why){if(!ok)throw new Error("MX Continuity QA FAIL: "+why);}
 const required=[
  "index.html","about.html","contact.html","support.html","terms.html","ownership.html",
  "refunds.html","cancellation.html","privacy.html","project-order.html",
- "monthly-care-authorization.html","404.html","assets/site.js","assets/style.css",
+ "monthly-care-authorization.html","change-order.html","404.html","assets/site.js","assets/style.css",
  "assets/contact-email.js","assets/support-email.js","assets/intake-config.js",
  "assets/support-config.js","assets/mx-logo-horizontal.svg","assets/mx-hero-laptop.webp"
 ];
@@ -58,6 +58,13 @@ check(read("terms.html").includes("MX will test the agreed form delivery"),"form
 check(read("terms.html").includes("signed the Project Order"),"copyright signature condition missing");
 check(read("ownership.html").includes("Project Order signed by an authorized MX representative"),"assignment execution ambiguous");
 check(read("project-order.html").includes("It incorporates the"),"project order doesn't incorporate legal terms");
+check(read("project-order.html").includes('href="change-order.html"'),"Project Order lacks change-order link");
+check(read("terms.html").includes('href="change-order.html"'),"Service Agreement lacks change-order link");
+const changeOrder=read("change-order.html");
+for(const phrase of ["Change Order &amp; Additional Work Authorization","Original signed Project Order","scope, changes to the schedule","Itemized cost","Total net one-time change amount","Revised delivery/go-live milestone","No additional billable work","Customer signature:","Provider representative signature:","separate affirmative Monthly-Care Authorization","signed by an authorized MX representative"]){
+ check(changeOrder.includes(phrase),"Change Order missing "+phrase);
+}
+
 check(read("monthly-care-authorization.html").includes("Recurring-billing disclosure"),"monthly consent missing recurring terms");
 check(read("cancellation.html").includes("Cancel%20MX%20monthly%20care"),"direct cancellation route missing");
 check(read("refunds.html").includes("Refund%20Request"),"direct refund contact missing");
