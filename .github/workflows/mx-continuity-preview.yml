@@ -1,14 +1,13 @@
-name: Publish MX Continuity Business Website
+name: Restore and publish approved MX Continuity website
 on:
   push:
     branches: [main]
     paths:
-      - 'mx-continuity/**'
       - '.github/workflows/mx-continuity-preview.yml'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -17,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  restore:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -25,12 +24,58 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Retrieve exact approved original static site
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED_SHA="aba7ae7e7a51d2b5151b5688993879dbf48234d116dc8a3e1da95ca5e0351756"
+          FILE_ID="1vMXQH-X20b3tYWnUmn1Ux7KdUPGoJvVI"
+          for URL in "https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&confirm=t" "https://drive.google.com/uc?export=download&id=${FILE_ID}"; do
+            echo "Retrieving source archive from approved static-site storage"
+            if curl --fail --location --max-time 45 --silent --show-error "${URL}" --output /tmp/mx-approved-site.zip; then
+              HASH="$(sha256sum /tmp/mx-approved-site.zip | awk '{print $1}')"
+              if [ "$HASH" = "$EXPECTED_SHA" ]; then echo "Approved source checksum verified"; break; fi
+              echo "Source checksum did not match; trying alternate download route"
+            fi
+          done
+          echo "$EXPECTED_SHA  /tmp/mx-approved-site.zip" | sha256sum -c -
+          unzip -tqq /tmp/mx-approved-site.zip
+          rm -rf mx-continuity
+          mkdir -p mx-continuity
+          unzip -q /tmp/mx-approved-site.zip -d mx-continuity
+          test -f mx-continuity/index.html
+          test -f mx-continuity/assets/style.css
+          test -f mx-continuity/assets/mx-hero-laptop.webp
+          test -f mx-continuity/support.html
+          test -f mx-continuity/privacy.html
+          test -f mx-continuity/terms.html
+          grep -q 'Care that continues' mx-continuity/index.html
+          grep -q '\$89' mx-continuity/index.html
+          grep -q '\$199' mx-continuity/index.html
+          grep -q '\$400' mx-continuity/index.html
+          grep -q 'checkoutEnabled:false' mx-continuity/assets/site.js
+          echo "Restored original MX Continuity 24 static files, checkout remains disabled"
+      - name: Commit original approved site files to repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A mx-continuity
+          if git diff --cached --quiet; then
+            echo "Original static site already identical; no commit required"
+          else
+            git commit -m "Restore original approved MX Continuity website from archived source"
+            git push origin HEAD:main
+          fi
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-      - name: Upload standalone MX Continuity website
+      - name: Upload original MX Continuity website
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./mx-continuity
-      - name: Publish website
+      - name: Publish approved original MX Continuity website
         id: deployment
         uses: actions/deploy-pages@v4
