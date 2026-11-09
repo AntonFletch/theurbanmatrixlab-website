@@ -1,0 +1,17 @@
+{
+  "name": "MX Continuity",
+  "short_name": "MX Continuity",
+  "description": "Website design and maintenance",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b0912",
+  "theme_color": "#0b0912",
+  "icons": [
+    {
+      "src": "assets/mx-favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
