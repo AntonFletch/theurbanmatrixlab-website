@@ -43,6 +43,13 @@ jobs:
           grep -q 'checkoutEnabled:false' mx-continuity/assets/site.js
       - name: Verify original MX Continuity site and launch guards
         run: node mx-continuity/scripts/verify-static-site.mjs
+      - name: Check public email JavaScript syntax
+        run: |
+          node --check mx-continuity/assets/site.js
+          node --check mx-continuity/assets/contact-email.js
+          node --check mx-continuity/assets/support-email.js
+      - name: Verify public CTA behavior and launch safeguards
+        run: node mx-continuity/scripts/verify-static-site.mjs
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Upload original approved website
