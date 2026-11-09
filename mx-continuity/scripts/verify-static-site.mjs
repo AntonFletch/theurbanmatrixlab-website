@@ -61,7 +61,7 @@ check(read("project-order.html").includes("It incorporates the"),"project order 
 check(read("project-order.html").includes('href="change-order.html"'),"Project Order lacks change-order link");
 check(read("terms.html").includes('href="change-order.html"'),"Service Agreement lacks change-order link");
 const changeOrder=read("change-order.html");
-for(const phrase of ["Change Order &amp; Additional Work Authorization","Original signed Project Order","scope, changes to the schedule","Itemized cost","Total net one-time change amount","Revised delivery/go-live milestone","No additional billable work","Customer signature:","Provider representative signature:","separate affirmative Monthly-Care Authorization","signed by an authorized MX representative"]){
+for(const phrase of ["Change Order &amp; Additional Work Authorization","Original signed Project Order","scope, changes to the schedule","Itemized cost","Total net one-time change amount","Revised delivery/go-live milestone","No additional billable work","Customer signature:","Provider representative signature:","separate affirmative Monthly-Care Authorization","signature of this Change Order by an authorized MX representative"]){
  check(changeOrder.includes(phrase),"Change Order missing "+phrase);
 }
 
