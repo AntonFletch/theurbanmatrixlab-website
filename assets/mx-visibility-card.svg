@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 650 540" role="img" aria-labelledby="title desc">
+<title id="title">MX Visibility search and growth emblem</title>
+<desc id="desc">A geometric magnifying glass encircling ascending analytics bars and an upward trend arrow, surrounded by fine orbit lines.</desc>
+<defs>
+  <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e4c889"/><stop offset=".47" stop-color="#84c8ef"/><stop offset="1" stop-color="#8d85ec"/></linearGradient>
+  <linearGradient id="graph" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#5f9ed1"/><stop offset="1" stop-color="#b5b4f4"/></linearGradient>
+  <radialGradient id="mist"><stop stop-color="#77acdf" stop-opacity=".30"/><stop offset="1" stop-color="#77acdf" stop-opacity="0"/></radialGradient>
+</defs>
+<circle cx="333" cy="258" r="235" fill="url(#mist)"/>
+<g fill="none" stroke="#9cb8dc" stroke-opacity=".27" stroke-width="2">
+  <circle cx="316" cy="240" r="215" stroke-dasharray="4 13"/>
+  <circle cx="316" cy="240" r="178"/>
+  <path d="M80 328 Q314 107 566 320"/>
+  <path d="M88 167 Q316 425 562 162"/>
+</g>
+<g stroke="url(#ring)" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <circle cx="296" cy="226" r="131" stroke-width="17"/>
+  <path d="M392 325 L496 431" stroke-width="31"/>
+  <path d="M504 436 L538 468" stroke-width="15"/>
+</g>
+<g fill="url(#graph)" opacity=".94">
+  <rect x="213" y="254" width="28" height="59" rx="4"/>
+  <rect x="254" y="217" width="28" height="96" rx="4"/>
+  <rect x="295" y="181" width="28" height="132" rx="4"/>
+  <rect x="336" y="151" width="28" height="162" rx="4"/>
+</g>
+<path d="M208 241 L264 205 L304 212 L367 141" fill="none" stroke="#efcf8b" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M340 143 L369 137 L365 170" fill="none" stroke="#efcf8b" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+<g fill="#e6c788"><circle cx="132" cy="220" r="5"/><circle cx="485" cy="137" r="5"/><circle cx="151" cy="392" r="4"/></g>
+</svg>
