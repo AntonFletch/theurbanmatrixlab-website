@@ -1,0 +1,36 @@
+name: Export current MX Continuity legal master
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mx-continuity/*.html'
+      - 'mx-continuity/scripts/export-legal-master.py'
+      - '.github/workflows/mx-legal-master.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current site
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install document dependencies
+        run: pip install --disable-pip-version-check beautifulsoup4 python-docx reportlab
+      - name: Export current website legal terms into Word and PDF
+        run: python mx-continuity/scripts/export-legal-master.py
+      - name: Verify both master files exist and are nonempty
+        run: |
+          test -s mx-continuity/exports/MX_Continuity_Legal_Master.docx
+          test -s mx-continuity/exports/MX_Continuity_Legal_Master.pdf
+      - name: Upload current master files
+        uses: actions/upload-artifact@v4
+        with:
+          name: MX-Continuity-Legal-Master
+          path: mx-continuity/exports/MX_Continuity_Legal_Master.*
+          if-no-files-found: error
+          retention-days: 30
