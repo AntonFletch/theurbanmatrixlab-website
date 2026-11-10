@@ -68,6 +68,15 @@ for(const phrase of ["Change Order &amp; Additional Work Authorization","Origina
 for(const phrase of ["Customer pays MX","MX issues a credit/refund","Consent to electronic records","signer authentication and audit reference","Signed document delivery method","change-order work actually completed","not automatically applied to a separate Change Order","rights that applicable law independently recognizes"]){
  check(changeOrder.includes(phrase),"revised #10 missing "+phrase);
 }
+// Contract-to-advertisement consistency guards; maintain one definitive signing form.
+const agreement=read("terms.html"),order=read("project-order.html"),careConsent=read("monthly-care-authorization.html");
+check(home.includes("Basic on-page search setup")&&agreement.includes("Basic on-page search setup (Business and Continuity packages)")&&order.includes("basic on-page search setup"),"advertised on-page search setup missing agreement/order definition");
+check(home.includes("Priority handling of routine maintenance requests")&&agreement.includes("Continuity priority support")&&order.includes("Continuity maintenance-request priority")&&careConsent.includes("Continuity priority handling"),"continuity support priority promises inconsistent");
+check(home.includes("Minor existing-content updates")&&agreement.includes("Routine existing-content updates")&&order.includes("content-update allowance")&&careConsent.includes("monthly content-update allowance"),"routine content updates not bounded or recorded");
+check(agreement.includes("greater of (i) $500")&&agreement.includes("violation of law (whether willful or negligent)"),"Montana liability clause missing positive floor or exception");
+check(!agreement.includes("<h2>Project Order and signatures</h2>")&&agreement.includes("standalone Project Order is the controlling execution form")&&order.includes("Customer signature:"),"agreement has competing signature form");
+check(agreement.includes("30 consecutive days of included care")&&careConsent.includes("no earlier than day 31"),"included care and first subscription charge conflict");
+
 check(read("terms.html").includes("signed Change Order procedure"),"contract amendment rule disagrees with Change Order");
 check(read("refunds.html").includes("not automatically applied"),"refund rule does not distinguish change-only work");
 check(read("refunds.html").includes('href="change-order.html"'),"refund policy lacks Change Order link");
