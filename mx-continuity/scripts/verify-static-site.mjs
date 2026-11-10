@@ -82,6 +82,10 @@ check(read("refunds.html").includes("not automatically applied"),"refund rule do
 check(read("refunds.html").includes('href="change-order.html"'),"refund policy lacks Change Order link");
 check(read("cancellation.html").includes('href="change-order.html"'),"cancellation policy lacks Change Order link");
 check(read("monthly-care-authorization.html").includes("Recurring-billing disclosure"),"monthly consent missing recurring terms");
+check(read("refunds.html").includes("ten business days after approval"),"refund initiation timing missing");
+check(read("refunds.html").includes("Cancellation and refunds are distinct"),"refund/cancellation distinction missing");
+check(read("cancellation.html").includes("is effective for that upcoming renewal"),"cancellation effective-date clause missing");
+check(!read("cancellation.html").includes("becomes effective for that renewal;"),"cancellation clause contains old sentence error");
 check(read("cancellation.html").includes("Cancel%20MX%20monthly%20care"),"direct cancellation route missing");
 check(read("refunds.html").includes("Refund%20Request"),"direct refund contact missing");
 check(read("privacy.html").includes("email application"),"email collection disclosure missing");
