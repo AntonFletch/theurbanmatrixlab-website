@@ -130,10 +130,10 @@ footer{color:#647d90}
 
 /* Jeremy Emmons original artwork — visual treatment only */
 .artist-feature{background:linear-gradient(110deg,#fdfefe 0%,#f1f7fc 68%,#e8f2f9 100%)}
-.artist-feature::after{content:"";position:absolute;right:0;top:0;bottom:0;width:46%;background:url('/assets/jeremy-emmons-feature.svg') center 47% / cover no-repeat;opacity:.94;mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.7) 25%,#000 63%);pointer-events:none}
+.artist-feature::after{content:"";position:absolute;inset:0;width:100%;background:url('/assets/jeremy-emmons-feature.svg') center 43% / cover no-repeat;filter:brightness(.59) contrast(1.2) saturate(1.12);opacity:1;mask-image:none;-webkit-mask-image:none;pointer-events:none;z-index:0}
 .artist-feature__copy,.artist-feature__cta{position:relative;z-index:1}
 .artist-feature:before{z-index:2}
-@media(max-width:640px){.artist-feature::after{width:75%;opacity:.28;mask-image:linear-gradient(90deg,transparent 0%,#000 100%)}}
+@media(max-width:640px){.artist-feature::after{inset:0;width:100%;opacity:1;filter:brightness(.56) contrast(1.22) saturate(1.12);mask-image:none;-webkit-mask-image:none}}
 
 
 /* Business cards: branded background artwork */
@@ -163,6 +163,14 @@ body{background:radial-gradient(ellipse at 70% 12%,rgba(90,138,187,.24),transpar
 .artist-feature__eyebrow em{color:#c9cfda}
 .artist-feature__cta{background:rgba(238,221,185,.17);border-color:#c9ad80;color:#f2ddb1}
 .artist-feature__cta small{color:#d4d9e2}
+
+
+/* Artist painting fills the entire banner; only the foreground copy is shaded for legibility. */
+.artist-feature{min-height:200px;isolation:isolate}
+.artist-feature__copy{position:relative;z-index:1;max-width:570px;padding:15px 18px;background:linear-gradient(100deg,rgba(11,21,36,.91),rgba(11,21,36,.73) 75%,rgba(11,21,36,.34));border-radius:6px}
+.artist-feature__cta{position:relative;z-index:1;background:rgba(16,29,47,.85);border-color:#d3bb88;color:#ffe4a4}
+.artist-feature__cta small{color:#e0dfea}
+@media(max-width:640px){.artist-feature__copy{max-width:100%;background:rgba(10,20,34,.78);padding:14px}.artist-feature__cta{background:rgba(10,20,34,.88)}}
 
 </style>
 </head>
