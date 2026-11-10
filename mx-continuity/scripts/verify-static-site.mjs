@@ -70,10 +70,13 @@ for(const phrase of ["Customer pays MX","MX issues a credit/refund","Consent to 
 }
 // Contract-to-advertisement consistency guards; maintain one definitive signing form.
 const agreement=read("terms.html"),order=read("project-order.html"),careConsent=read("monthly-care-authorization.html");
-check(home.includes("Basic on-page search setup")&&agreement.includes("Basic on-page search setup (Business and Continuity packages)")&&order.includes("basic on-page search setup"),"advertised on-page search setup missing agreement/order definition");
+check(!home.includes("Basic on-page search setup")&&!agreement.includes("Basic on-page search setup")&&!order.includes("basic on-page search setup"),"search-service promises must stay outside MX Continuity");
+check(home.includes("hosting coordination is $99")&&agreement.includes("separately authorized $99")&&order.includes("$99 one-time service accepted"),"separate $99 add-on disclosure inconsistent");
+check(agreement.includes("no undisclosed absolute liability cap")&&agreement.includes("even if the Customer has not authorized public go-live"),"risk and paid handoff terms not aligned");
+check(read("refunds.html").includes("ten business days after receipt of the request"),"refund decision deadline not guaranteed");
 check(home.includes("Priority handling of routine maintenance requests")&&agreement.includes("Continuity priority support")&&order.includes("Continuity maintenance-request priority")&&careConsent.includes("Continuity priority handling"),"continuity support priority promises inconsistent");
 check(home.includes("Minor existing-content updates")&&agreement.includes("Routine existing-content updates")&&order.includes("content-update allowance")&&careConsent.includes("monthly content-update allowance"),"routine content updates not bounded or recorded");
-check(agreement.includes("greater of (i) $500")&&agreement.includes("violation of law (whether willful or negligent)"),"Montana liability clause missing positive floor or exception");
+check(!agreement.includes("greater of (i) $500")&&agreement.includes("no undisclosed absolute liability cap"),"unexpected standard liability cap");
 check(!agreement.includes("<h2>Project Order and signatures</h2>")&&agreement.includes("standalone Project Order is the controlling execution form")&&order.includes("Customer signature:"),"agreement has competing signature form");
 check(agreement.includes("30 consecutive days of included care")&&careConsent.includes("no earlier than day 31"),"included care and first subscription charge conflict");
 
