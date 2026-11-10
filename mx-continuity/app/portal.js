@@ -68,17 +68,24 @@
     const rows=checks.map(c=>{const b=element("button","item"+(state.selectedCheck===c.id?" active":""),undefined);
       b.type="button";const head=element("div","item-header");head.append(element("strong","",clientName(c.client_id)+" • "+stamp(c.scheduled_date)),pill(c.status,checkedStatus(c.status)));
       b.append(head,element("p","",c.status==="healthy"?"HTTPS endpoint responded — manual checks still pending":c.detail||"Scheduled website check"),element("span","meta",c.completed_at?fmt(c.completed_at):"Queued / processing"));
-      b.addEventListener("click",()=>{state.selectedCheck=c.id;state.draft="";renderCheckList();renderDetail();});return b;});
+      b.addEventListener("click",async()=>{state.selectedCheck=c.id;state.draft="";state.comments=[];renderCheckList();renderDetail();await loadSelectedComments();});return b;});
     replace("checkup-list",rows.length?rows:[empty("No checkups yet. Authorized plans begin creating records on their scheduled day.")]);
   }
   function fieldResult(label,value){
     const box=element("div","",undefined);box.append(element("strong","",label),element("span","",value.replaceAll("_"," ")));return box;
   }
+  async function loadSelectedComments(){
+    const id=state.selectedCheck;if(!id)return;
+    const {data,error}=await db.from("mx_ops_check_comments").select("id,client_id,inspection_id,author_id,kind,body,created_at").eq("inspection_id",id).order("created_at").limit(150);
+    if(error){notice("Unable to load discussion: "+error.message);return;}
+    if(state.selectedCheck===id){state.comments=data||[];renderDetail();}
+  }
   function renderDetail(){
-    const root=$("checkup-detail");root.replaceChildren();
+    const root=$("checkup-detail");
+    const prior=$("comment-text");if(prior)state.draft=prior.value;
+    root.replaceChildren();
     const c=state.checks.find(x=>x.id===state.selectedCheck&&view(state.checks).includes(x));
     if(!c){root.append(empty("Select a checkup to see its actual results and add a comment."));return;}
-    const prior=$("comment-text");if(prior)state.draft=prior.value;
     root.append(element("h3","",clientName(c.client_id)+" · "+stamp(c.scheduled_date)));
     const status=element("p","",undefined);status.append(pill(c.status,checkedStatus(c.status)));root.append(status);
     root.append(element("p","muted",c.detail||"Checkup is being processed."));
@@ -113,7 +120,7 @@
     button.disabled=true;const kind=$("comment-kind").value;
     const {error}=await db.from("mx_ops_check_comments").insert({client_id:c.client_id,inspection_id:c.id,author_id:state.user.id,body,kind});
     button.disabled=false;if(error){notice("Comment not posted: "+error.message);return;}
-    state.draft="";notice("Check-in recorded.");await refresh();
+    state.draft="";const input=$("comment-text");if(input)input.value="";notice("Check-in recorded.");await refresh();
   }
   function renderInquiries(){
     const rows=view(state.inquiries).map(i=>{
@@ -140,7 +147,9 @@
   }
   function render(){renderOverview();renderCheckList();renderDetail();renderInquiries();renderTickets();}
   async function refresh(){
-    if(!state.user||state.busy)return;state.busy=true;$("connection").textContent="Updating records…";
+    if(!state.user||state.busy)return;
+    const input=$("comment-text");if(input)state.draft=input.value;
+    state.busy=true;$("connection").textContent="Updating records…";
     try{
       const {data:clients,error:ce}=await db.from("veil_clients").select("id,business_name,domain,project_status,package_name,recurring_plan").order("business_name").limit(200);
       if(ce)throw ce;state.clients=clients||[];
