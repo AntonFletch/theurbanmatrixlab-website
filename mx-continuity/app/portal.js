@@ -20,20 +20,28 @@
   function checkedStatus(status){return ["healthy","completed"].includes(status)?"good":["alert","error","critical"].includes(status)?"bad":"";}
   function nextSchedule(tier){
     const now=Date.now();
-    for(let i=0;i<15;i++){const d=new Date();d.setUTCHours(16,0,0,0);d.setUTCDate(d.getUTCDate()+i);
-      if(d.getTime()<=now)continue;
-      if(d.getUTCDay()===1||(tier==="Continuity"&&d.getUTCDay()===5))return d;
+    for(let i=0;i<15;i++){
+      const day=new Date();day.setUTCHours(0,0,0,0);day.setUTCDate(day.getUTCDate()+i);
+      if(day.getUTCDay()!==1&&!(tier==="Continuity"&&day.getUTCDay()===5))continue;
+      for(const hour of [15,16]){
+        const candidate=new Date(day);candidate.setUTCHours(hour);
+        const localHour=Number(new Intl.DateTimeFormat("en-US",{timeZone:"America/Denver",hour:"numeric",hourCycle:"h23"}).format(candidate));
+        if(localHour===9&&candidate.getTime()>now)return candidate;
+      }
     }
     return null;
   }
   function renderSchedule(){
-    const targets=view(state.targets).filter(t=>t.is_active&&t.customer_authorized_at!==null&&!t.care_expired&&(!t.care_entitled_until||new Date(t.care_entitled_until)>new Date()));
+    const now=new Date();
+    const targets=view(state.targets).filter(t=>t.is_active&&t.customer_authorized_at&&t.care_starts_at&&t.care_entitled_until
+      &&new Date(t.care_starts_at)<=now&&new Date(t.care_entitled_until)>now
+      &&["live","care"].includes(state.clients.find(c=>c.id===t.client_id)?.project_status));
     const candidates=targets.map(t=>({t,date:nextSchedule(t.tier)})).filter(x=>x.date).sort((a,b)=>a.date-b.date);
     const first=candidates[0];
     $("next-check").textContent=first ? fmt(first.date) : "No active care check scheduled";
     $("check-plan").textContent=first ?
       clientName(first.t.client_id)+" · "+first.t.tier+" care · "+first.t.site_url+
-      ". The current system runs at 16:00 UTC (9 AM in winter / 10 AM in summer in Montana)." :
+      ". Scheduled for 9:00 AM Montana time, adjusted automatically for daylight saving time." :
       "A client site must be authorized, live and covered by active care before checks are queued.";
   }
   function setTab(tab){
@@ -165,7 +173,7 @@
       }
       const ids=state.clients.map(x=>x.id);
       const responses=await Promise.all([
-        db.from("mx_ops_monitor_targets").select("id,client_id,site_url,tier,is_active,customer_authorized_at,care_entitled_until").in("client_id",ids).limit(200),
+        db.from("mx_ops_monitor_targets").select("id,client_id,site_url,tier,is_active,customer_authorized_at,care_starts_at,care_entitled_until").in("client_id",ids).limit(200),
         db.from("mx_ops_inspections").select("id,client_id,target_id,scheduled_date,status,http_status,completed_at,detail,mobile_test,desktop_test,form_test,security_test,backup_test").in("client_id",ids).order("created_at",{ascending:false}).limit(200),
         db.from("mx_client_inquiries").select("id,client_id,contact_name,contact_email,contact_phone,subject,message,status,created_at").in("client_id",ids).order("created_at",{ascending:false}).limit(200),
         db.from("veil_support_tickets").select("id,client_id,ticket_code,subject,description,status,priority,created_at").in("client_id",ids).order("created_at",{ascending:false}).limit(100)
