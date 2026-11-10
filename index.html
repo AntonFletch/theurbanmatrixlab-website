@@ -130,7 +130,7 @@ footer{color:#647d90}
 
 /* Jeremy Emmons original artwork — visual treatment only */
 .artist-feature{background:linear-gradient(110deg,#fdfefe 0%,#f1f7fc 68%,#e8f2f9 100%)}
-.artist-feature::after{content:"";position:absolute;right:0;top:0;bottom:0;width:46%;background:url('/assets/jeremy-emmons-feature.svg') center 47% / cover no-repeat;opacity:.94;mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.7) 25%,#000 63%);pointer-events:none}
+.artist-feature::after{content:"";position:absolute;right:0;top:0;bottom:0;width:46%;background:url('/assets/jeremy-emmons-feature.svg') center 47% / cover no-repeat;filter:brightness(.62) contrast(1.07);opacity:.94;mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.7) 25%,#000 63%);pointer-events:none}
 .artist-feature__copy,.artist-feature__cta{position:relative;z-index:1}
 .artist-feature:before{z-index:2}
 @media(max-width:640px){.artist-feature::after{width:75%;opacity:.28;mask-image:linear-gradient(90deg,transparent 0%,#000 100%)}}
