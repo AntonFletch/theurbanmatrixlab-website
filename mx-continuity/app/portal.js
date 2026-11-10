@@ -76,7 +76,7 @@
     const rows=checks.map(c=>{const b=element("button","item"+(state.selectedCheck===c.id?" active":""),undefined);
       b.type="button";const head=element("div","item-header");head.append(element("strong","",clientName(c.client_id)+" • "+stamp(c.scheduled_date)),pill(c.status,checkedStatus(c.status)));
       b.append(head,element("p","",c.status==="healthy"?"HTTPS endpoint responded — manual checks still pending":c.detail||"Scheduled website check"),element("span","meta",c.completed_at?fmt(c.completed_at):"Queued / processing"));
-      b.addEventListener("click",async()=>{state.selectedCheck=c.id;state.draft="";state.comments=[];renderCheckList();renderDetail();await loadSelectedComments();});return b;});
+      b.addEventListener("click",async()=>{const draft=$("comment-text");if(draft)draft.value="";state.selectedCheck=c.id;state.draft="";state.comments=[];renderCheckList();renderDetail();await loadSelectedComments();});return b;});
     replace("checkup-list",rows.length?rows:[empty("No checkups yet. Authorized plans begin creating records on their scheduled day.")]);
   }
   function fieldResult(label,value){
