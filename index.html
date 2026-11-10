@@ -135,6 +135,24 @@ footer{color:#647d90}
 .artist-feature:before{z-index:2}
 @media(max-width:640px){.artist-feature::after{width:75%;opacity:.28;mask-image:linear-gradient(90deg,transparent 0%,#000 100%)}}
 
+
+/* Business cards: branded background artwork */
+body{background:radial-gradient(ellipse at 70% 12%,rgba(90,138,187,.24),transparent 39%),linear-gradient(180deg,#dfeaf3 0%,#bed2e3 60%,#d7e5f0 100%)}
+.site-header{background:rgba(227,236,245,.97)}
+.frame{background:radial-gradient(ellipse at 70% 36%,rgba(99,148,197,.22),transparent 41%),linear-gradient(125deg,#e6f0f7 0%,#c8dbea 52%,#e3edf6 100%);box-shadow:0 0 0 6px rgba(111,154,188,.20),inset 0 0 70px rgba(255,255,255,.24),0 28px 75px rgba(34,71,104,.15)}
+.business{isolation:isolate;border-color:#7599b8;background:linear-gradient(120deg,#1e3651 0%,#2d4d6a 65%,#344f6f 100%);box-shadow:0 16px 38px rgba(27,52,78,.24)}
+.business:nth-child(2){background:linear-gradient(120deg,#263750 0%,#3d4367 67%,#4d4670 100%)}
+.business::before{content:"";position:absolute;z-index:0;right:0;top:0;bottom:0;width:55%;background:url('/mx-continuity/assets/mx-logo-stacked.svg') center 45% / contain no-repeat;opacity:.25;pointer-events:none}
+.business:nth-child(2)::before{background-image:url('/assets/mx-visibility-card.svg');opacity:.53}
+.business::after{z-index:0;border-color:rgba(206,227,244,.15)}
+.business-top,.business>.btn,.business>.path{position:relative;z-index:1}
+.business-top svg{stroke:#e0c98c}
+.business h2{color:#f1d99e}
+.business p{color:#e4edf6}
+.business .path{color:#c8d9e8}
+.business .btn{background:linear-gradient(135deg,#f6e8bb,#d5b575);border-color:#f8e7b9;color:#203d54}
+@media(max-width:640px){.business::before{width:62%;opacity:.18}.business:nth-child(2)::before{opacity:.33}}
+
 </style>
 </head>
 <body>
