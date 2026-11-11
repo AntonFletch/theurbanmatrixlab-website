@@ -48,6 +48,7 @@ jobs:
           node --check mx-continuity/assets/site.js
           node --check mx-continuity/assets/contact-email.js
           node --check mx-continuity/assets/support-email.js
+          node --check mx-continuity/app/portal.js
       - name: Verify public CTA behavior and launch safeguards
         run: node mx-continuity/scripts/verify-static-site.mjs
       - name: Configure GitHub Pages
