@@ -23,10 +23,10 @@
     ["umxContracts","umx_contracts",'id,contract_title,status,created_at',"created_at",80],
     ["umxNotifications","umx_notifications",'id,user_id,title,body,read_at,created_at,link',"created_at",120],
     ["mxLeads","veil_leads",'id,business_name,status,created_at',"created_at",120],
-    ["mxClients","veil_clients",'id,business_name,package_name,project_status,created_at',"created_at",120],
+    ["mxClients","veil_clients",'id,client_code,business_name,package_name,project_status,created_at',"created_at",120],
     ["mxTickets","veil_support_tickets",'id,ticket_code,subject,priority,status,created_at',"created_at",120],
     ["mxProjects","veil_projects",'id,name,status,created_at',"created_at",120],
-    ["mxInvoices","veil_invoices",'id,invoice_no,amount_cents,status,paid_at,created_at',"created_at",120],
+    ["mxInvoices","veil_invoices",'id,invoice_no,client_id,amount_cents,status,paid_at,created_at',"created_at",120],
     ["mxHealth","veil_system_health",'id,component,status,last_checked_at,detail',"last_checked_at",80],
     ["mxLaunch","veil_launch_checklist",'item_code,label,status,detail,updated_at',"updated_at",120],
     ["scheduler","mx_ops_scheduler_runs",'id,step,affected_count,detail,executed_at',"executed_at",100],
@@ -223,6 +223,10 @@
     }));
     db={};failures={};
     response.forEach(x=>{if(x.error){failures[x.key]=x.error;db[x.key]=[];}else db[x.key]=x.data;});
+    // Exclude retained sandbox data from real operating metrics; do not delete test records.
+    const sandboxIds=new Set(rows("mxClients").filter(x=>/^MC-SANDBOX-/i.test(String(x.client_code||""))).map(x=>x.id));
+    db.mxClients=rows("mxClients").filter(x=>!sandboxIds.has(x.id));
+    db.mxInvoices=rows("mxInvoices").filter(x=>!sandboxIds.has(x.client_id)&&!/^MC-TEST-/i.test(String(x.invoice_no||"")));
     buildAlerts();buildActivity();
     renderOverview();renderAlerts();renderAutomation();renderMonitoring();renderCustomers();renderFinance();renderActivity();renderAccess();
     const errorCount=Object.keys(failures).length;
