@@ -78,7 +78,7 @@
     if(available("umxNotifications"))rows("umxNotifications").filter(x=>!x.read_at).forEach(x=>addAlert(x.title||"Unread UMX notification",x.body||"Open the source workspace.","UMX notifications","warn",x.link&&x.link.startsWith("/")?x.link:"/owner.html"));
     if(available("mxTickets"))rows("mxTickets").filter(x=>!["closed","resolved","completed","cancelled"].includes(String(x.status).toLowerCase())).forEach(x=>{
       const critical=["critical","urgent","high"].includes(String(x.priority).toLowerCase());
-      addAlert(x.subject||"Open support ticket","Ticket "+(x.ticket_code||"")+" · "+fmtDate(x.created_at),"MX Support",critical?"bad":"warn","/mx-continuity/app/");
+      addAlert(x.subject||"Open support ticket","Ticket "+(x.ticket_code||"")+" · "+fmtDate(x.created_at),"MX Continuity Support",critical?"bad":"warn","/mx-continuity/app/");
     });
     if(available("mxHealth"))rows("mxHealth").filter(x=>["failed","error","critical","unhealthy","degraded","warning"].includes(String(x.status).toLowerCase())).forEach(x=>addAlert(x.component||"System health issue",String(x.detail||"Requires review"),"System health","bad"));
     if(available("inspections"))rows("inspections").filter(x=>["failed","error","critical"].includes(String(x.status).toLowerCase()) || ["failed","rejected"].includes(String(x.manual_review_status).toLowerCase())).forEach(x=>addAlert("Website inspection needs review",String(x.inspection_type||"Check")+" · "+fmtDate(x.completed_at||x.created_at),"Monitoring","bad","/mx-continuity/app/"));
@@ -91,11 +91,11 @@
     const add=(key,itemsHere,stamp,title,description,link)=>{if(available(key))(itemsHere||[]).forEach(x=>{const date=x[stamp];if(date)items.push({date,title:title(x),description:description(x),link});});};
     add("scheduler",rows("scheduler"),"executed_at",x=>"MX scheduler: "+x.step,x=>x.detail||"Run recorded","");
     add("inspections",rows("inspections"),"created_at",x=>"Website check: "+(x.inspection_type||"Inspection"),x=>x.status||"Status unrecorded","/mx-continuity/app/");
-    add("mxTickets",rows("mxTickets"),"created_at",x=>"MX ticket: "+(x.ticket_code||"New ticket"),x=>x.subject||"Support","/mx-continuity/app/");
+    add("mxTickets",rows("mxTickets"),"created_at",x=>"MX Continuity ticket: "+(x.ticket_code||"New ticket"),x=>x.subject||"Support","/mx-continuity/app/");
     add("umxJobs",rows("umxJobs"),"created_at",x=>"UMX job: "+(x.title||"New job"),x=>x.status||"Status pending","/owner.html");
-    add("mxLeads",rows("mxLeads"),"created_at",x=>"New MX lead",x=>x.business_name||"Lead received","/mx-continuity/app/");
+    add("mxLeads",rows("mxLeads"),"created_at",x=>"New MX Continuity lead",x=>x.business_name||"Lead received","/mx-continuity/app/");
     add("umxRequests",rows("umxRequests"),"created_at",x=>"New UMX inquiry",x=>x.service||"Website request","/owner.html");
-    add("mxInvoices",rows("mxInvoices"),"created_at",x=>"MX invoice: "+(x.invoice_no||"New"),x=>x.status||"Status pending","/mx-continuity/app/");
+    add("mxInvoices",rows("mxInvoices"),"created_at",x=>"MX Continuity invoice: "+(x.invoice_no||"New"),x=>x.status||"Status pending","/mx-continuity/app/");
     add("umxNotifications",rows("umxNotifications"),"created_at",x=>"UMX notification",x=>x.title||"New notification","/owner.html");
     activities=items.sort((a,b)=>new Date(b.date)-new Date(a.date));
   }
@@ -156,7 +156,7 @@
     const last=runs[0];
     const targetCount=rows("monitorTargets").filter(x=>x.is_active).length;
     const haveRun=available("scheduler") && !!last;
-    append("automation-cards",automationCard("MX Scheduled Checkups","Recorded website-check scheduler executions and last run.",haveRun?"Run history recorded":available("scheduler")?"No runs recorded":"Source unavailable",haveRun?"info":"warn",haveRun?"Last: "+fmtDate(last.executed_at):"No confirmed execution"));
+    append("automation-cards",automationCard("MX Continuity Scheduled Checkups","Recorded website-check scheduler executions and last run.",haveRun?"Run history recorded":available("scheduler")?"No runs recorded":"Source unavailable",haveRun?"info":"warn",haveRun?"Last: "+fmtDate(last.executed_at):"No confirmed execution"));
     append("automation-cards",automationCard("Website Monitoring","Authorized monitored sites and recorded inspection results.",available("monitorTargets")?targetCount+" active target(s)":"Source unavailable",targetCount>0?"info":"warn",available("inspections")?rows("inspections").length+" inspections recorded":"Inspection source unavailable"));
     append("automation-cards",automationCard("Component Health Checks","Status history recorded by the MX system, if reporting has been configured.",available("mxHealth")&&rows("mxHealth").length?"Health records found":"No health records",rows("mxHealth").length?"info":"warn",rows("mxHealth").length?"Latest: "+fmtDate(rows("mxHealth")[0].last_checked_at):"A scheduled health monitor is not confirmed"));
     append("automation-cards",automationCard("Client Support Alerts","Support-ticket alerts and email delivery should be visible here when delivery receipts are integrated.","External delivery not linked","warn","Tickets themselves are monitored in this control center"));
@@ -175,8 +175,8 @@
   function renderCustomers() {
     list("tickets-list","mxTickets",rows("mxTickets"),x=>record(x.subject||"Support request",(x.ticket_code||"Ticket")+" · "+fmtDate(x.created_at),"Priority: "+(x.priority||"Normal"),x.status,"/mx-continuity/app/"),40);
     const merged=[...rows("mxClients").map(x=>({title:x.business_name,meta:"Client · "+(x.package_name||"Package unrecorded"),status:x.project_status,date:x.created_at})),...rows("mxProjects").map(x=>({title:x.name,meta:"Project",status:x.status,date:x.created_at}))].sort((a,b)=>new Date(b.date)-new Date(a.date));
-    clear("mx-clients-list");if(!available("mxClients")||!available("mxProjects"))append("mx-clients-list",el("div","error","One or more MX client sources are unavailable."));else if(!merged.length)append("mx-clients-list",empty());else merged.slice(0,35).forEach(x=>append("mx-clients-list",record(x.title,x.meta+" · "+fmtDate(x.date),"",x.status,"/mx-continuity/app/")));
-    const leads=[...rows("mxLeads").map(x=>({title:x.business_name||"New lead",meta:"MX lead",status:x.status,date:x.created_at})),...rows("mxInquiries").map(x=>({title:x.subject||"Website inquiry",meta:"From "+(x.contact_name||"customer"),status:x.status,date:x.created_at}))].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    clear("mx-clients-list");if(!available("mxClients")||!available("mxProjects"))append("mx-clients-list",el("div","error","One or more MX Continuity client sources are unavailable."));else if(!merged.length)append("mx-clients-list",empty());else merged.slice(0,35).forEach(x=>append("mx-clients-list",record(x.title,x.meta+" · "+fmtDate(x.date),"",x.status,"/mx-continuity/app/")));
+    const leads=[...rows("mxLeads").map(x=>({title:x.business_name||"New lead",meta:"MX Continuity lead",status:x.status,date:x.created_at})),...rows("mxInquiries").map(x=>({title:x.subject||"Website inquiry",meta:"From "+(x.contact_name||"customer"),status:x.status,date:x.created_at}))].sort((a,b)=>new Date(b.date)-new Date(a.date));
     clear("leads-list");if(!available("mxLeads")||!available("mxInquiries"))append("leads-list",el("div","error","One or more MX inquiry sources are unavailable."));else if(!leads.length)append("leads-list",empty());else leads.slice(0,35).forEach(x=>append("leads-list",record(x.title,x.meta+" · "+fmtDate(x.date),"",x.status,"/mx-continuity/app/")));
     list("requests-list","umxRequests",rows("umxRequests"),x=>record(x.name||"New request",fmtDate(x.created_at),x.service||"Service not recorded",x.status,"/owner.html"),40);
   }
