@@ -120,3 +120,14 @@ body{background:#11151c}
 .command-link:hover,.command-link:focus-visible{background:#393046}
 @media(max-width:780px){.command-nav{padding:10px 0 8px;gap:6px}.command-link{flex:1 1 42%;padding:10px 6px;font-size:11px}}
 @media print{.command-nav{display:none!important}}
+
+/* Staff-only Northside inquiry matching; affects the Command Map only. */
+#property-inquiries{margin-top:10px}
+#property-inquiries p{font-size:12px;color:#bdb4bd;line-height:1.55}
+#property-inquiries select{width:100%;padding:11px 10px;margin:7px 0 10px;background:#16151c;border:1px solid #736144;border-radius:4px;color:#f5ead6;font-size:12px}
+#property-inquiries button{max-width:100%;white-space:normal;padding:10px 14px}
+#linked-inquiries{font-size:12px;color:#cfc4c7;max-height:160px;overflow:auto;padding:8px 0}
+#linked-inquiries>div{padding:8px 0;border-bottom:1px solid #77603c48}
+#linked-inquiries strong{color:#f0d7a1}
+#linked-inquiries small{display:block;color:#b7b0b9}
+#inquiry-link-message{display:block;color:#f0d19c;margin-top:8px;line-height:1.5}
