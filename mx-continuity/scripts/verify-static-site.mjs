@@ -42,7 +42,9 @@ check(contactJs.includes("form"),"inquiry email script malformed");
 check(contactJs.includes("reportValidity"),"inquiry validation missing");
 check(support.includes('id="email-support-btn"'),"working support email action missing");
 check(support.includes("assets/support-email.js"),"support email script missing");
-check(supportJs.includes("mailto:TheUrbanMatrixLab@outlook.com"),"support email recipient missing");
+check(supportJs.includes('"mailto:"') && ticket.includes("TheUrbanMatrixLab@outlook.com"),"support fallback email recipient missing");
+check(support.includes("assets/support-config.js"),"support backend config script missing");
+check(supportJs.includes("/functions/v1/veil-public-support") && supportJs.includes("turnstileToken") && supportJs.includes("request_id"),"secure tracked support integration missing");
 check(supportJs.includes("reportValidity"),"support validation missing");
 for(const file of ["contact.html","support.html"]){
  check(!read(file).includes('disabled="" type="submit"'),"public form still presents disabled CTA: "+file);
