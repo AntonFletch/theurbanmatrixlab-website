@@ -356,6 +356,15 @@ function openRequest(id) {
   const r=byId(cache.requests,id); if(!r)return;
   const body=document.createElement('div'); body.innerHTML=`<div class="detail-grid"><div class="detail-box"><small>CONTACT</small><strong>${esc(r.name)}</strong></div><div class="detail-box"><small>EMAIL</small><strong>${esc(r.email)}</strong></div><div class="detail-box"><small>SERVICE</small><strong>${esc(r.service)}</strong></div></div><div class="portal-panel" style="margin:0 0 15px"><h2>${esc(r.company||'Property request')}</h2><p>${esc(r.location||'')}</p><p style="white-space:pre-wrap;color:#b8afbb">${esc(r.details)}</p></div><form class="portal-form" id="request-status-form"><label>STATUS<select name="status">${['new','reviewing','contacted','closed','spam'].map(s=>option(s,statusText(s),r.status)).join('')}</select></label><div class="form-actions"><button class="mini-button" type="submit">Save status</button></div></form>`;
   const m=modal({title:'Website request',body});
+  if(r.location){
+    const mapLink=document.createElement('a');
+    mapLink.href='/map.html?request='+encodeURIComponent(r.id)+'&address='+encodeURIComponent(r.location);
+    mapLink.textContent='Match this request to Northside property →';
+    mapLink.className='mini-button secondary';
+    mapLink.style.display='inline-block';
+    mapLink.style.marginTop='8px';
+    body.querySelector('.portal-panel')?.append(mapLink);
+  }
   body.querySelector('form').onsubmit=async e=>{e.preventDefault();const btn=e.submitter;setBusy(btn,true);const status=new FormData(e.target).get('status');const {error}=await supabase.from('umx_service_requests').update({status,updated_at:new Date().toISOString()}).eq('id',id);setBusy(btn,false);if(error)return toast(error.message,'error');toast('Request updated.');m.close();await loadRequests();renderOverview();};
 }
 
