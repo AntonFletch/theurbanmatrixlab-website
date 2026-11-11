@@ -7,7 +7,10 @@ import {loadAddresses,loadBoundaries,sectorMask,sectorNames} from './sector-data
 import {readFlags,writeFlag} from './sector-sync.mjs';
 import {propertyFlags,propertyColor,propertyStatus} from './sector-status.mjs';
 const NAMES=sectorNames;
-const $=id=>document.getElementById(id),state={sector:'Northside',kind:'home',base:'street',page:0,visible:8,search:'',boundaries:{},cache:new Map(),flags:new Map(),user:null,dbReady:false,map:null,tiles:null,mask:null,outline:null,markers:null,selection:null,serial:0,checks:new Map(),dirty:false,saving:false,syncing:false,flagSerial:0,editVersion:0};
+const query=new URLSearchParams(location.search);
+const initialRequest=query.get('request')||'';
+const initialAddress=query.get('address')||'';
+const $=id=>document.getElementById(id),state={sector:'Northside',kind:'home',base:'street',page:0,visible:8,search:'',boundaries:{},cache:new Map(),flags:new Map(),user:null,dbReady:false,requests:[],links:new Map(),inquiriesReady:false,requestFilter:'',map:null,tiles:null,mask:null,outline:null,markers:null,selection:null,serial:0,checks:new Map(),dirty:false,saving:false,syncing:false,flagSerial:0,editVersion:0};
 const escapeText=t=>String(t??'').trim();
 function label(t){return escapeText(t)||'(Unnamed county address)'}
 function statusKey(id){return String(id)}
@@ -29,13 +32,13 @@ async function verifyAccess(){
 }
 function lockSector(message='Your access changed or expired. Sign in again.'){
  state.serial++;state.flagSerial++;state.addressRequest?.abort();state.user=null;state.dbReady=false;state.flags.clear();state.cache.clear();state.map?.remove();state.map=null;$('record-list').replaceChildren();$('flag-reason').value='';$('profile').hidden=true;
- clearInterval(state.syncTimer);$('app').hidden=true;$('lock').hidden=false;$('auth-message').textContent=message;
+ clearInterval(state.syncTimer);clearInterval(state.inquiryTimer);$('app').hidden=true;$('lock').hidden=false;$('auth-message').textContent=message;
 }
 async function bootstrap(){
  try{
   state.user=await verifyAccess();$('lock').hidden=true;$('app').hidden=false;
   supabase.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'||(session&&session.user.id!==state.user?.id))setTimeout(()=>lockSector(),0)});
-  await init();state.syncTimer=setInterval(syncCurrent,30000);
+  await init();state.syncTimer=setInterval(syncCurrent,30000);state.inquiryTimer=setInterval(()=>{if(!document.hidden&&!state.saving)loadInquiries().catch(console.warn)},90000);
  }catch(e){if($('app').hidden){$('auth-message').textContent=e.message+'. Use UMX Sign in.'}else setNotice('UMX could not finish loading: '+e.message)}
 }
 async function init(){
@@ -66,6 +69,11 @@ async function init(){
  try{
   const result=await loadBoundaries();state.boundaries=result.boundaries;state.boundaryReference=result.reference;
   await loadSector(state.sector);
+  try{await loadInquiries()}catch(e){console.warn('UMX inquiry index unavailable',e)}
+  if(initialAddress&&state.sector==='Northside'){
+   const term=initialAddress.split(',')[0].trim().slice(0,120);
+   if(term){state.search=term.toLowerCase();$('search-address').value=term;state.visible=32;refresh()}
+  }
  }catch(e){setNotice('City neighborhood boundaries unavailable: '+e.message)}
  fetch('./sector-reference/audit.json').then(r=>r.ok?r.json():null).then(a=>{if(a){$('audit-homes').textContent=a.totals.homes.toLocaleString();$('audit-businesses').textContent=a.totals.businesses.toLocaleString();$('audit-method').textContent='County GIS audit: '+a.checkedDate+' · address records, not verified occupied homes or operating companies. Boundary overlaps are counted once in city totals.'}}).catch(()=>{});
 }
@@ -229,13 +237,14 @@ function fillProfile(row){
  $('save-message').textContent=state.dbReady?'Shared UMX status synced · updates every 30 seconds':'Shared status unavailable — Northside only; reload to retry';
  $('save-flags').disabled=!state.dbReady||!navigator.onLine;
  $('reload-status').disabled=!navigator.onLine;
+ renderInquiryPanel(row);
 }
 function selectRow(row){
  if(state.selection?.id===row.id){
   state.selection=null;state.dirty=false;$('profile').hidden=true;refresh();return;
  }
  state.selection=row;state.dirty=false;fillProfile(row);refresh();
- state.map.easeTo({center:[row.lng,row.lat],zoom:Math.max(16,state.map.getZoom()),pitch:0,bearing:0,duration:480});loadPropertyHistory(row);
+ state.map.easeTo({center:[row.lng,row.lat],zoom:Math.max(16,state.map.getZoom()),pitch:0,bearing:0,duration:480});loadPropertyHistory(row);renderInquiryPanel(row);
 }
 async function loadPropertyHistory(row){
  const root=$('property-history');if(!root)return;
@@ -257,6 +266,100 @@ async function loadPropertyHistory(row){
    root.append(p);
   }
  }catch(e){if(state.selection?.id===row.id)root.textContent='Contact history unavailable: '+e.message}
+}
+
+async function readAllStaffRows(table,fields,sort,max=10000){
+ const rows=[];
+ for(let offset=0;offset<max;offset+=1000){
+  const {data,error}=await supabase.from(table).select(fields)
+    .order(sort,{ascending:false}).range(offset,offset+999);
+  if(error)throw error;
+  rows.push(...(data||[]));
+  if((data||[]).length<1000)return rows;
+ }
+ throw Error('Inquiries exceed the current map display limit. Use the UMX operations desk.');
+}
+async function loadInquiries(){
+ if(!state.user)return;
+ const [requests,links]=await Promise.all([
+  readAllStaffRows('umx_service_requests','id,name,email,service,location,status,created_at','created_at'),
+  readAllStaffRows('umx_northside_inquiry_links','request_id,property_id,property_address,linked_at','linked_at')
+ ]);
+ state.requests=requests;
+ state.links=new Map(links.map(x=>[x.request_id,x]));
+ state.inquiriesReady=true;
+ if(state.selection)renderInquiryPanel(state.selection);
+}
+function renderInquiryPanel(row){
+ const select=$('request-to-link'),list=$('linked-inquiries'),status=$('inquiry-link-message'),button=$('link-inquiry');
+ if(!select||!list||!button)return;
+ const permitted=state.sector==='Northside'&&state.inquiriesReady;
+ select.replaceChildren();list.replaceChildren();
+ const intro=document.createElement('option');
+ intro.value='';intro.textContent=state.inquiriesReady?'Select an unlinked inquiry':'Inquiries unavailable — reload';
+ select.append(intro);
+ const requestById=new Map(state.requests.map(x=>[x.id,x]));
+ const linked=[...state.links.values()].filter(x=>x.property_id===row.id);
+ if(!linked.length){list.textContent='No inquiries linked to this property.'}
+ else{
+   for(const entry of linked){
+    const request=requestById.get(entry.request_id);
+    const item=document.createElement('div');
+    const summary=document.createElement('strong');
+    summary.textContent=request?request.name+' · '+request.service:'Linked request '+entry.request_id.slice(0,8);
+    const detail=document.createElement('small');
+    detail.textContent=(request?.location||entry.property_address)+' · Linked '+new Date(entry.linked_at).toLocaleString();
+    item.append(summary,document.createElement('br'),detail);list.append(item);
+   }
+ }
+ const normalize=x=>String(x||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+ const key=normalize(row.address);
+ const available=state.requests.filter(x=>!state.links.has(x.id)&&!['closed','spam'].includes(x.status));
+ const similar=x=>{const loc=normalize(x.location);return loc.length>4&&(loc.includes(key)||key.includes(loc))};
+ const filter=state.requestFilter;
+ const filtered=available.filter(x=>!filter||[x.name,x.location,x.service,x.email].join(' ').toLowerCase().includes(filter));
+ filtered.sort((a,b)=>Number(similar(b))-Number(similar(a)));
+ const shown=filtered.slice(0,100);
+ if(initialRequest&&!shown.some(x=>x.id===initialRequest)){
+  const requested=available.find(x=>x.id===initialRequest);
+  if(requested&&(!filter||[requested.name,requested.location,requested.email].join(' ').toLowerCase().includes(filter)))shown.unshift(requested);
+ }
+ for(const request of shown){
+  const option=document.createElement('option');
+  option.value=request.id;
+  option.textContent=request.name+' — '+(request.location||'No address')+' — '+request.service;
+  select.append(option);
+ }
+ if(initialRequest&&shown.some(x=>x.id===initialRequest))select.value=initialRequest;
+ select.disabled=!permitted||shown.length===0;
+ button.disabled=!permitted||shown.length===0;
+ intro.textContent=shown.length?('Select one of '+filtered.length+' matching inquiries'):(state.inquiriesReady?'No matching unlinked inquiries':'Inquiries unavailable');
+ if(status&&!state.inquiriesReady)status.textContent='Restricted inquiry records unavailable.';
+}
+async function linkInquiry(){
+ const row=state.selection;
+ const id=$('request-to-link')?.value;
+ const msg=$('inquiry-link-message'),button=$('link-inquiry');
+ if(!row||!id||state.sector!=='Northside'||!state.inquiriesReady)return;
+ const request=state.requests.find(x=>x.id===id);
+ if(!request||state.links.has(id)){msg.textContent='That inquiry is already linked. Reload and try again.';return}
+ button.disabled=true;msg.textContent='Linking verified property selection…';
+ try{
+   await verifyAccess();
+   const {error}=await supabase.from('umx_northside_inquiry_links').insert({
+     request_id:id,property_id:row.id,property_address:row.address,linked_by:state.user.id
+   });
+   if(error)throw error;
+   await loadInquiries();
+   if(state.selection?.id===row.id){
+    $('flag-pending').checked=true;
+    $('flag-contacted').checked=true;
+    state.editVersion++;state.dirty=true;
+    $('save-message').textContent='Inquiry linked. Save the Pending reply status to turn this pin yellow.';
+    msg.textContent='Inquiry linked; check the address and save the pending status.';
+   }
+ }catch(e){msg.textContent='NOT LINKED: '+(e.code==='23505'?'Inquiry already linked to a property.':e.message)}
+ finally{button.disabled=false}
 }
 async function saveFlags(){
  if(!state.selection||!state.user||!state.dbReady||state.saving)return;
@@ -283,5 +386,7 @@ function connectEvents(){
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncCurrent()});
  window.addEventListener('online',()=>{if(state.selection)$('save-flags').disabled=!state.dbReady;syncCurrent()});
  window.addEventListener('offline',()=>{if(state.selection){$('save-flags').disabled=true;$('save-message').textContent='Offline — changes are not saved. Reconnect to save.'}});
- document.querySelectorAll('.tabs [data-kind]').forEach(b=>b.onclick=()=>{state.kind=b.dataset.kind;state.visible=8;state.search='';$('search-address').value='';$('profile').hidden=true;document.querySelectorAll('.tabs button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',String(x===b))});refresh()});$('streets').onclick=()=>setTiles('street');$('satellite').onclick=()=>setTiles('satellite');$('tilt-view').onclick=()=>{const flat=state.map.getPitch()>10;state.map.easeTo({pitch:flat?0:52,bearing:flat?0:-19,duration:600});$('tilt-view').textContent=flat?'3D View':'2D View'};$('sector-prev').onclick=()=>{state.page=Math.max(0,state.page-1);renderStrip()};$('sector-next').onclick=()=>{state.page=Math.min(Math.ceil(NAMES.length/3)-1,state.page+1);renderStrip()};$('all-sectors-toggle').onclick=()=>{$('all-sectors').hidden=!$('all-sectors').hidden};$('sector-select').onchange=e=>{state.page=Math.floor(NAMES.indexOf(e.target.value)/3);loadSector(e.target.value)};$('search-address').oninput=e=>{state.search=e.target.value.trim().toLowerCase();state.visible=8;refresh()};$('show-more').onclick=()=>{state.visible+=24;refresh()};$('profile-close').onclick=()=>{state.selection=null;state.dirty=false;$('profile').hidden=true;refresh()};$('save-flags').onclick=saveFlags;$('print-contract').onclick=()=>window.print()}
+ document.querySelectorAll('.tabs [data-kind]').forEach(b=>b.onclick=()=>{state.kind=b.dataset.kind;state.visible=8;state.search='';$('search-address').value='';$('profile').hidden=true;document.querySelectorAll('.tabs button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',String(x===b))});refresh()});$('streets').onclick=()=>setTiles('street');$('satellite').onclick=()=>setTiles('satellite');$('tilt-view').onclick=()=>{const flat=state.map.getPitch()>10;state.map.easeTo({pitch:flat?0:52,bearing:flat?0:-19,duration:600});$('tilt-view').textContent=flat?'3D View':'2D View'};$('sector-prev').onclick=()=>{state.page=Math.max(0,state.page-1);renderStrip()};$('sector-next').onclick=()=>{state.page=Math.min(Math.ceil(NAMES.length/3)-1,state.page+1);renderStrip()};$('all-sectors-toggle').onclick=()=>{$('all-sectors').hidden=!$('all-sectors').hidden};$('sector-select').onchange=e=>{state.page=Math.floor(NAMES.indexOf(e.target.value)/3);loadSector(e.target.value)};$('search-address').oninput=e=>{state.search=e.target.value.trim().toLowerCase();state.visible=8;refresh()};$('show-more').onclick=()=>{state.visible+=24;refresh()};$('profile-close').onclick=()=>{state.selection=null;state.dirty=false;$('profile').hidden=true;refresh()};$('save-flags').onclick=saveFlags;
+ $('request-match-search').oninput=e=>{state.requestFilter=e.target.value.trim().toLowerCase();if(state.selection)renderInquiryPanel(state.selection)};
+ $('link-inquiry').onclick=linkInquiry;$('print-contract').onclick=()=>window.print()}
 bootstrap();
