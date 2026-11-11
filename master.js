@@ -34,7 +34,6 @@
     ["inspections","mx_ops_inspections",'id,inspection_type,status,scheduled_date,completed_at,detail,manual_review_status,mobile_test,desktop_test,form_test,security_test,backup_test,created_at',"created_at",120],
     ["mxInquiries","mx_client_inquiries",'id,subject,status,contact_name,created_at',"created_at",120],
     ["profiles","profiles",'id,"Full_Name","Email",role',"created_at",80],
-    ["socialQueue","publication_social_queue",'id,platform,status,scheduled_for,last_error,created_at',"created_at",60]
   ];
   function rows(key) {return db[key] || [];}
   function available(key) {return !failures[key];}
@@ -85,7 +84,6 @@
     if(available("inspections"))rows("inspections").filter(x=>["failed","error","critical"].includes(String(x.status).toLowerCase()) || ["failed","rejected"].includes(String(x.manual_review_status).toLowerCase())).forEach(x=>addAlert("Website inspection needs review",String(x.inspection_type||"Check")+" · "+fmtDate(x.completed_at||x.created_at),"Monitoring","bad","/mx-continuity/app/"));
     if(available("scheduler"))rows("scheduler").filter(x=>["failed","error"].includes(String(x.step).toLowerCase())).forEach(x=>addAlert("Automation run failed",String(x.detail||"Scheduler error")+" · "+fmtDate(x.executed_at),"MX scheduler","bad"));
     if(available("umxInvoices"))rows("umxInvoices").filter(x=>x.due_date && new Date(x.due_date+"T23:59:59")<new Date() && !["paid","void","cancelled"].includes(String(x.status).toLowerCase()) && Number(x.total||0)>Number(x.amount_paid||0)).forEach(x=>addAlert("UMX invoice past due","Invoice "+(x.number||"")+" · due "+x.due_date,"UMX billing","warn","/owner.html"));
-    if(available("socialQueue"))rows("socialQueue").filter(x=>["failed","error"].includes(String(x.status).toLowerCase())).forEach(x=>addAlert("Publishing workflow failed",x.platform+" · "+String(x.last_error||"Needs review"),"Publishing","bad"));
     alerts.sort((a,b)=>(a.severity==="bad"?0:1)-(b.severity==="bad"?0:1));
   }
   function buildActivity() {
@@ -141,7 +139,7 @@
     text("alert-summary",alerts.length===0?"None found in available sources":alerts.length+" flagged");
     list("alerts-list",null,alerts,x=>record(x.title,x.origin,x.detail,x.severity==="bad"?"Critical":"Review",x.link),100);
     clear("alert-coverage");
-    ["umxNotifications","mxTickets","mxHealth","inspections","scheduler","umxInvoices","socialQueue"].forEach(key=>{
+    ["umxNotifications","mxTickets","mxHealth","inspections","scheduler","umxInvoices"].forEach(key=>{
       const row=el("div");row.appendChild(el("strong","",key.replace(/([A-Z])/g," $1").replace(/^./,s=>s.toUpperCase())));
       row.appendChild(el("small","",available(key)?"Connected records readable":"Unavailable: "+failures[key]));append("alert-coverage",row);
     });
@@ -162,7 +160,6 @@
     append("automation-cards",automationCard("Website Monitoring","Authorized monitored sites and recorded inspection results.",available("monitorTargets")?targetCount+" active target(s)":"Source unavailable",targetCount>0?"info":"warn",available("inspections")?rows("inspections").length+" inspections recorded":"Inspection source unavailable"));
     append("automation-cards",automationCard("Component Health Checks","Status history recorded by the MX system, if reporting has been configured.",available("mxHealth")&&rows("mxHealth").length?"Health records found":"No health records",rows("mxHealth").length?"info":"warn",rows("mxHealth").length?"Latest: "+fmtDate(rows("mxHealth")[0].last_checked_at):"A scheduled health monitor is not confirmed"));
     append("automation-cards",automationCard("Client Support Alerts","Support-ticket alerts and email delivery should be visible here when delivery receipts are integrated.","External delivery not linked","warn","Tickets themselves are monitored in this control center"));
-    append("automation-cards",automationCard("Publications / Social Queue","Publication queue records where available.",available("socialQueue")?rows("socialQueue").length+" recorded items":"Source unavailable","neutral","Automation configuration not inferred from queue records"));
     append("automation-cards",automationCard("Automated Market Briefs","ChatGPT-based market reports and recurring research.","External workflow not linked","warn","No run receipts are sent to this website yet"));
     list("scheduler-list","scheduler",runs,x=>record("Scheduler step: "+x.step,fmtDate(x.executed_at)+" · affected "+(x.affected_count??0),x.detail,"Recorded"),60);
   }
