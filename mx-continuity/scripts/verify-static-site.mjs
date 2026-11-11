@@ -13,6 +13,11 @@ const required=[
 ];
 for(const file of required)check(fs.existsSync(path.join(root,file)),"missing "+file);
 const home=read("index.html"),site=read("assets/site.js"),contact=read("contact.html");
+const portal=read("app/index.html"),portalJs=read("app/portal.js");
+check(home.includes('href="app/"'),"homepage missing client portal route");
+check(portal.includes("Client &amp; Checkup Center"),"client portal page missing");
+check(portal.includes("noindex,nofollow,noarchive"),"client portal must stay unindexed");
+check(!/sb_secret_|service_role|sk_live_/i.test(portalJs),"client portal contains a server-side credential");
 const support=read("support.html"),intake=read("assets/intake-config.js");
 const ticket=read("assets/support-config.js"),contactJs=read("assets/contact-email.js");
 const supportJs=read("assets/support-email.js");
