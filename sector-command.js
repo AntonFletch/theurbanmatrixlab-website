@@ -10,7 +10,7 @@ const NAMES=sectorNames;
 const query=new URLSearchParams(location.search);
 const initialRequest=query.get('request')||'';
 const initialAddress=query.get('address')||'';
-const $=id=>document.getElementById(id),state={sector:'Northside',kind:'home',base:'street',page:0,visible:8,search:'',boundaries:{},cache:new Map(),flags:new Map(),user:null,dbReady:false,requests:[],links:new Map(),inquiriesReady:false,map:null,tiles:null,mask:null,outline:null,markers:null,selection:null,serial:0,checks:new Map(),dirty:false,saving:false,syncing:false,flagSerial:0,editVersion:0};
+const $=id=>document.getElementById(id),state={sector:'Northside',kind:'home',base:'street',page:0,visible:8,search:'',boundaries:{},cache:new Map(),flags:new Map(),user:null,dbReady:false,requests:[],links:new Map(),inquiriesReady:false,requestFilter:'',map:null,tiles:null,mask:null,outline:null,markers:null,selection:null,serial:0,checks:new Map(),dirty:false,saving:false,syncing:false,flagSerial:0,editVersion:0};
 const escapeText=t=>String(t??'').trim();
 function label(t){return escapeText(t)||'(Unnamed county address)'}
 function statusKey(id){return String(id)}
@@ -268,18 +268,25 @@ async function loadPropertyHistory(row){
  }catch(e){if(state.selection?.id===row.id)root.textContent='Contact history unavailable: '+e.message}
 }
 
+async function readAllStaffRows(table,fields,sort,max=10000){
+ const rows=[];
+ for(let offset=0;offset<max;offset+=1000){
+  const {data,error}=await supabase.from(table).select(fields)
+    .order(sort,{ascending:false}).range(offset,offset+999);
+  if(error)throw error;
+  rows.push(...(data||[]));
+  if((data||[]).length<1000)return rows;
+ }
+ throw Error('Inquiries exceed the current map display limit. Use the UMX operations desk.');
+}
 async function loadInquiries(){
  if(!state.user)return;
- const [reqRes,linkRes]=await Promise.all([
-  supabase.from('umx_service_requests').select('id,name,email,service,location,status,created_at')
-    .order('created_at',{ascending:false}).limit(300),
-  supabase.from('umx_northside_inquiry_links').select('request_id,property_id,property_address,linked_at')
-    .order('linked_at',{ascending:false}).limit(5000)
+ const [requests,links]=await Promise.all([
+  readAllStaffRows('umx_service_requests','id,name,email,service,location,status,created_at','created_at'),
+  readAllStaffRows('umx_northside_inquiry_links','request_id,property_id,property_address,linked_at','linked_at')
  ]);
- if(reqRes.error)throw reqRes.error;
- if(linkRes.error)throw linkRes.error;
- state.requests=reqRes.data||[];
- state.links=new Map((linkRes.data||[]).map(x=>[x.request_id,x]));
+ state.requests=requests;
+ state.links=new Map(links.map(x=>[x.request_id,x]));
  state.inquiriesReady=true;
  if(state.selection)renderInquiryPanel(state.selection);
 }
@@ -309,17 +316,24 @@ function renderInquiryPanel(row){
  const key=normalize(row.address);
  const available=state.requests.filter(x=>!state.links.has(x.id)&&!['closed','spam'].includes(x.status));
  const similar=x=>{const loc=normalize(x.location);return loc.length>4&&(loc.includes(key)||key.includes(loc))};
- available.sort((a,b)=>Number(similar(b))-Number(similar(a)));
- for(const request of available){
+ const filter=state.requestFilter;
+ const filtered=available.filter(x=>!filter||[x.name,x.location,x.service,x.email].join(' ').toLowerCase().includes(filter));
+ filtered.sort((a,b)=>Number(similar(b))-Number(similar(a)));
+ const shown=filtered.slice(0,100);
+ if(initialRequest&&!shown.some(x=>x.id===initialRequest)){
+  const requested=available.find(x=>x.id===initialRequest);
+  if(requested&&(!filter||[requested.name,requested.location,requested.email].join(' ').toLowerCase().includes(filter)))shown.unshift(requested);
+ }
+ for(const request of shown){
   const option=document.createElement('option');
   option.value=request.id;
   option.textContent=request.name+' — '+(request.location||'No address')+' — '+request.service;
   select.append(option);
  }
- if(initialRequest&&available.some(x=>x.id===initialRequest))select.value=initialRequest;
- select.disabled=!permitted||available.length===0;
- button.disabled=!permitted||available.length===0;
- if(!available.length)intro.textContent=state.inquiriesReady?'No unlinked open inquiries':'Inquiries unavailable';
+ if(initialRequest&&shown.some(x=>x.id===initialRequest))select.value=initialRequest;
+ select.disabled=!permitted||shown.length===0;
+ button.disabled=!permitted||shown.length===0;
+ intro.textContent=shown.length?('Select one of '+filtered.length+' matching inquiries'):(state.inquiriesReady?'No matching unlinked inquiries':'Inquiries unavailable');
  if(status&&!state.inquiriesReady)status.textContent='Restricted inquiry records unavailable.';
 }
 async function linkInquiry(){
@@ -372,5 +386,7 @@ function connectEvents(){
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncCurrent()});
  window.addEventListener('online',()=>{if(state.selection)$('save-flags').disabled=!state.dbReady;syncCurrent()});
  window.addEventListener('offline',()=>{if(state.selection){$('save-flags').disabled=true;$('save-message').textContent='Offline — changes are not saved. Reconnect to save.'}});
- document.querySelectorAll('.tabs [data-kind]').forEach(b=>b.onclick=()=>{state.kind=b.dataset.kind;state.visible=8;state.search='';$('search-address').value='';$('profile').hidden=true;document.querySelectorAll('.tabs button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',String(x===b))});refresh()});$('streets').onclick=()=>setTiles('street');$('satellite').onclick=()=>setTiles('satellite');$('tilt-view').onclick=()=>{const flat=state.map.getPitch()>10;state.map.easeTo({pitch:flat?0:52,bearing:flat?0:-19,duration:600});$('tilt-view').textContent=flat?'3D View':'2D View'};$('sector-prev').onclick=()=>{state.page=Math.max(0,state.page-1);renderStrip()};$('sector-next').onclick=()=>{state.page=Math.min(Math.ceil(NAMES.length/3)-1,state.page+1);renderStrip()};$('all-sectors-toggle').onclick=()=>{$('all-sectors').hidden=!$('all-sectors').hidden};$('sector-select').onchange=e=>{state.page=Math.floor(NAMES.indexOf(e.target.value)/3);loadSector(e.target.value)};$('search-address').oninput=e=>{state.search=e.target.value.trim().toLowerCase();state.visible=8;refresh()};$('show-more').onclick=()=>{state.visible+=24;refresh()};$('profile-close').onclick=()=>{state.selection=null;state.dirty=false;$('profile').hidden=true;refresh()};$('save-flags').onclick=saveFlags;$('link-inquiry').onclick=linkInquiry;$('print-contract').onclick=()=>window.print()}
+ document.querySelectorAll('.tabs [data-kind]').forEach(b=>b.onclick=()=>{state.kind=b.dataset.kind;state.visible=8;state.search='';$('search-address').value='';$('profile').hidden=true;document.querySelectorAll('.tabs button').forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-selected',String(x===b))});refresh()});$('streets').onclick=()=>setTiles('street');$('satellite').onclick=()=>setTiles('satellite');$('tilt-view').onclick=()=>{const flat=state.map.getPitch()>10;state.map.easeTo({pitch:flat?0:52,bearing:flat?0:-19,duration:600});$('tilt-view').textContent=flat?'3D View':'2D View'};$('sector-prev').onclick=()=>{state.page=Math.max(0,state.page-1);renderStrip()};$('sector-next').onclick=()=>{state.page=Math.min(Math.ceil(NAMES.length/3)-1,state.page+1);renderStrip()};$('all-sectors-toggle').onclick=()=>{$('all-sectors').hidden=!$('all-sectors').hidden};$('sector-select').onchange=e=>{state.page=Math.floor(NAMES.indexOf(e.target.value)/3);loadSector(e.target.value)};$('search-address').oninput=e=>{state.search=e.target.value.trim().toLowerCase();state.visible=8;refresh()};$('show-more').onclick=()=>{state.visible+=24;refresh()};$('profile-close').onclick=()=>{state.selection=null;state.dirty=false;$('profile').hidden=true;refresh()};$('save-flags').onclick=saveFlags;
+ $('request-match-search').oninput=e=>{state.requestFilter=e.target.value.trim().toLowerCase();if(state.selection)renderInquiryPanel(state.selection)};
+ $('link-inquiry').onclick=linkInquiry;$('print-contract').onclick=()=>window.print()}
 bootstrap();
