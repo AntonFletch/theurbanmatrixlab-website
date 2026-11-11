@@ -108,7 +108,7 @@
   function renderBusinesses(id) {
     clear(id);
     const configs=[
-      {code:"UMX",name:"UMX Field Services",state:"Operating records connected",stateStyle:"info",detail:"Property services, Missoula field work, contracts, and outreach.",stat:(available("umxJobs")?rows("umxJobs").length:"—")+" jobs · "+n("umxRequests")+" website requests",links:[["Open field desk","/owner.html"],["Sector map","/map.html"]]},
+      {code:"UMX",name:"UMX Field Services",state:"Operating records connected",stateStyle:"info",detail:"Property services, Missoula field work, contracts, and outreach.",stat:(available("umxJobs")?rows("umxJobs").length:"—")+" jobs · "+n("umxRequests")+" website requests",links:[["Field Services website","/umx-field-services/"],["Open field desk","/owner.html"],["Sector map","/map.html"]]},
       {code:"MX",name:"MX Continuity",state:"Operating records connected",stateStyle:"info",detail:"Websites, client care, technical checkups, inquiries, and support.",stat:n("mxClients")+" clients · "+n("mxTickets")+" support tickets",links:[["Open client center","/mx-continuity/app/"],["Website","/mx-continuity/"]]},
       {code:"MX",name:"MX Visibility",state:"In preparation",stateStyle:"warn",detail:"Search optimization and local business visibility. No independent operating data feed is connected yet.",stat:"No tracked revenue or customers connected",links:[["Open website","/mx-visibility/"]]}
     ];
