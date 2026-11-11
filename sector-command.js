@@ -141,7 +141,7 @@ async function loadSector(n,{force=false}={}){
    if(token!==state.serial)return;state.cache.set(n,inventory.rows);state.checks.set(n,inventory);
   }
   await loadFlags(n);if(token!==state.serial)return;refresh();
-  setNotice(state.dbReady?(state.boundaryReference?'Using city boundary reference from October 25, 2026.':''):'County inventory loaded. Private status sync unavailable — reload data to retry.');
+  setNotice(n!=='Northside'?'Future sector preview only — Northside is the active launch territory. Editing disabled.':state.dbReady?(state.boundaryReference?'Using city boundary reference from October 25, 2026.':''):'County inventory loaded. Shared UMX status sync unavailable — reload data to retry.');
  }catch(e){if(token!==state.serial)return;state.cache.delete(n);refresh();setNotice('County inventory unavailable for '+n+': '+e.message+'. Reload data to retry.');}
 }
 function drawSectorBoundary(n){
