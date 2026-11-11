@@ -141,7 +141,7 @@ async function loadSector(n,{force=false}={}){
    if(token!==state.serial)return;state.cache.set(n,inventory.rows);state.checks.set(n,inventory);
   }
   await loadFlags(n);if(token!==state.serial)return;refresh();
-  setNotice(state.dbReady?(state.boundaryReference?'Using city boundary reference from October 25, 2026.':''):'County inventory loaded. Private status sync unavailable — reload data to retry.');
+  setNotice(n!=='Northside'?'Future sector preview only — Northside is the active launch territory. Editing disabled.':state.dbReady?(state.boundaryReference?'Using city boundary reference from October 25, 2026.':''):'County inventory loaded. Shared UMX status sync unavailable — reload data to retry.');
  }catch(e){if(token!==state.serial)return;state.cache.delete(n);refresh();setNotice('County inventory unavailable for '+n+': '+e.message+'. Reload data to retry.');}
 }
 function drawSectorBoundary(n){
@@ -158,7 +158,7 @@ async function loadFlags(n,{background=false}={}){
  const token=++state.flagSerial,user=state.user;
  if(!user)return;
  try{
-  const flags=await readFlags(supabase,user.id,n);
+  const flags=await readFlags(supabase,n);
   if(token!==state.flagSerial||n!==state.sector||user!==state.user||(background&&(state.dirty||state.saving)))return;
   state.flags=flags;state.dbReady=true;
  }catch(e){if(token!==state.flagSerial||n!==state.sector)return;state.dbReady=false;console.warn('UMX status sync unavailable',e.message)}
@@ -177,7 +177,7 @@ function visibleRows(){const list=state.cache.get(state.sector)||[];return list.
 function refresh(){
  const n=state.sector,list=visibleRows(),root=$('record-list'),profile=$('profile');
  $('records-title').textContent=(state.kind==='home'?'Houses':'Businesses')+' · '+n;
- $('data-source').textContent='County GIS checked '+(state.checks.get(n)?new Date(state.checks.get(n).checkedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'when loaded')+' · '+(state.dbReady?'private status synced':'private status sync unavailable');
+ $('data-source').textContent='County GIS checked '+(state.checks.get(n)?new Date(state.checks.get(n).checkedAt).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'when loaded')+' · '+(state.dbReady?'shared UMX status synced':'shared status unavailable');
  $('record-count').textContent=list.length.toLocaleString()+' address records';
  $('show-more').hidden=list.length<=state.visible;
  root.replaceChildren();
@@ -224,9 +224,9 @@ function fillProfile(row){
  $('profile-address').textContent=row.address;
  $('profile-status').textContent=statusText(row);
  $('profile-detail').textContent=(row.kind==='home'?'Residential address':'Commercial-coded address')+' • County postal: '+(row.postal===1?'Verified':'Unverified')+' • County structure: '+(row.countyStatus===2?'Field verified by county':'Unverified')+(row.parcelId?' • Parcel reference: '+row.parcelId:'')+' • UMX service measurements and client authorization pending.'+(row.type===2001?' • Hospital: automatically excluded.':'');
- const f=flagFor(row.id);for(const [name,prop] of [['contacted','contacted'],['declined','declined'],['excluded','excluded'],['active','active_business'],['vip','vip']])$('flag-'+name).checked=!!f[prop];
+ const f=flagFor(row.id);for(const [name,prop] of [['contacted','contacted'],['pending','pending'],['declined','declined'],['excluded','excluded'],['active','active_business'],['vip','vip']])$('flag-'+name).checked=!!f[prop];
  $('flag-active').disabled=false;$('flag-excluded').disabled=row.type===2001;$('flag-excluded').checked=!!f.excluded||row.type===2001;$('flag-reason').value=f.notes||'';
- $('save-message').textContent=state.dbReady?'Private status synced · updates every 30 seconds':'Private status sync unavailable — reload data before saving';
+ $('save-message').textContent=state.dbReady?'Shared UMX status synced · updates every 30 seconds':'Shared status unavailable — Northside only; reload to retry';
  $('save-flags').disabled=!state.dbReady||!navigator.onLine;
  $('reload-status').disabled=!navigator.onLine;
 }
@@ -235,19 +235,43 @@ function selectRow(row){
   state.selection=null;state.dirty=false;$('profile').hidden=true;refresh();return;
  }
  state.selection=row;state.dirty=false;fillProfile(row);refresh();
- state.map.easeTo({center:[row.lng,row.lat],zoom:Math.max(16,state.map.getZoom()),pitch:0,bearing:0,duration:480});
+ state.map.easeTo({center:[row.lng,row.lat],zoom:Math.max(16,state.map.getZoom()),pitch:0,bearing:0,duration:480});loadPropertyHistory(row);
+}
+async function loadPropertyHistory(row){
+ const root=$('property-history');if(!root)return;
+ root.textContent='Loading saved staff changes…';
+ try{
+  const {data,error}=await supabase.from('umx_northside_status_audit')
+   .select('changed_at,action,previous,current').eq('property_id',row.id)
+   .order('changed_at',{ascending:false}).limit(25);
+  if(error)throw error;
+  if(state.selection?.id!==row.id)return;
+  root.replaceChildren();
+  if(!(data||[]).length){root.textContent='No recorded changes yet.';return}
+  for(const entry of data){
+   const p=document.createElement('p');
+   const before=entry.previous?propertyStatus(row,entry.previous):'No saved status';
+   const after=propertyStatus(row,entry.current||{});
+   const ts=new Date(entry.changed_at).toLocaleString();
+   p.textContent=ts+' · '+before+' → '+after;
+   root.append(p);
+  }
+ }catch(e){if(state.selection?.id===row.id)root.textContent='Contact history unavailable: '+e.message}
 }
 async function saveFlags(){
  if(!state.selection||!state.user||!state.dbReady||state.saving)return;
  const row=state.selection,sector=state.sector,serial=state.serial,editVersion=state.editVersion;
- const f={user_id:state.user.id,property_id:row.id,sector,contacted:$('flag-contacted').checked,declined:$('flag-declined').checked,excluded:$('flag-excluded').checked||row.type===2001,active_business:$('flag-active').checked,vip:$('flag-vip').checked,notes:$('flag-reason').value.trim(),updated_at:new Date().toISOString()};
+ const declined=$('flag-declined').checked,excluded=$('flag-excluded').checked||row.type===2001;
+ const active=!declined&&!excluded&&$('flag-active').checked;
+ const pending=!declined&&!excluded&&!active&&$('flag-pending').checked;
+ const f={updated_by:state.user.id,property_id:row.id,sector,contacted:$('flag-contacted').checked||pending||active, pending,declined,excluded,active_business:active,vip:$('flag-vip').checked,notes:$('flag-reason').value.trim(),updated_at:new Date().toISOString()};
  state.flagSerial++;state.saving=true;$('save-flags').disabled=true;$('save-message').textContent='Saving…';
  try{
   if(!navigator.onLine)throw Error('Device is offline. Your changes remain on screen; reconnect and save again.');
   await verifyAccess();
   const saved=await writeFlag(supabase,f,flagFor(row.id));
   if(serial!==state.serial||state.selection?.id!==row.id)return;
-  state.flags.set(row.id,saved);state.dirty=state.editVersion!==editVersion;$('save-message').textContent=state.dirty?'Earlier values saved. Your newer changes are still unsaved.':'Saved to private UMX OS · available on your other signed-in devices';refresh();
+  state.flags.set(row.id,saved);state.dirty=state.editVersion!==editVersion;$('save-message').textContent=state.dirty?'Earlier values saved. Your newer changes are still unsaved.':'Saved to shared UMX OS · visible to authorized staff';if(!state.dirty)fillProfile(row);refresh();loadPropertyHistory(row);
  }catch(e){if(serial===state.serial&&state.selection?.id===row.id)$('save-message').textContent='NOT SAVED: '+e.message}
  finally{state.saving=false;if(serial===state.serial)$('save-flags').disabled=!state.dbReady||!navigator.onLine}
 }
