@@ -13,9 +13,9 @@
 <script defer src="/master.js"></script>
 </head>
 <body>
-<div id="gate" class="gate" role="status" aria-live="polite"><div class="gate-mark">UMX</div><h1>Master Command Center</h1><p id="gate-message">Verifying private owner access…</p><a id="gate-login" href="/login.html" class="button" hidden>Go to UMX Access</a></div>
+<div id="gate" class="gate" role="status" aria-live="polite"><img class="gate-symbol" src="/umx-technology-mark.svg" alt="UMX Technology"><h1>Master Command Center</h1><p id="gate-message">Verifying private owner access…</p><a id="gate-login" href="/login.html" class="button" hidden>Go to UMX Access</a></div>
 <div id="app" class="app" hidden>
-<header class="topbar"><a class="topbrand" href="/" aria-label="UMX public website"><span class="brand-mark">UMX</span><span class="brand-copy"><strong>MASTER COMMAND CENTER</strong><small>The Urban Matrix Lab LLC · UMX OS</small></span></a><div class="top-actions"><span class="secure"><span class="dot"></span> OWNER-ONLY</span><button id="refresh" class="button subtle" type="button">↻ Refresh</button><button id="signout" class="button subtle" type="button">Sign out</button></div></header>
+<header class="topbar"><a class="topbrand" href="/" aria-label="UMX public website"><img class="brand-symbol" src="/umx-technology-mark.svg" alt=""><span class="brand-copy"><strong>UMX TECHNOLOGY</strong><small>Master Command Center · The Urban Matrix Lab LLC</small></span></a><div class="top-actions"><span class="secure"><span class="dot"></span> OWNER-ONLY</span><button id="refresh" class="button subtle" type="button">↻ Refresh</button><button id="signout" class="button subtle" type="button">Sign out</button></div></header>
 <div class="layout">
 <aside class="sidebar" id="sidebar">
 <div class="sidebar-group"><div class="nav-cap">COMMAND</div>
@@ -29,30 +29,34 @@
 <button class="nav" data-tab="finance" type="button">$ <span>Finance &amp; Billing</span></button>
 <button class="nav" data-tab="activity" type="button">≡ <span>System Activity</span></button>
 <button class="nav" data-tab="access" type="button">◇ <span>Access &amp; Integrations</span></button></div>
-<div class="sidebar-group nav-bottom"><a href="/owner.html">↗ <span>UMX Field Operations</span></a><a href="/map.html">⌖ <span>Missoula Sector Command</span></a><a href="/mx-continuity/app/">↗ <span>MX Continuity Workspace</span></a><a href="/">↗ <span>Public Website</span></a></div>
+<div class="sidebar-group nav-bottom"><a href="/mx-continuity/app/">↗ <span>MX Continuity Workspace</span></a><a href="/mx-visibility/">↗ <span>MX Visibility Website</span></a><a href="/">↗ <span>UMX Technology Home</span></a></div>
 </aside>
 <main id="main" class="main" tabindex="-1">
 <div class="mobile-bar"><button id="mobile-nav" type="button" class="button subtle" aria-controls="sidebar" aria-expanded="false">☰ Sections</button><span>PRIVATE OWNER WORKSPACE</span></div>
 <div id="sync-banner" class="sync-banner" role="status" aria-live="polite"><span id="sync-text">Loading connected operating records…</span><span id="last-refresh"></span></div>
 <section data-section="overview">
-<div class="page-head"><div><div class="eyebrow">UMX OS / CENTRAL OVERSIGHT</div><h1>Master <em>Command</em></h1><p>One private operating view across your current businesses, systems, checks, customers, money, and alerts.</p></div><div class="head-date" id="today"></div></div>
+<div class="page-head"><div><div class="eyebrow">UMX TECHNOLOGY / OWNER OVERSIGHT</div><h1>Master <em>Command</em></h1><p>Customer support, website inspections, system activity, billing records, and alerts for the current businesses.</p></div><div class="head-date" id="today"></div></div>
 <div class="metric-grid">
-<div class="metric"><small>ATTENTION REQUIRED</small><strong id="metric-alerts">—</strong><span>Connected alert sources</span></div>
-<div class="metric"><small>UMX WORK</small><strong id="metric-jobs">—</strong><span>Open field jobs</span></div>
-<div class="metric"><small>MX SUPPORT</small><strong id="metric-tickets">—</strong><span>Open support tickets</span></div>
-<div class="metric"><small>WEBSITE CHECKS</small><strong id="metric-inspections">—</strong><span>Recorded inspections</span></div>
-<div class="metric"><small>PAYMENTS RECORDED</small><strong id="metric-paid">—</strong><span>Paid invoices in connected records</span></div>
-<div class="metric"><small>AUTOMATION RUNS</small><strong id="metric-runs">—</strong><span>Recorded scheduler executions</span></div>
+<button class="metric metric-action" type="button" data-tab="alerts"><small>ALERTS TO REVIEW</small><strong id="metric-alerts">—</strong><span>Open alert records ↗</span></button>
+<button class="metric metric-action" type="button" data-tab="customers"><small>MX SUPPORT TICKETS</small><strong id="metric-tickets">—</strong><span>View open tickets ↗</span></button>
+<button class="metric metric-action" type="button" data-tab="monitoring"><small>WEBSITE INSPECTIONS</small><strong id="metric-inspections">—</strong><span>View inspection history ↗</span></button>
+<button class="metric metric-action" type="button" data-tab="finance"><small>MX RECORDED PAYMENTS</small><strong id="metric-paid">—</strong><span>Review invoice records ↗</span></button>
+<button class="metric metric-action" type="button" data-tab="automation"><small>SCHEDULER RUNS</small><strong id="metric-runs">—</strong><span>Open run history ↗</span></button>
+<button class="metric metric-action" type="button" data-tab="access"><small>LOGIN PROFILES</small><strong id="metric-profiles">—</strong><span>View accounts ↗</span></button>
 </div>
-<div class="section-label"><h2>Businesses</h2><button class="link-button" data-tab="businesses">See all ↗</button></div><div id="overview-businesses" class="business-grid"></div>
+<div class="section-label"><h2>Businesses &amp; featured artist</h2><button class="link-button" data-tab="businesses">See all ↗</button></div><div id="overview-businesses" class="business-grid"></div>
 <div class="two-col"><div class="panel"><div class="panel-header"><h2>Priority alerts</h2><button class="link-button" data-tab="alerts">Open alerts ↗</button></div><div id="overview-alerts"></div></div><div class="panel"><div class="panel-header"><h2>Latest system activity</h2><button class="link-button" data-tab="activity">View history ↗</button></div><div id="overview-activity"></div></div></div>
 </section>
 <section data-section="businesses" hidden>
-<div class="page-head"><div><div class="eyebrow">PORTFOLIO CONTROL</div><h1>All <em>Businesses</em></h1><p>Only the current UMX businesses. Each card opens its operating records or website.</p></div></div><div id="businesses-grid" class="business-grid"></div>
-<div class="panel"><div class="panel-header"><h2>Operating areas</h2></div><div class="link-grid"><a class="jump" href="/owner.html"><strong>UMX Field Services</strong><small>Requests · Jobs · Contracts · Customers · Billing</small></a><a class="jump" href="/map.html"><strong>UMX Missoula Map</strong><small>Property outreach · Target status · Field map</small></a><a class="jump" href="/mx-continuity/app/"><strong>MX Continuity Client Center</strong><small>Client checkups · Website inquiries · Support</small></a><a class="jump" href="/mx-visibility/"><strong>MX Visibility</strong><small>Business website · Operating data not yet connected</small></a></div></div>
+<div class="page-head"><div><div class="eyebrow">PORTFOLIO CONTROL</div><h1>Business <em>Directory</em></h1><p>MX Continuity and MX Visibility are distinct businesses. Jeremy Emmons is an independent featured artist.</p></div></div><div id="businesses-grid" class="business-grid"></div>
+<div class="panel"><div class="panel-header"><h2>Open workspaces</h2></div><div class="link-grid">
+<a class="jump" href="/mx-continuity/app/"><strong>MX Continuity workspace</strong><small>Client support · checkups · inquiries</small></a>
+<a class="jump" href="/mx-visibility/"><strong>MX Visibility website</strong><small>Independent website experience</small></a>
+<a class="jump" href="/#featured-artist-title"><strong>Jeremy Emmons</strong><small>Independent featured painter · UMX Technology feature</small></a>
+</div></div>
 </section>
 <section data-section="alerts" hidden>
-<div class="page-head"><div><div class="eyebrow">CENTRAL ALERT DESK</div><h1>Alerts <em>&amp; Exceptions</em></h1><p>Actionable findings from connected records. No hidden assumption that external systems are reporting here.</p></div></div><div class="panel"><div class="panel-header"><h2>Needs attention</h2><span id="alert-summary" class="mini-status">—</span></div><div id="alerts-list"></div></div><div class="panel"><div class="panel-header"><h2>Coverage / limitations</h2></div><p class="panel-copy">Database notifications, support tickets, inspections, recorded billing, and system-health records are checked. An external Outlook or ChatGPT alert is not confirmed delivered merely because a task is configured; delivery tracking needs a secure server-side integration.</p><div id="alert-coverage" class="coverage"></div></div>
+<div class="page-head"><div><div class="eyebrow">CENTRAL ALERT DESK</div><h1>Alerts <em>&amp; Exceptions</em></h1><p>Actionable findings from connected records. No hidden assumption that external systems are reporting here.</p></div></div><div class="panel"><div class="panel-header"><h2>Needs attention</h2><span id="alert-summary" class="mini-status">—</span></div><div id="alerts-list"></div></div><div class="panel"><div class="panel-header"><h2>Coverage / limitations</h2></div><p class="panel-copy">Support tickets, inspections, recorded MX billing, and system-health records are checked. An external Outlook or ChatGPT alert is not confirmed delivered merely because a task is configured; delivery tracking needs a secure server-side integration.</p><div id="alert-coverage" class="coverage"></div></div>
 </section>
 <section data-section="automation" hidden>
 <div class="page-head"><div><div class="eyebrow">AUTOMATION CONTROL ROOM</div><h1>Automated <em>Systems</em></h1><p>Inspect last runs, scheduled website checks, output, and gaps. A recorded run is not proof that a schedule will continue running.</p></div></div>
@@ -67,14 +71,14 @@
 <div class="panel"><div class="panel-header"><h2>MX Continuity launch checklist</h2></div><div id="launch-list"></div></div>
 </section>
 <section data-section="customers" hidden>
-<div class="page-head"><div><div class="eyebrow">CUSTOMERS &amp; SERVICE DESK</div><h1>Clients <em>&amp; Support</em></h1><p>UMX requests, MX Continuity leads, projects, tickets, and website inquiries.</p></div></div>
+<div class="page-head"><div><div class="eyebrow">CUSTOMERS &amp; SERVICE DESK</div><h1>Clients <em>&amp; Support</em></h1><p>MX Continuity leads, projects, tickets, and website inquiries.</p></div></div>
 <div class="two-col"><div class="panel"><div class="panel-header"><h2>MX Continuity Support Tickets</h2></div><div id="tickets-list"></div></div><div class="panel"><div class="panel-header"><h2>MX Continuity Clients &amp; Projects</h2></div><div id="mx-clients-list"></div></div></div>
-<div class="two-col"><div class="panel"><div class="panel-header"><h2>New MX Continuity Leads &amp; Inquiries</h2></div><div id="leads-list"></div></div><div class="panel"><div class="panel-header"><h2>UMX Service Requests</h2></div><div id="requests-list"></div></div></div>
+<div class="panel"><div class="panel-header"><h2>MX Continuity Leads &amp; Inquiries</h2></div><div id="leads-list"></div></div>
 </section>
 <section data-section="finance" hidden>
-<div class="page-head"><div><div class="eyebrow">FINANCIAL VISIBILITY</div><h1>Finance <em>&amp; Billing</em></h1><p>Invoice records from UMX OS only. These are not live bank, Stripe, or cash-account balances.</p></div></div>
-<div class="metric-grid finance-grid"><div class="metric"><small>UMX RECORDED INVOICES</small><strong id="finance-umx">—</strong></div><div class="metric"><small>MX RECORDED INVOICES</small><strong id="finance-mx">—</strong></div><div class="metric"><small>RECORDED AS PAID</small><strong id="finance-paid">—</strong></div></div>
-<div class="two-col"><div class="panel"><div class="panel-header"><h2>UMX Invoices</h2></div><div id="umx-invoices-list"></div></div><div class="panel"><div class="panel-header"><h2>MX Continuity Invoices</h2></div><div id="mx-invoices-list"></div></div></div>
+<div class="page-head"><div><div class="eyebrow">FINANCIAL VISIBILITY</div><h1>Finance <em>&amp; Billing</em></h1><p>MX Continuity invoice records only. Not live Stripe, bank, or cash-account balances.</p></div></div>
+<div class="metric-grid finance-grid"><div class="metric"><small>MX CONTINUITY INVOICE RECORDS</small><strong id="finance-mx">—</strong></div><div class="metric"><small>RECORDED AS PAID</small><strong id="finance-paid">—</strong></div></div>
+<div class="panel"><div class="panel-header"><h2>MX Continuity Invoices</h2></div><div id="mx-invoices-list"></div></div>
 <div class="notice">Stripe live payment synchronization and bank balances are not wired to this screen. Use the Stripe dashboard for authoritative live payment status until a secure integration is enabled.</div>
 </section>
 <section data-section="activity" hidden>
@@ -83,7 +87,7 @@
 <section data-section="access" hidden>
 <div class="page-head"><div><div class="eyebrow">PRIVATE OWNER ACCESS</div><h1>Access <em>&amp; Connections</em></h1><p>The master view requires both UMX administration and the originating MX system role. Data permissions remain enforced by Supabase RLS.</p></div></div>
 <div class="panel"><div class="panel-header"><h2>Signed-in owner</h2></div><div class="identity"><strong id="identity-name">—</strong><span id="identity-email">—</span><span id="identity-role" class="mini-status">Verified</span></div></div>
-<div class="panel"><div class="panel-header"><h2>Connected sources</h2></div><div id="sources-list" class="coverage"></div></div>
+<div class="panel"><div class="panel-header"><h2>Login profiles <span id="access-profile-count" class="mini-status"></span></h2></div><div id="profiles-list"></div></div><div class="panel"><div class="panel-header"><h2>Connected sources</h2></div><div id="sources-list" class="coverage"></div></div>
 <div class="notice">Security: this is a private read-only oversight center. It does not expose service-role secrets, create new staff access, or execute payments. Employee and customer access stays in the existing restricted workspaces.</div>
 </section>
 <footer>UMX OS · Master Command Center · Owner access only · The Urban Matrix Lab LLC</footer>
