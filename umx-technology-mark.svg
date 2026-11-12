@@ -1,0 +1,28 @@
+<svg role="img" aria-label="UMX Technology orbital mark" viewBox="0 0 580 530" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="sphere" cx="34%" cy="26%" r="78%"><stop stop-color="#be77e6" offset="0"/><stop stop-color="#512b79" offset=".36"/><stop stop-color="#130b24" offset=".85"/><stop stop-color="#07050b" offset="1"/></radialGradient>
+<linearGradient id="goldline" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7dc9a"/><stop offset=".48" stop-color="#d88bd7"/><stop offset="1" stop-color="#cb904c"/></linearGradient>
+<radialGradient id="flare"><stop offset="0" stop-color="#fff9d7"/><stop offset=".2" stop-color="#ffd780" stop-opacity=".9"/><stop offset="1" stop-color="#ffcb72" stop-opacity="0"/></radialGradient>
+<clipPath id="core-clip"><circle cx="290" cy="245" r="158"/></clipPath>
+<filter id="softglow"><feGaussianBlur stdDeviation="5"/></filter>
+</defs>
+<circle cx="290" cy="245" r="188" fill="#622b91" opacity=".17" filter="url(#softglow)"/>
+<circle cx="290" cy="245" r="158" fill="url(#sphere)" stroke="#be87e6" stroke-width="2"/>
+<g clip-path="url(#core-clip)" fill="none" stroke-width="1.1" opacity=".8">
+<ellipse cx="290" cy="245" rx="39" ry="158" stroke="#d5a4f0"/>
+<ellipse cx="290" cy="245" rx="100" ry="158" stroke="#9760c4"/>
+<ellipse cx="290" cy="245" rx="148" ry="65" stroke="#c799d9"/>
+<ellipse cx="290" cy="245" rx="158" ry="126" stroke="#8f5fba"/>
+<path d="M135 206 Q290 310 445 206M135 284 Q290 175 445 284M155 156 Q285 355 424 166M154 337 Q282 145 426 338" stroke="#e3ad84" opacity=".72"/>
+<path d="M185 118L365 359M370 125L217 351M144 236L443 263" stroke="#9d6cc9" opacity=".55"/>
+</g>
+<ellipse cx="290" cy="245" rx="242" ry="83" transform="rotate(-26 290 245)" fill="none" stroke="url(#goldline)" stroke-width="2.7" opacity=".92"/>
+<ellipse cx="290" cy="245" rx="228" ry="95" transform="rotate(27 290 245)" fill="none" stroke="#995cbd" stroke-width="1.5" opacity=".58"/>
+<g fill="#ffdfa2" stroke="#fff5ca" stroke-width=".6">
+<circle cx="176" cy="126" r="4.7"/><circle cx="367" cy="111" r="4"/><circle cx="413" cy="213" r="4.1"/><circle cx="240" cy="293" r="4.2"/><circle cx="350" cy="330" r="3.9"/><circle cx="441" cy="308" r="3.3"/><circle cx="177" cy="319" r="3.8"/><circle cx="290" cy="89" r="3.7"/>
+</g>
+<g stroke="#f5d58d" opacity=".9"><path d="M289 40V80M289 410V451M75 242H120M461 242H510" stroke-width="1"/></g>
+<circle cx="355" cy="215" r="65" fill="url(#flare)" opacity=".8"/>
+<circle cx="290" cy="401" r="70" fill="url(#flare)" opacity=".8"/>
+<ellipse cx="290" cy="438" rx="159" ry="20" fill="none" stroke="#cb8d5f" opacity=".25"/>
+</svg>
