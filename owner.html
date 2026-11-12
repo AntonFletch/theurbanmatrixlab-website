@@ -25,14 +25,14 @@
     <section data-section="overview">
       <div class="portal-heading"><div><p class="eyebrow">UMX OS // OWNER</p><h1>Owner <span>Command</span></h1><p class="portal-sub">One private operating view for incoming requests, contracts, jobs, customers, billing, outreach, and the field team.</p></div><div class="user-block"><strong id="portal-user">Loading…</strong><small id="portal-status">Connecting…</small></div></div>
       <div class="metric-grid">
-        <div class="metric"><small>NEW WEB REQUESTS</small><strong id="m-requests">—</strong><em>public intake</em></div>
-        <div class="metric"><small>ACTIVE JOBS</small><strong id="m-jobs">—</strong><em>scheduled / in progress</em></div>
-        <div class="metric"><small>CONTRACTS</small><strong id="m-contracts">—</strong><em>all contract records</em></div>
-        <div class="metric"><small>ACTIVE TARGETS</small><strong id="m-targets">—</strong><em>Missoula outreach</em></div>
-        <div class="metric"><small>OPEN INVOICES</small><strong id="m-invoices">—</strong><em>unpaid records</em></div>
-        <div class="metric"><small>TEAM ACCOUNTS</small><strong id="m-team">—</strong><em>authorized profiles</em></div>
-      </div>
-      <div class="two-col">
+<button type="button" class="metric" data-tab="requests"><small>NEW WEB REQUESTS</small><strong id="m-requests">—</strong><em>Open requests ↗</em></button>
+<button type="button" class="metric" data-tab="jobs"><small>OPEN WORK RECORDS</small><strong id="m-jobs">—</strong><em>Open records ↗</em></button>
+<button type="button" class="metric" data-tab="contracts"><small>CONTRACT RECORDS</small><strong id="m-contracts">—</strong><em>Open contracts ↗</em></button>
+<button type="button" class="metric" data-tab="targets"><small>ACTIVE OUTREACH TARGETS</small><strong id="m-targets">—</strong><em>Business prospects, not customers · View all ↗</em></button>
+<button type="button" class="metric" data-tab="billing"><small>OPEN INVOICES</small><strong id="m-invoices">—</strong><em>Open billing ↗</em></button>
+<button type="button" class="metric" data-tab="team"><small>LOGIN PROFILES</small><strong id="m-team">—</strong><em>View user account records ↗</em></button>
+</div>
+<div class="two-col">
         <section class="portal-panel"><div class="panel-head"><div><h2>Newest requests</h2><p>Website intake routed directly into UMX OS.</p></div><button class="mini-button" data-tab="requests">Open requests</button></div><div id="overview-requests"></div></section>
         <section class="portal-panel"><div class="panel-head"><div><h2>Next jobs</h2><p>Upcoming field work and current status.</p></div><button class="mini-button" data-tab="jobs">Open jobs</button></div><div id="overview-jobs"></div></section>
       </div>
@@ -271,6 +271,11 @@ async function getLocation() {
 }
 
 const app = await initPortal('owner');
+// Owner's original account opens the dedicated Master Command Center, not this legacy operations portal.
+if(['owner','admin'].includes(app.role)){
+  const {data:masterAccess}=await supabase.from('veil_memberships').select('role,active').eq('user_id',app.user.id).maybeSingle();
+  if(masterAccess?.role==='origin' && masterAccess.active===true)location.replace('/master.html');
+}
 openInitialTab('overview');
 
 const cache = { requests:[], jobs:[], contracts:[], customers:[], properties:[], services:[], targets:[], profiles:[], estimates:[], invoices:[], assignments:[] };
