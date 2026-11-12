@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /
+# Remove this file restriction AND noindex only after Jeremy authorizes public launch.
