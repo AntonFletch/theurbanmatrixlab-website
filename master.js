@@ -17,11 +17,6 @@
   const currentDay = new Date();
 
   const specs = [
-    ["umxRequests","umx_service_requests",'id,name,service,status,created_at',"created_at",120],
-    ["umxJobs","umx_jobs",'id,title,status,scheduled_start,created_at',"created_at",120],
-    ["umxInvoices","umx_invoices",'id,number,status,total,amount_paid,due_date',"due_date",120],
-    ["umxContracts","umx_contracts",'id,contract_title,status,created_at',"created_at",80],
-    ["umxNotifications","umx_notifications",'id,user_id,title,body,read_at,created_at,link',"created_at",120],
     ["mxLeads","veil_leads",'id,business_name,status,created_at',"created_at",120],
     ["mxClients","veil_clients",'id,client_code,business_name,package_name,project_status,created_at',"created_at",120],
     ["mxTickets","veil_support_tickets",'id,ticket_code,subject,priority,status,created_at',"created_at",120],
@@ -75,7 +70,6 @@
   }
   function buildAlerts() {
     alerts=[];
-    if(available("umxNotifications"))rows("umxNotifications").filter(x=>!x.read_at).forEach(x=>addAlert(x.title||"Unread UMX notification",x.body||"Open the source workspace.","UMX notifications","warn",x.link&&x.link.startsWith("/")?x.link:"/owner.html"));
     if(available("mxTickets"))rows("mxTickets").filter(x=>!["closed","resolved","completed","cancelled"].includes(String(x.status).toLowerCase())).forEach(x=>{
       const critical=["critical","urgent","high"].includes(String(x.priority).toLowerCase());
       addAlert(x.subject||"Open support ticket","Ticket "+(x.ticket_code||"")+" · "+fmtDate(x.created_at),"MX Continuity Support",critical?"bad":"warn","/mx-continuity/app/");
@@ -83,7 +77,6 @@
     if(available("mxHealth"))rows("mxHealth").filter(x=>["failed","error","critical","unhealthy","degraded","warning"].includes(String(x.status).toLowerCase())).forEach(x=>addAlert(x.component||"System health issue",String(x.detail||"Requires review"),"System health","bad"));
     if(available("inspections"))rows("inspections").filter(x=>["failed","error","critical"].includes(String(x.status).toLowerCase()) || ["failed","rejected"].includes(String(x.manual_review_status).toLowerCase())).forEach(x=>addAlert("Website inspection needs review",String(x.inspection_type||"Check")+" · "+fmtDate(x.completed_at||x.created_at),"Monitoring","bad","/mx-continuity/app/"));
     if(available("scheduler"))rows("scheduler").filter(x=>["failed","error"].includes(String(x.step).toLowerCase())).forEach(x=>addAlert("Automation run failed",String(x.detail||"Scheduler error")+" · "+fmtDate(x.executed_at),"MX scheduler","bad"));
-    if(available("umxInvoices"))rows("umxInvoices").filter(x=>x.due_date && new Date(x.due_date+"T23:59:59")<new Date() && !["paid","void","cancelled"].includes(String(x.status).toLowerCase()) && Number(x.total||0)>Number(x.amount_paid||0)).forEach(x=>addAlert("UMX invoice past due","Invoice "+(x.number||"")+" · due "+x.due_date,"UMX billing","warn","/owner.html"));
     alerts.sort((a,b)=>(a.severity==="bad"?0:1)-(b.severity==="bad"?0:1));
   }
   function buildActivity() {
@@ -92,16 +85,12 @@
     add("scheduler",rows("scheduler"),"executed_at",x=>"MX scheduler: "+x.step,x=>x.detail||"Run recorded","");
     add("inspections",rows("inspections"),"created_at",x=>"Website check: "+(x.inspection_type||"Inspection"),x=>x.status||"Status unrecorded","/mx-continuity/app/");
     add("mxTickets",rows("mxTickets"),"created_at",x=>"MX Continuity ticket: "+(x.ticket_code||"New ticket"),x=>x.subject||"Support","/mx-continuity/app/");
-    add("umxJobs",rows("umxJobs"),"created_at",x=>"UMX job: "+(x.title||"New job"),x=>x.status||"Status pending","/owner.html");
     add("mxLeads",rows("mxLeads"),"created_at",x=>"New MX Continuity lead",x=>x.business_name||"Lead received","/mx-continuity/app/");
-    add("umxRequests",rows("umxRequests"),"created_at",x=>"New UMX inquiry",x=>x.service||"Website request","/owner.html");
     add("mxInvoices",rows("mxInvoices"),"created_at",x=>"MX Continuity invoice: "+(x.invoice_no||"New"),x=>x.status||"Status pending","/mx-continuity/app/");
-    add("umxNotifications",rows("umxNotifications"),"created_at",x=>"UMX notification",x=>x.title||"New notification","/owner.html");
     activities=items.sort((a,b)=>new Date(b.date)-new Date(a.date));
   }
   function paidTotal() {
     let amount=0;
-    if(available("umxInvoices"))rows("umxInvoices").forEach(x=>amount+=Number(x.amount_paid)||0);
     if(available("mxInvoices"))rows("mxInvoices").filter(x=>String(x.status).toLowerCase()==="paid").forEach(x=>amount+=(Number(x.amount_cents)||0)/100);
     return amount;
   }
@@ -109,7 +98,8 @@
     clear(id);
     const configs=[
       {code:"MX",name:"MX Continuity",state:"Operating records connected",stateStyle:"info",detail:"Websites, client care, technical checkups, inquiries, and support.",stat:n("mxClients")+" clients · "+n("mxTickets")+" support tickets",links:[["Open client center","/mx-continuity/app/"],["Website","/mx-continuity/"]]},
-      {code:"MX",name:"MX Visibility",state:"In preparation",stateStyle:"warn",detail:"Search optimization and local business visibility. No independent operating data feed is connected yet.",stat:"No tracked revenue or customers connected",links:[["Open website","/mx-visibility/"]]}
+      {code:"MX",name:"MX Visibility",state:"In preparation",stateStyle:"warn",detail:"Search optimization and local business visibility. No independent operating data feed is connected yet.",stat:"No tracked revenue or customers connected",links:[["Open website","/mx-visibility/"]]},
+      {code:"ART",name:"Jeremy Emmons",state:"Independent featured artist",stateStyle:"neutral",detail:"Independent painter featured by UMX Technology, not a UMX operating business.",stat:"Artist feature · no operating system connected",links:[["View artist feature","/#featured-artist-title"]]}
     ];
     configs.forEach(c=>{
       const card=el("article","business-card");
@@ -123,11 +113,11 @@
   }
   function renderOverview() {
     text("metric-alerts",String(alerts.length));
-    text("metric-jobs",available("umxJobs")?rows("umxJobs").filter(x=>!["completed","cancelled"].includes(String(x.status).toLowerCase())).length:"—");
     text("metric-tickets",available("mxTickets")?rows("mxTickets").filter(x=>!["closed","resolved","completed","cancelled"].includes(String(x.status).toLowerCase())).length:"—");
     text("metric-inspections",n("inspections"));
-    text("metric-paid",(available("umxInvoices")&&available("mxInvoices"))?usd(paidTotal()):"—");
+    text("metric-paid",available("mxInvoices")?usd(paidTotal()):"—");
     text("metric-runs",n("scheduler"));
+    text("metric-profiles",n("profiles"));
     renderBusinesses("overview-businesses");
     renderBusinesses("businesses-grid");
     list("overview-alerts",null,alerts,x=>record(x.title,x.origin,x.detail,x.severity==="bad"?"Critical":"Review",x.link),5);
@@ -138,7 +128,7 @@
     text("alert-summary",alerts.length===0?"None found in available sources":alerts.length+" flagged");
     list("alerts-list",null,alerts,x=>record(x.title,x.origin,x.detail,x.severity==="bad"?"Critical":"Review",x.link),100);
     clear("alert-coverage");
-    ["umxNotifications","mxTickets","mxHealth","inspections","scheduler","umxInvoices"].forEach(key=>{
+    ["mxTickets","mxHealth","inspections","scheduler","mxInvoices"].forEach(key=>{
       const row=el("div");row.appendChild(el("strong","",key.replace(/([A-Z])/g," $1").replace(/^./,s=>s.toUpperCase())));
       row.appendChild(el("small","",available(key)?"Connected records readable":"Unavailable: "+failures[key]));append("alert-coverage",row);
     });
@@ -177,21 +167,20 @@
     clear("mx-clients-list");if(!available("mxClients")||!available("mxProjects"))append("mx-clients-list",el("div","error","One or more MX Continuity client sources are unavailable."));else if(!merged.length)append("mx-clients-list",empty());else merged.slice(0,35).forEach(x=>append("mx-clients-list",record(x.title,x.meta+" · "+fmtDate(x.date),"",x.status,"/mx-continuity/app/")));
     const leads=[...rows("mxLeads").map(x=>({title:x.business_name||"New lead",meta:"MX Continuity lead",status:x.status,date:x.created_at})),...rows("mxInquiries").map(x=>({title:x.subject||"Website inquiry",meta:"From "+(x.contact_name||"customer"),status:x.status,date:x.created_at}))].sort((a,b)=>new Date(b.date)-new Date(a.date));
     clear("leads-list");if(!available("mxLeads")||!available("mxInquiries"))append("leads-list",el("div","error","One or more MX inquiry sources are unavailable."));else if(!leads.length)append("leads-list",empty());else leads.slice(0,35).forEach(x=>append("leads-list",record(x.title,x.meta+" · "+fmtDate(x.date),"",x.status,"/mx-continuity/app/")));
-    list("requests-list","umxRequests",rows("umxRequests"),x=>record(x.name||"New request",fmtDate(x.created_at),x.service||"Service not recorded",x.status,"/owner.html"),40);
   }
   function renderFinance() {
-    const u=rows("umxInvoices"),m=rows("mxInvoices");
-    text("finance-umx",available("umxInvoices")?usd(u.reduce((s,x)=>s+Number(x.total||0),0)):"—");
-    text("finance-mx",available("mxInvoices")?usd(m.reduce((s,x)=>s+Number(x.amount_cents||0)/100,0)):"—");
-    text("finance-paid",available("umxInvoices")&&available("mxInvoices")?usd(paidTotal()):"—");
-    list("umx-invoices-list","umxInvoices",u,x=>record("Invoice "+(x.number||""),x.due_date?"Due "+x.due_date:"No due date",usd(x.total)+" · paid "+usd(x.amount_paid),x.status,"/owner.html"),50);
-    list("mx-invoices-list","mxInvoices",m,x=>record("Invoice "+(x.invoice_no||""),fmtDate(x.created_at),usd(Number(x.amount_cents||0)/100),x.status),50);
+    const m=rows("mxInvoices");
+    text("finance-mx",available("mxInvoices")?usd(m.reduce((sum,x)=>sum+(Number(x.amount_cents)||0)/100,0)):"—");
+    text("finance-paid",available("mxInvoices")?usd(paidTotal()):"—");
+    list("mx-invoices-list","mxInvoices",m,x=>record("Invoice "+(x.invoice_no||""),fmtDate(x.created_at),usd((Number(x.amount_cents)||0)/100),x.status,"/mx-continuity/app/"),50);
   }
   function renderActivity() {list("activity-list",null,activities,x=>record(x.title,fmtDate(x.date),x.description,null,x.link),90);}
   function renderAccess() {
     text("identity-name",owner.profile.Full_Name||"UMX owner");
     text("identity-email",owner.user.email||owner.profile.Email||"");
     text("identity-role","UMX "+owner.profile.role+" · MX "+owner.member.role);
+    text("access-profile-count",n("profiles")+" profiles");
+    list("profiles-list","profiles",rows("profiles"),x=>record(x.Full_Name||x.Email||"Account",x.role||"Unknown role",x.Email||"No email stored","Authorized profile"),80);
     clear("sources-list");
     specs.forEach(s=>{
       const node=el("div");
