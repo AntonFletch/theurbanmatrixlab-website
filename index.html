@@ -208,6 +208,28 @@ body{background:radial-gradient(ellipse at 70% 12%,rgba(90,138,187,.24),transpar
 <filter id="softglow"><feGaussianBlur stdDeviation="5"/></filter>
 </defs>
 <circle cx="290" cy="245" r="188" fill="#622b91" opacity=".17" filter="url(#softglow)"/>
+<!-- Kycilia's approved three-faceted-black-stars emblem: a subdued background mark BEHIND the original planet. -->
+<g id="kycilia-emblem-background" aria-hidden="true" transform="translate(50,-24) scale(.8)" opacity=".80">
+  <defs>
+    <linearGradient id="ky-gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffda95"/><stop offset=".55" stop-color="#b78a43"/><stop offset="1" stop-color="#f4c875"/></linearGradient>
+    <linearGradient id="ky-purple" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b473d9"/><stop offset="1" stop-color="#4d2967"/></linearGradient>
+    <g id="ky-star">
+      <polygon points="0,-126 30,-43 118,-43 48,13 76,105 0,50 -76,105 -48,13 -118,-43 -30,-43" fill="#121017" stroke="url(#ky-gold)" stroke-width="13" stroke-linejoin="miter"/>
+      <path d="M0 -126L0 50 30 -43Z" fill="#45434a" opacity=".8"/>
+      <path d="M0 -126L-30 -43 0 50Z" fill="#25242c"/>
+      <path d="M0 50L118 -43 48 13Z" fill="#393640" opacity=".75"/>
+      <path d="M0 50L-118 -43 -48 13Z" fill="#0d0c11"/>
+      <path d="M0 50L76 105 48 13Z" fill="#0a090e"/>
+      <path d="M0 50L-76 105 -48 13Z" fill="#24212b"/>
+      <path d="M0 -126L30 -43 118 -43 48 13 76 105 0 50 -76 105 -48 13 -118 -43 -30 -43Z" fill="none" stroke="#f1cc86" stroke-opacity=".86" stroke-width="4"/>
+    </g>
+  </defs>
+  <path d="M96 229L158 369 299 478 442 369 504 229" stroke="url(#ky-purple)" stroke-width="22" fill="none" stroke-linejoin="miter"/>
+  <path d="M85 221L157 374 299 499 443 374 515 221" stroke="url(#ky-gold)" stroke-width="8" fill="none" stroke-linejoin="miter"/>
+  <use href="#ky-star" transform="translate(300 174) scale(1.37)"/>
+  <use href="#ky-star" transform="translate(171 336) scale(1.23)"/>
+  <use href="#ky-star" transform="translate(429 336) scale(1.23)"/>
+</g>
 <circle cx="290" cy="245" r="158" fill="url(#sphere)" stroke="#be87e6" stroke-width="2"/>
 <g clip-path="url(#core-clip)" fill="none" stroke-width="1.1" opacity=".8">
 <ellipse cx="290" cy="245" rx="39" ry="158" stroke="#d5a4f0"/>
