@@ -31,3 +31,6 @@
 .mt-record{display:grid;grid-template-columns:10px 1fr;gap:11px;width:100%;text-align:left;padding:15px 16px;background:transparent;color:#f7f3fa;border:0;border-bottom:1px solid rgba(255,255,255,.07)}.mt-record:hover,.mt-record.active{background:rgba(255,255,255,.045)}
 .mt-record i{width:9px;height:9px;border-radius:50%;margin-top:7px}.mt-record i.job{background:#43d49b}.mt-record i.opportunity{background:#e5bd58}.mt-record i.lead{background:#8b5cf6}.mt-record b,.mt-record small,.mt-record em{display:block}.mt-record em{font-style:normal;color:#e5bd58;font-size:.62rem;text-transform:uppercase;font-weight:800}.mt-record small{color:#8f8496}.mt-map-empty{padding:28px;color:#8f8496;text-align:center}
 @media(max-width:900px){.montana-map-layout{grid-template-columns:1fr}.montana-map-feed{border-left:0;border-top:1px solid rgba(255,255,255,.08);max-height:330px}.montana-map-stage{min-height:380px;padding:12px}}
+
+/* Every portal overview count opens the corresponding record list. */
+button.metric{display:block;width:100%;text-align:left;cursor:pointer;font-family:inherit;color:inherit;appearance:none;transition:border-color .15s ease,transform .15s ease}button.metric:hover{border-color:#e5bd66;transform:translateY(-2px)}button.metric:focus-visible{outline:3px solid #e5bd66;outline-offset:2px}button.metric em{font-style:normal}
