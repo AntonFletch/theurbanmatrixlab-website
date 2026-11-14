@@ -28,14 +28,19 @@
       "MX Continuity website project inquiry",
       "",
       "Name: "+name,
+      "",
       "Contact email: "+email,
+      "",
       "Business: "+business,
+      "",
       "Package: "+plan,
       "",
       "Project details:",
+      "",
       details,
       "",
       "Please contact me to discuss scope and a written project order.",
+      "",
       "I consent to contact about this inquiry; this is not a subscription or purchase."
    ].join("\n");
    const href="mailto:TheUrbanMatrixLab@outlook.com?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
