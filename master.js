@@ -152,6 +152,35 @@
     append("automation-cards",automationCard("Automated Market Briefs","ChatGPT-based market reports and recurring research.","External workflow not linked","warn","No run receipts are sent to this website yet"));
     list("scheduler-list","scheduler",runs,x=>record("Scheduler step: "+x.step,fmtDate(x.executed_at)+" · affected "+(x.affected_count??0),x.detail,"Recorded"),60);
   }
+  // Owner-visible reachability checks use same-origin public pages only.
+  // These are separate from customer monitoring and never imply launch readiness.
+  let publicCheckGeneration=0;
+  async function checkPublicSites() {
+    const generation=++publicCheckGeneration;
+    const sites=[
+      ["UMX Technology","/","UMX Technology | The Urban Matrix Lab"],
+      ["MX Continuity","/mx-continuity/","Website Design &amp; Maintenance | MX Continuity"],
+      ["MX Visibility","/mx-visibility/","MX Visibility | Search Visibility & SEO"],
+      ["Jeremy Emmons","/jeremy-emmons/","Jeremy Emmons — Original Paintings"]
+    ];
+    clear("public-sites-list");
+    append("public-sites-list",empty("Checking public websites…"));
+    const results=await Promise.all(sites.map(async ([name,path,expectedTitle])=>{
+      const controller=new AbortController();
+      const timeout=setTimeout(()=>controller.abort(),10000);
+      try {
+        const response=await fetch(path,{method:"GET",cache:"no-store",credentials:"same-origin",signal:controller.signal});
+        const html=await response.text();
+        const matched=html.includes("<title>"+expectedTitle+"</title>");
+        return {name,path,status:response.ok&&matched?"Reachable":response.ok?"Unexpected page":"Unavailable",code:response.status};
+      } catch {
+        return {name,path,status:"Unavailable",code:null};
+      } finally {clearTimeout(timeout);}
+    }));
+    if(generation!==publicCheckGeneration)return;
+    clear("public-sites-list");
+    results.forEach(s=>append("public-sites-list",record(s.name,s.path,s.code?"HTTP "+s.code+" · title verified only when reachable":"Request failed",s.status,s.path)));
+  }
   function renderMonitoring() {
     list("targets-list","monitorTargets",rows("monitorTargets"),x=>record(x.site_url||"Monitored site","Care until "+(x.care_entitled_until||"not recorded"),"Tier: "+(x.tier||"not recorded"),x.is_active?"Active":"Inactive"),50);
     list("health-list","mxHealth",rows("mxHealth"),x=>record(x.component||"System",fmtDate(x.last_checked_at),x.detail,x.status),50);
@@ -217,6 +246,7 @@
     db.mxInvoices=rows("mxInvoices").filter(x=>!sandboxIds.has(x.client_id)&&!/^MC-TEST-/i.test(String(x.invoice_no||"")));
     buildAlerts();buildActivity();
     renderOverview();renderAlerts();renderAutomation();renderMonitoring();renderCustomers();renderFinance();renderActivity();renderAccess();
+    checkPublicSites();
     const errorCount=Object.keys(failures).length;
     text("sync-text",errorCount?errorCount+" source(s) unavailable — check Access & Integrations":"Connected sources refreshed. Counts show recorded data, not unverified live-service status.");
     text("last-refresh","Refreshed "+fmtDate(new Date().toISOString()));
