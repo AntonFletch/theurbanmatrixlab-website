@@ -5,6 +5,10 @@ on:
     paths:
       - 'mx-continuity/**'
       - '.github/workflows/mx-continuity-preview.yml'
+      - 'master.js'
+      - 'master.html'
+      - 'master.css'
+      - 'login.html'
   workflow_dispatch:
 
 permissions:
@@ -43,6 +47,8 @@ jobs:
           grep -q 'checkoutEnabled:false' mx-continuity/assets/site.js
       - name: Verify original MX Continuity site and launch guards
         run: node mx-continuity/scripts/verify-static-site.mjs
+      - name: Verify UMX owner authentication and dashboard source
+        run: node mx-continuity/scripts/verify-umx-owner.mjs
       - name: Check public email JavaScript syntax
         run: |
           node --check mx-continuity/assets/site.js
