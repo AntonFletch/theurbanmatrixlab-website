@@ -59,7 +59,7 @@ for(const file of ["project-order.html","monthly-care-authorization.html"]){
 const legalPages=["terms.html","ownership.html","refunds.html","cancellation.html","privacy.html"];
 for(const file of legalPages){
  const html=read(file);
- check(html.includes("November 9, 2026"),"policy lacks current effective/update date: "+file);
+ check(html.includes(file==="privacy.html"?"November 15, 2026":"November 9, 2026"),"policy lacks current effective/update date: "+file);
  check(!/Version 1\.0|Version 2\.0|Before publishing this notice|temporary business contact|draft for review|must be verified before this agreement/i.test(html),
    "policy has draft instructions or temporary information: "+file);
 }
@@ -101,7 +101,7 @@ check(read("cancellation.html").includes("is effective for that upcoming renewal
 check(!read("cancellation.html").includes("becomes effective for that renewal;"),"cancellation clause contains old sentence error");
 check(read("cancellation.html").includes("Cancel%20MX%20monthly%20care"),"direct cancellation route missing");
 check(read("refunds.html").includes("Refund%20Request"),"direct refund contact missing");
-check(read("privacy.html").includes("email application"),"email collection disclosure missing");
+check(read("privacy.html").includes("email application") && read("privacy.html").includes("protected MX Continuity record system"),"new website-form storage and optional email-copy disclosure missing");
 const htmls=fs.readdirSync(root).filter(f=>f.endsWith(".html"));
 let references=0;
 for(const file of htmls){
