@@ -10,6 +10,7 @@
   let requestId = null;
   let pending = false;
   let completed = false;
+  let lastMailto = null;
   const notify = message => { if (status) status.textContent = message; };
 
   const params = new URLSearchParams(location.search);
@@ -24,6 +25,7 @@
     if (completed) {
       completed = false;
       requestId = null;
+      lastMailto = null;
       button.textContent = "Submit project inquiry";
       notify("Review your details and submit to the secure inquiry records.");
     }
@@ -31,6 +33,7 @@
 
   button.addEventListener("click", async () => {
     if (pending) return;
+    if (completed && lastMailto) { window.location.href = lastMailto; return; }
     if (!form.reportValidity()) return;
     if (!form.elements.contact_consent.checked) {
       notify("Please acknowledge the Privacy Policy before submitting.");
@@ -100,6 +103,7 @@
       ].join("\n");
       const mailto = "mailto:TheUrbanMatrixLab@outlook.com?subject=" +
         encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+      lastMailto = mailto;
       if (status) {
         status.replaceChildren();
         status.append(document.createTextNode("Saved securely (reference " + leadId.slice(0, 8) +
@@ -110,7 +114,6 @@
         status.append(fallback);
       }
       button.textContent = "Open email copy again";
-      button.onclick = () => { window.location.href = mailto; };
       window.location.href = mailto;
     } catch (error) {
       notify(error.message || "Submission was not confirmed. Try again; we will not create duplicate records for retries.");
