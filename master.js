@@ -20,7 +20,7 @@
     ["mxProjectInquiries","mx_project_inquiries",'id,request_id,contact_name,contact_email,business_name,package_interest,project_details,status,source,is_test,created_at',"created_at",120],
     ["mxLeads","veil_leads",'id,business_name,contact_name,email,package_interest,problems,desired_features,status,created_at',"created_at",120],
     ["mxClients","veil_clients",'id,client_code,business_name,package_name,project_status,created_at',"created_at",120],
-    ["mxTickets","veil_support_tickets",'id,ticket_code,subject,priority,status,created_at',"created_at",120],
+    ["mxTickets","veil_support_tickets",'id,ticket_code,requester_name,requester_email,subject,description,priority,source,status,created_at',"created_at",120],
     ["mxProjects","veil_projects",'id,name,status,created_at',"created_at",120],
     ["mxInvoices","veil_invoices",'id,invoice_no,client_id,amount_cents,status,paid_at,created_at',"created_at",120],
     ["mxHealth","veil_system_health",'id,component,status,last_checked_at,detail',"last_checked_at",80],
@@ -247,8 +247,45 @@
     card.appendChild(body);
     return card;
   }
+  function supportTicketRecord(x){
+    const card=el("details","record inquiry-record");
+    card.id="ticket-"+x.id;
+    const summary=el("summary","record-head"),info=el("div");
+    info.appendChild(el("strong","",x.subject||"Support request"));
+    info.appendChild(el("small","",(x.ticket_code||"Ticket")+" · "+fmtDate(x.created_at)+" · "+(x.requester_name||"Customer")));
+    summary.append(info,pill(x.status));
+    card.appendChild(summary);
+    const body=el("div","inquiry-details");
+    const item=(name,value)=>{const p=el("p","");p.appendChild(el("strong","",name+": "));p.appendChild(document.createTextNode(String(value||"Not supplied")));body.appendChild(p);};
+    item("Ticket",x.ticket_code);item("Contact",x.requester_name);item("Email",x.requester_email);
+    item("Priority",x.priority);item("Source",x.source);item("Description",x.description);
+    const actions=el("div","record-actions");
+    if(x.requester_email&&/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(x.requester_email)){
+      const email=el("a","record-link","Reply to customer ↗");
+      email.href="mailto:"+encodeURIComponent(x.requester_email)+"?subject="+encodeURIComponent("Re: "+(x.ticket_code||"MX Continuity support"));
+      actions.append(email);
+    }
+    const link=el("a","record-link","Link to this ticket ↗");link.href="/master.html?ticket="+encodeURIComponent(x.id)+"#customers";actions.append(link);
+    body.append(actions);
+    const label=el("label","inquiry-status","Ticket status ");
+    const select=el("select","");
+    ["open","acknowledged","working","waiting_on_client","resolved","closed"].forEach(value=>{
+      const opt=el("option","",value.replaceAll("_"," "));opt.value=value;select.append(opt);
+    });
+    select.value=x.status;
+    select.addEventListener("change",async ()=>{
+      const old=x.status;select.disabled=true;
+      const {data,error}=await client.from("veil_support_tickets").update({status:select.value}).eq("id",x.id).select("id,status").maybeSingle();
+      select.disabled=false;
+      if(error||!data){select.value=old;window.alert("Ticket status not saved.");return;}
+      x.status=data.status;
+      const tag=summary.querySelector(".pill");
+      if(tag){tag.textContent=data.status.replaceAll("_"," ");tag.className="pill "+statusStyle(data.status);}
+    });
+    label.append(select);body.append(label);card.append(body);return card;
+  }
   function renderCustomers() {
-    list("tickets-list","mxTickets",rows("mxTickets"),x=>record(x.subject||"Support request",(x.ticket_code||"Ticket")+" · "+fmtDate(x.created_at),"Priority: "+(x.priority||"Normal"),x.status,"/mx-continuity/app/"),40);
+    list("tickets-list","mxTickets",rows("mxTickets"),x=>supportTicketRecord(x),40);
     const merged=[...rows("mxClients").map(x=>({title:x.business_name,meta:"Client · "+(x.package_name||"Package unrecorded"),status:x.project_status,date:x.created_at})),...rows("mxProjects").map(x=>({title:x.name,meta:"Project",status:x.status,date:x.created_at}))].sort((a,b)=>new Date(b.date)-new Date(a.date));
     clear("mx-clients-list");if(!available("mxClients")||!available("mxProjects"))append("mx-clients-list",el("div","error","One or more MX Continuity client sources are unavailable."));else if(!merged.length)append("mx-clients-list",empty());else merged.slice(0,35).forEach(x=>append("mx-clients-list",record(x.title,x.meta+" · "+fmtDate(x.date),"",x.status,"/mx-continuity/app/")));
     clear("leads-list");
@@ -311,10 +348,14 @@
     db.mxInvoices=rows("mxInvoices").filter(x=>!sandboxIds.has(x.client_id)&&!/^MC-TEST-/i.test(String(x.invoice_no||"")));
     buildAlerts();buildActivity();
     renderOverview();renderAlerts();renderAutomation();renderMonitoring();renderCustomers();renderFinance();renderActivity();renderAccess();
-    const requestedLead=new URLSearchParams(location.search).get("lead");
-    if(active==="customers" && requestedLead && /^[0-9a-f-]{36}$/i.test(requestedLead)){
-      const focus=document.getElementById("lead-"+requestedLead);
-      if(focus){focus.open=true;if(!focus.dataset.focused){focus.dataset.focused="yes";focus.scrollIntoView({block:"center",behavior:"auto"});}}
+    if(active==="customers"){
+      const params=new URLSearchParams(location.search);
+      const requestedLead=params.get("lead"),requestedTicket=params.get("ticket");
+      for(const id of [requestedLead&&"lead-"+requestedLead,requestedTicket&&"ticket-"+requestedTicket]){
+        if(!id||!/^((lead|ticket)-)[0-9a-f-]{36}$/i.test(id))continue;
+        const focus=document.getElementById(id);
+        if(focus){focus.open=true;if(!focus.dataset.focused){focus.dataset.focused="yes";focus.scrollIntoView({block:"center",behavior:"auto"});}}
+      }
     }
     checkPublicSites();
     const errorCount=Object.keys(failures).length;
