@@ -1,5 +1,5 @@
 "use strict";
-const MX_CONFIG={prelaunch:true,checkoutEnabled:false,contactEnabled:false};
+const MX_CONFIG={prelaunch:true,checkoutEnabled:false,contactEnabled:true};
 const mobileButton=document.querySelector('.menu-toggle');
 const nav=document.querySelector('.main-nav');
 if(mobileButton&&nav){
