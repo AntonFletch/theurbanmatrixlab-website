@@ -25,6 +25,7 @@
     ["mxInvoices","veil_invoices",'id,invoice_no,client_id,amount_cents,status,paid_at,created_at',"created_at",120],
     ["mxHealth","veil_system_health",'id,component,status,last_checked_at,detail',"last_checked_at",80],
     ["mxLaunch","veil_launch_checklist",'item_code,label,status,detail,updated_at',"updated_at",120],
+    ["mxRecovery","mx_recovery_health",'snapshot_id,created_at,schema_version,row_counts,restore_test_status,restore_test_at,restore_test_notes',"created_at",15],
     ["scheduler","mx_ops_scheduler_runs",'id,step,affected_count,detail,executed_at',"executed_at",100],
     ["monitorTargets","mx_ops_monitor_targets",'id,site_url,tier,is_active,care_entitled_until,created_at',"created_at",100],
     ["inspections","mx_ops_inspections",'id,inspection_type,status,scheduled_date,completed_at,detail,manual_review_status,mobile_test,desktop_test,form_test,security_test,backup_test,created_at',"created_at",120],
@@ -159,6 +160,14 @@
     append("automation-cards",automationCard("MX Continuity Scheduled Checkups","Recorded website-check scheduler executions and last run.",haveRun?"Run history recorded":available("scheduler")?"No runs recorded":"Source unavailable",haveRun?"info":"warn",haveRun?"Last: "+fmtDate(last.executed_at):"No confirmed execution"));
     append("automation-cards",automationCard("Website Monitoring","Authorized monitored sites and recorded inspection results.",available("monitorTargets")?targetCount+" active target(s)":"Source unavailable",targetCount>0?"info":"warn",available("inspections")?rows("inspections").length+" inspections recorded":"Inspection source unavailable"));
     append("automation-cards",automationCard("Component Health Checks","Status history recorded by the MX system, if reporting has been configured.",available("mxHealth")&&rows("mxHealth").length?"Health records found":"No health records",rows("mxHealth").length?"info":"warn",rows("mxHealth").length?"Latest: "+fmtDate(rows("mxHealth")[0].last_checked_at):"A scheduled health monitor is not confirmed"));
+    const newestRecovery=rows("mxRecovery")[0];
+    const recoveryFresh=newestRecovery&&Date.now()-new Date(newestRecovery.created_at).getTime()<36*3600*1000;
+    const recoveryPassed=newestRecovery?.restore_test_status==="passed";
+    append("automation-cards",automationCard("MX Private Recovery Snapshots",
+      "Daily same-database snapshots and isolated restore checks; NOT an off-site disaster backup.",
+      !available("mxRecovery")?"Source unavailable":!newestRecovery?"No snapshot":!recoveryPassed?"Restore test needs attention":!recoveryFresh?"Last snapshot overdue":"Recovery test passed",
+      recoveryPassed&&recoveryFresh?"info":"warn",
+      newestRecovery?"Latest: "+fmtDate(newestRecovery.restore_test_at||newestRecovery.created_at)+" · "+newestRecovery.schema_version:"No verified snapshot"));
     append("automation-cards",automationCard("MX Outlook Owner Alerts","Hourly Outlook inquiry and support alert workflow is configured externally.","Delivery not verified here","warn","Inbox receipt history is not synchronized; verify Outlook when a new alert arrives."));
     append("automation-cards",automationCard("MX Project Inquiries","Owner-visible submitted website inquiries and record status.",available("mxProjectInquiries")?rows("mxProjectInquiries").length+" recorded":"Source unavailable",rows("mxProjectInquiries").length?"info":"warn","Email copies still require the submitter to press Send"));
     list("scheduler-list","scheduler",runs,x=>record("Scheduler step: "+x.step,fmtDate(x.executed_at)+" · affected "+(x.affected_count??0),x.detail,"Recorded"),60);
@@ -193,6 +202,8 @@
     results.forEach(s=>append("public-sites-list",record(s.name,s.path,s.code?"HTTP "+s.code+" · title verified only when reachable":"Request failed",s.status,s.path)));
   }
   function renderMonitoring() {
+    list("recovery-list","mxRecovery",rows("mxRecovery"),x=>record("Recovery "+(x.restore_test_status||"unknown"),fmtDate(x.created_at)+" · "+x.schema_version,
+      "Saved row counts: "+Object.entries(x.row_counts||{}).map(([k,v])=>k+" "+v).join(" · ")+". Same-database only; no off-site disaster backup.",x.restore_test_status),10);
     list("targets-list","monitorTargets",rows("monitorTargets"),x=>record(x.site_url||"Monitored site","Care until "+(x.care_entitled_until||"not recorded"),"Tier: "+(x.tier||"not recorded"),x.is_active?"Active":"Inactive"),50);
     list("health-list","mxHealth",rows("mxHealth"),x=>record(x.component||"System",fmtDate(x.last_checked_at),x.detail,x.status),50);
     list("inspections-list","inspections",rows("inspections"),x=>{
