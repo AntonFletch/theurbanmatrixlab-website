@@ -49,6 +49,7 @@ check(support.includes("assets/support-config.js"),"support backend config scrip
 check(supportJs.includes("/functions/v1/mx-public-support") && supportJs.includes("request_id") && supportJs.includes("privacy_ack") && supportJs.includes("result.ok"),"secure tracked support integration missing");
 check(supportJs.includes("reportValidity"),"support validation missing");
 check(support.includes("Submit support request")&&support.includes('name="company_website"'),"secure support CTA or spam trap missing");
+check(support.includes("After submitting your support request")&&!support.includes("After you send your email")&&!support.includes("prepare an email to our support team"),"public support instructions contradict recorded-ticket workflow");
 for(const file of ["contact.html","support.html"]){
  check(!read(file).includes('disabled="" type="submit"'),"public form still presents disabled CTA: "+file);
 }
