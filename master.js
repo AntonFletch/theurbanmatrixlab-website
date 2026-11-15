@@ -71,6 +71,9 @@
   }
   function buildAlerts() {
     alerts=[];
+    if(available("mxProjectInquiries"))rows("mxProjectInquiries").filter(x=>!x.is_test && x.status==="new").forEach(x=>{
+      addAlert("New MX project inquiry: "+(x.business_name||"Customer"),"Package: "+(x.package_interest||"not recorded")+" · "+fmtDate(x.created_at),"MX Continuity Inquiries","warn","/master.html?lead="+encodeURIComponent(x.id)+"#customers");
+    });
     if(available("mxTickets"))rows("mxTickets").filter(x=>!["closed","resolved","completed","cancelled"].includes(String(x.status).toLowerCase())).forEach(x=>{
       const critical=["critical","urgent","high"].includes(String(x.priority).toLowerCase());
       addAlert(x.subject||"Open support ticket","Ticket "+(x.ticket_code||"")+" · "+fmtDate(x.created_at),"MX Continuity Support",critical?"bad":"warn","/mx-continuity/app/");
