@@ -10,7 +10,17 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.118.0';
 const SUPABASE_URL='https://xdaxbueyftyljsrhabpx.supabase.co';const SUPABASE_KEY='sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ';
 const supabase=createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const login=document.getElementById('login-form'),setPassword=document.getElementById('password-form'),recovery=document.getElementById('recovery-form');const status=document.getElementById('status');
-const routeForRole=async(r,userId)=>{r=String(r||'').toLowerCase();if(['owner','admin'].includes(r)&&userId){const {data:m,error}=await supabase.from('veil_memberships').select('role,active').eq('user_id',userId).maybeSingle();if(error)throw new Error('Owner access could not be verified. Try signing in again.');if(m?.role==='origin'&&m.active===true)return'master.html';}if(['owner','admin','dispatcher','manager'].includes(r))return'owner.html';if(['employee','staff','worker'].includes(r))return'employee.html';return'customer.html'};
+function ownerReturnPath(){
+  const raw=new URLSearchParams(location.search).get('next');
+  if(!raw||!raw.startsWith('/master.html'))return '/master.html';
+  let target;
+  try{target=new URL(raw,location.origin);}catch{return '/master.html';}
+  if(target.origin!==location.origin||target.pathname!=='/master.html')return '/master.html';
+  if([...target.searchParams].some(([key,value])=>!['lead','ticket'].includes(key)||!/^[0-9a-f-]{36}$/i.test(value)))return '/master.html';
+  if(target.hash&&!/^#(?:overview|businesses|alerts|automation|monitoring|customers|finance|activity|access)$/.test(target.hash))return '/master.html';
+  return target.pathname+target.search+target.hash;
+}
+const routeForRole=async(r,userId)=>{r=String(r||'').toLowerCase();if(['owner','admin'].includes(r)&&userId){const {data:m,error}=await supabase.from('veil_memberships').select('role,active').eq('user_id',userId).maybeSingle();if(error)throw new Error('Owner access could not be verified. Try signing in again.');if(m?.role==='origin'&&m.active===true)return ownerReturnPath();}if(['owner','admin','dispatcher','manager'].includes(r))return'owner.html';if(['employee','staff','worker'].includes(r))return'employee.html';return'customer.html'};
 async function route(){const {data:{user},error}=await supabase.auth.getUser();if(error||!user)return;const {data:profile,error:pe}=await supabase.from('profiles').select('role').eq('id',user.id).maybeSingle();if(pe){status.textContent='Your account role could not be verified. Try signing in again.';return;}try{location.replace(await routeForRole(profile?.role,user.id));}catch(e){status.textContent=e.message;}}
 const params=new URLSearchParams(location.search);const authMode=params.get('mode')||'';let invited=authMode==='invite'||authMode==='recovery'||location.hash.includes('type=invite')||location.hash.includes('type=recovery');
 // Give Supabase a moment to exchange an invite/recovery callback for a session.
