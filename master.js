@@ -107,7 +107,7 @@
   function renderBusinesses(id) {
     clear(id);
     const configs=[
-      {code:"MX",name:"MX Continuity",state:"Operating records connected",stateStyle:"info",detail:"Websites, client care, technical checkups, inquiries, and support.",stat:n("mxClients")+" clients · "+n("mxTickets")+" support tickets",links:[["Open client center","/mx-continuity/app/"],["Website","/mx-continuity/"]]},
+      {code:"MX",name:"MX Continuity",state:"Website inquiry and support records connected",stateStyle:"info",detail:"Website intake and support tickets are connected. Customer checkups require an activated and authorized care account.",stat:n("mxClients")+" clients · "+n("mxTickets")+" support tickets",links:[["Open client center","/mx-continuity/app/"],["Website","/mx-continuity/"]]},
       {code:"MX",name:"MX Visibility",state:"In preparation",stateStyle:"warn",detail:"Search optimization and local business visibility. No independent operating data feed is connected yet.",stat:"No tracked revenue or customers connected",links:[["Open website","/mx-visibility/"]]},
       {code:"ART",name:"Jeremy Emmons",state:"Independent featured artist",stateStyle:"neutral",detail:"Independent painter featured by UMX Technology, not a UMX operating business.",stat:"Artist feature · no operating system connected",links:[["View artist feature","/#featured-artist-title"]]}
     ];
@@ -159,7 +159,7 @@
     append("automation-cards",automationCard("MX Continuity Scheduled Checkups","Recorded website-check scheduler executions and last run.",haveRun?"Run history recorded":available("scheduler")?"No runs recorded":"Source unavailable",haveRun?"info":"warn",haveRun?"Last: "+fmtDate(last.executed_at):"No confirmed execution"));
     append("automation-cards",automationCard("Website Monitoring","Authorized monitored sites and recorded inspection results.",available("monitorTargets")?targetCount+" active target(s)":"Source unavailable",targetCount>0?"info":"warn",available("inspections")?rows("inspections").length+" inspections recorded":"Inspection source unavailable"));
     append("automation-cards",automationCard("Component Health Checks","Status history recorded by the MX system, if reporting has been configured.",available("mxHealth")&&rows("mxHealth").length?"Health records found":"No health records",rows("mxHealth").length?"info":"warn",rows("mxHealth").length?"Latest: "+fmtDate(rows("mxHealth")[0].last_checked_at):"A scheduled health monitor is not confirmed"));
-    append("automation-cards",automationCard("Client Support Alerts","Support-ticket alerts and email delivery should be visible here when delivery receipts are integrated.","External delivery not linked","warn","Tickets themselves are monitored in this control center"));
+    append("automation-cards",automationCard("MX Outlook Owner Alerts","Hourly Outlook inquiry and support alert workflow is configured externally.","Delivery not verified here","warn","Inbox receipt history is not synchronized; verify Outlook when a new alert arrives."));
     append("automation-cards",automationCard("MX Project Inquiries","Owner-visible submitted website inquiries and record status.",available("mxProjectInquiries")?rows("mxProjectInquiries").length+" recorded":"Source unavailable",rows("mxProjectInquiries").length?"info":"warn","Email copies still require the submitter to press Send"));
     list("scheduler-list","scheduler",runs,x=>record("Scheduler step: "+x.step,fmtDate(x.executed_at)+" · affected "+(x.affected_count??0),x.detail,"Recorded"),60);
   }
