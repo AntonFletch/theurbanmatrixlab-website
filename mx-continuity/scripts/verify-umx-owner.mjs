@@ -1,0 +1,22 @@
+import fs from "node:fs";
+import vm from "node:vm";
+
+const check = (ok, message) => { if (!ok) throw new Error("UMX owner QA FAIL: " + message); };
+const login = fs.readFileSync("login.html", "utf8");
+const dashboard = fs.readFileSync("master.js", "utf8");
+const master = fs.readFileSync("master.html", "utf8");
+const moduleMatch = login.match(/<script type="module">([\s\S]*?)<\/script>/i);
+check(!!moduleMatch, "inline owner login module missing");
+const loginSource = moduleMatch[1].replace(/^\s*import\s+\{\s*createClient\s*\}\s+from\s+['"][^'"]+['"];\s*/m, "");
+check(!/^\s*import\b/m.test(loginSource), "unexpected import in login module");
+new vm.Script("(async()=>{\n" + loginSource + "\n})()", {filename:"login.html"});
+new vm.Script(dashboard, {filename:"master.js"});
+check(login.includes("return ownerReturnPath()"), "owner redirect no longer preserves requested destination");
+check(login.includes("target.origin!==location.origin"), "owner redirect missing same-origin guard");
+check(login.includes("target.pathname!=='/master.html'"), "owner redirect missing path guard");
+check(dashboard.includes("next=\"+encodeURIComponent(next)"), "master access gate does not preserve record link");
+check(master.includes("id=\"gate-login\""), "master access gate missing");
+check(dashboard.includes("mx_project_inquiries")&&dashboard.includes("supportTicketRecord"),"record views missing");
+check(master.includes("id=\"recovery-list\""),"recovery history missing");
+check(!/sb_secret_|service_role|sk_live_/i.test(dashboard+login),"server credentials in public scripts");
+console.log("UMX owner QA PASS: login module, owner routing, inquiry/ticket drilldown, recovery section");
