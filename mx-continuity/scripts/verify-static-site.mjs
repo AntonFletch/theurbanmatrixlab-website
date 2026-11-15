@@ -33,7 +33,7 @@ for(const token of ["prelaunch:true","checkoutEnabled:false","contactEnabled:tru
  check(site.includes(token),"backend safety flag missing: "+token);
 }
 check(intake.includes("enabled:false"),"backend intake activated unintentionally");
-check(ticket.includes("enabled: false"),"support backend activated unintentionally");
+check(ticket.includes("enabled:true"),"secure support ticketing unexpectedly disabled");
 check(contact.includes('id="email-inquiry-btn"'),"working inquiry email action missing");
 check(contact.includes('name="contact_consent"'),"inquiry privacy consent missing");
 check(contact.includes("assets/contact-email.js"),"inquiry email script missing");
@@ -46,8 +46,9 @@ check(support.includes('id="email-support-btn"'),"working support email action m
 check(support.includes("assets/support-email.js"),"support email script missing");
 check(supportJs.includes('"mailto:"') && ticket.includes("TheUrbanMatrixLab@outlook.com"),"support fallback email recipient missing");
 check(support.includes("assets/support-config.js"),"support backend config script missing");
-check(supportJs.includes("/functions/v1/veil-public-support") && supportJs.includes("turnstileToken") && supportJs.includes("request_id"),"secure tracked support integration missing");
+check(supportJs.includes("/functions/v1/mx-public-support") && supportJs.includes("request_id") && supportJs.includes("privacy_ack") && supportJs.includes("result.ok"),"secure tracked support integration missing");
 check(supportJs.includes("reportValidity"),"support validation missing");
+check(support.includes("Submit support request")&&support.includes('name="company_website"'),"secure support CTA or spam trap missing");
 for(const file of ["contact.html","support.html"]){
  check(!read(file).includes('disabled="" type="submit"'),"public form still presents disabled CTA: "+file);
 }
