@@ -1,4 +1,4 @@
-/* UMX Master Command Center — read-only, owner-only oversight.
+/* UMX Master Command Center — owner-only oversight.
    Data access is granted by Supabase RLS; never use a service-role key here. */
 "use strict";
 (function () {
@@ -412,6 +412,8 @@
     }catch(err){
       $("gate").hidden=false;$("app").hidden=true;
       text("gate-message",err.message||"Unable to verify owner access.");
+      const next=window.location.pathname+window.location.search+window.location.hash;
+      $("gate-login").href="/login.html?next="+encodeURIComponent(next);
       $("gate-login").hidden=false;
     }
   }
