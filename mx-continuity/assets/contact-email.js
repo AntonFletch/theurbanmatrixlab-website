@@ -97,9 +97,7 @@
         "Project details:",
         details,
         "",
-        "This inquiry is recorded in MX Continuity's secure owner dashboard.",
-        "Please contact me to discuss the project and written project order.",
-        "Consent: Contact about this inquiry only; no purchase or subscription."
+        "Inquiry only — no order, payment, or subscription."
       ].join("\n");
       const mailto = "mailto:TheUrbanMatrixLab@outlook.com?subject=" +
         encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
