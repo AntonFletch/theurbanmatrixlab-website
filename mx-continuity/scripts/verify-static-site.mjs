@@ -29,7 +29,7 @@ for(const tier of ["basic","business","continuity"]){
  check(home.includes("contact.html?package="+tier),"package action broken: "+tier);
 }
 check(!home.includes('disabled="" type="button"'),"package buttons still disabled");
-for(const token of ["prelaunch:true","checkoutEnabled:false","contactEnabled:false"]){
+for(const token of ["prelaunch:true","checkoutEnabled:false","contactEnabled:true"]){
  check(site.includes(token),"backend safety flag missing: "+token);
 }
 check(intake.includes("enabled:false"),"backend intake activated unintentionally");
@@ -38,6 +38,8 @@ check(contact.includes('id="email-inquiry-btn"'),"working inquiry email action m
 check(contact.includes('name="contact_consent"'),"inquiry privacy consent missing");
 check(contact.includes("assets/contact-email.js"),"inquiry email script missing");
 check(contactJs.includes("mailto:TheUrbanMatrixLab@outlook.com"),"inquiry email recipient missing");
+check(contactJs.includes("/functions/v1/mx-project-inquiry")&&contactJs.includes("request_id")&&contactJs.includes("contact_consent")&&contactJs.includes("result.ok !== true"),"secure project inquiry endpoint, request id, consent or save check missing");
+check(contact.includes("Submit project inquiry")&&contact.includes('name="company_website"'),"inquiry button or spam trap missing");
 check(contactJs.includes("form"),"inquiry email script malformed");
 check(contactJs.includes("reportValidity"),"inquiry validation missing");
 check(support.includes('id="email-support-btn"'),"working support email action missing");
