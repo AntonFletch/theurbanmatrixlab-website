@@ -86,12 +86,16 @@
   async function joinVideo(){
     const r=state.room;if(!r||!active(r)){notify("This video room is not active.");return;}
     const button=$("join-video");button.disabled=true;button.textContent="Checking access…";
+    // Reserve the tab within the click event so mobile browsers do not block Zoom after async permission checks.
+    const meetingTab=window.open("about:blank","_blank");
+    if(meetingTab)meetingTab.opener=null;
     try{
       const {data,error}=await db.rpc("mx_live_get_join_link",{p_room:r.id});if(error)throw error;
-      if(!data){notify("The host has not assigned an active Zoom meeting link.");return;}
-      if(!isZoomURL(data)){notify("The configured Zoom link is invalid.");return;}
-      window.open(data,"_blank","noopener,noreferrer");
-    }catch(err){notify("Unable to join: "+err.message);}
+      if(!data){if(meetingTab)meetingTab.close();notify("The host has not assigned an active Zoom meeting link.");return;}
+      if(!isZoomURL(data)){if(meetingTab)meetingTab.close();notify("The configured Zoom link is invalid.");return;}
+      if(meetingTab)meetingTab.location.replace(data);
+      else window.location.assign(data);
+    }catch(err){if(meetingTab)meetingTab.close();notify("Unable to join: "+err.message);}
     finally{button.disabled=false;button.textContent="Join Zoom video";}
   }
   async function sendMessage(e){
