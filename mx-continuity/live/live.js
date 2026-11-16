@@ -43,14 +43,25 @@
     const canEnter=active(r);
     $("stage-title").textContent=canEnter?"Your private Zoom session":"Appointment room locked";
     $("stage-status").textContent=canEnter?"Room is open. Only approved attendees can join.":r.status==="closed"?"This appointment is closed.":r.status==="scheduled"?"Waiting for the host to open this room.":"Access is available only during the appointment window.";
-    $("join-video").disabled=!canEnter;
-    $("join-video").textContent=canEnter?"Join Zoom video":"Video available at appointment";
+    $("join-video").disabled=true;
+    $("join-video").textContent=canEnter?"Checking Zoom availability…":"Video available at appointment";
     $("message").disabled=!canEnter;
     $("message-form").querySelector("button").disabled=!canEnter;
     $("messages").replaceChildren(node("p","muted",canEnter?"Loading private messages…":"Group chat unlocks when this appointment is open."));
     if(state.owner){$("edit-status").value=r.status;$("edit-zoom").value="";}
     if(!canEnter)return;
-    // The Zoom URL never comes from the room listing. Fetch only from the access-checked RPC on click.
+    // A signed-in participant can retrieve the Zoom link only during the approved window.
+    // Keep the Join control disabled if no real meeting has been configured.
+    const {data,error}=await db.rpc("mx_live_get_join_link",{p_room:r.id});
+    if(state.room?.id!==r.id)return;
+    if(error||!data||!isZoomURL(data)){
+      $("join-video").disabled=true;
+      $("join-video").textContent="Zoom meeting not configured";
+      $("stage-status").textContent="The host has not connected a Zoom meeting to this appointment.";
+      return;
+    }
+    $("join-video").disabled=false;
+    $("join-video").textContent="Join Zoom video";
   }
   async function refresh(preserve=true){
     if(!state.user||state.busy)return;
@@ -61,8 +72,17 @@
       if(error)throw error;
       state.rooms=data||[];
       const wanted=preserve?state.room?.id:null;
+      const previous=state.room;
       state.room=state.rooms.find(r=>r.id===wanted)||roomsForGroup()[0]||null;
-      setGroup(state.audience);
+      const changed=!previous||!state.room||previous.id!==state.room.id||
+        previous.status!==state.room.status||previous.starts_at!==state.room.starts_at||
+        previous.ends_at!==state.room.ends_at;
+      if(changed){
+        setGroup(state.audience);
+      }else{
+        showRooms();
+        if(active(state.room))await loadMessages();
+      }
     }catch(err){notify("Unable to load private rooms: "+err.message);}
     finally{state.busy=false;}
   }
@@ -158,7 +178,7 @@
     if(!isZoomURL(link)){notify("Enter a valid https://…zoom.us/ meeting link.");return;}
     const {error}=await db.rpc("mx_live_set_zoom_link",{p_room:state.room.id,p_url:link});
     if(error){notify("Link not saved: "+error.message);return;}
-    $("edit-zoom").value="";notify("Private Zoom link saved. It remains locked until the room opens.");
+    $("edit-zoom").value="";notify("Private Zoom link saved. It remains locked until the room opens.");await showRoom();
   }
   async function setUser(user){
     state.user=user;clearInterval(poll);poll=null;
