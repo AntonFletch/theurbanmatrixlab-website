@@ -34,6 +34,8 @@ for(const token of ["prelaunch:true","checkoutEnabled:false","contactEnabled:tru
 }
 check(intake.includes("enabled:false"),"backend intake activated unintentionally");
 check(ticket.includes("enabled:true"),"secure support ticketing unexpectedly disabled");
+check(site.includes('smithChatAccount="61dbafef-826c-45bc-a7a3-055fe772f8b0"') && site.includes("https://app.smith.ai/chat/widget-latest.js"),"Smith.ai chat widget not configured on MX Continuity");
+check(read("privacy.html").includes("Smith.ai website chat"),"Smith.ai chat privacy disclosure missing");
 check(contact.includes('id="email-inquiry-btn"'),"working inquiry email action missing");
 check(contact.includes('name="contact_consent"'),"inquiry privacy consent missing");
 check(contact.includes("assets/contact-email.js"),"inquiry email script missing");
@@ -60,7 +62,7 @@ for(const file of ["project-order.html","monthly-care-authorization.html"]){
 const legalPages=["terms.html","ownership.html","refunds.html","cancellation.html","privacy.html"];
 for(const file of legalPages){
  const html=read(file);
- check(html.includes(file==="privacy.html"?"November 15, 2026":"November 9, 2026"),"policy lacks current effective/update date: "+file);
+ check(html.includes(file==="privacy.html"?"November 16, 2026":"November 9, 2026"),"policy lacks current effective/update date: "+file);
  check(!/Version 1\.0|Version 2\.0|Before publishing this notice|temporary business contact|draft for review|must be verified before this agreement/i.test(html),
    "policy has draft instructions or temporary information: "+file);
 }
