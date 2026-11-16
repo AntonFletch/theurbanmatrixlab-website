@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="../assets/mx-favicon.svg">
 <link rel="stylesheet" href="live.css">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0"></script>
-<script defer src="live.js?v=1"></script>
+<script defer src="live.js?v=20261116-invites"></script>
 </head><body>
 <header class="header"><a class="brand" href="../index.html"><img src="../assets/mx-logo-horizontal.svg" alt="MX Continuity" width="226" height="45"></a><span class="header-note">Private Video &amp; Group Chat</span><button id="signout" class="secondary" hidden>Sign out</button></header>
 <main class="container">
@@ -33,9 +33,9 @@
 <label class="wide">Zoom meeting URL (optional until scheduled)<input id="new-zoom" type="url" placeholder="https://us02web.zoom.us/j/…"></label><button class="primary wide" type="submit">Create private room</button></form>
 <div id="manage-room" class="manage-room" hidden><h3>Manage selected room</h3>
 <div class="form-grid"><label>Status<select id="edit-status"><option value="scheduled">Scheduled / locked</option><option value="open">Open during appointment</option><option value="closed">Closed</option></select></label><button id="save-status" class="secondary" type="button">Save room status</button>
-<label class="wide">Add approved account by email<input id="invite-email" type="email" placeholder="guest@example.com"></label><button id="invite" class="secondary wide" type="button">Grant room access</button>
+<label class="wide">Add or invite participant by email<input id="invite-email" type="email" placeholder="guest@example.com"></label><button id="invite" class="secondary wide" type="button">Grant access / send invitation</button>
 <label class="wide">Set or replace Zoom link<input id="edit-zoom" type="url" placeholder="https://us02web.zoom.us/j/…"></label><button id="save-zoom" class="secondary wide" type="button">Save Zoom link</button></div>
-<p class="fineprint">Guests must already have an approved sign-in account. Only the invited users can view this room. A room cannot admit visitors solely because they select a group.</p></div>
+<p class="fineprint">Existing accounts are granted access; new addresses receive an approval-only invitation. Email delivery depends on Supabase Auth configuration. Only invited accounts can view this room. Selecting a group does not grant access.</p></div>
 </section>
 <footer>MX Continuity • Private rooms • <a href="../privacy.html">Privacy</a> • <a href="../support.html">Support</a></footer>
 </section></main></body></html>
