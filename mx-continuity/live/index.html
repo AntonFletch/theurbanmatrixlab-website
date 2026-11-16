@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="../assets/mx-favicon.svg">
 <link rel="stylesheet" href="live.css">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0"></script>
-<script defer src="live.js?v=20261116-tested"></script>
+<script defer src="live.js?v=20261116-meet"></script>
 </head><body>
 <header class="header"><a class="brand" href="../index.html"><img src="../assets/mx-logo-horizontal.svg" alt="MX Continuity" width="226" height="45"></a><span class="header-note">Private Video &amp; Group Chat</span><button id="signout" class="secondary" hidden>Sign out</button></header>
 <main class="container">
@@ -24,17 +24,17 @@
 <nav id="groups" class="groups" aria-label="Chat groups"><button type="button" class="group active" data-audience="client">Client</button><button type="button" class="group" data-audience="employee">Employee</button><button type="button" class="group" data-audience="guest">Guest</button></nav>
 <div class="layout"><aside class="card rooms"><div class="card-head"><h2 id="group-name">Client rooms</h2><span class="eyebrow" id="room-count">0 rooms</span></div><div id="room-list" class="room-list"><p class="muted">Loading private rooms…</p></div></aside>
 <section class="card session"><div id="room-detail" class="room-detail"><h2>Select a room.</h2><p>Approved appointments and group chats will appear here.</p></div>
-<div id="video-stage" class="stage" hidden><div class="video-icon" aria-hidden="true">▶</div><h2 id="stage-title">Private video room</h2><p id="stage-status">Waiting for the host.</p><button id="join-video" class="primary" type="button" disabled>Join Zoom video</button><p class="fineprint">Only authorized participants can retrieve the meeting link. Zoom may open in a new tab.</p></div>
+<div id="video-stage" class="stage" hidden><div class="video-icon" aria-hidden="true">▶</div><h2 id="stage-title">Private video room</h2><p id="stage-status">Waiting for the host.</p><button id="join-video" class="primary" type="button" disabled>Join video meeting</button><p class="fineprint">Only authorized participants can retrieve the meeting link. Zoom or Google Meet opens in a new tab.</p></div>
 <div id="chat-area" class="chat" hidden><div class="card-head"><h2>Group chat</h2><span class="eyebrow" id="chat-count"></span></div><div id="messages" class="messages" aria-live="polite"><p class="muted">No messages.</p></div><form id="message-form" class="message-form"><label class="sr-only" for="message">Your message</label><textarea id="message" maxlength="2000" placeholder="Write a message…" required rows="2"></textarea><button type="submit" class="primary">Send</button></form></div></section></div>
 <section id="owner-tools" class="card owner-tools" hidden><div class="card-head"><div><span class="eyebrow">OWNER ONLY</span><h2>Schedule and manage rooms</h2></div></div>
 <form id="create-form" class="form-grid"><label>Group<select id="new-audience"><option value="client">Client</option><option value="employee">Employee</option><option value="guest">Guest</option></select></label>
 <label>Room name<input id="new-title" maxlength="120" minlength="3" required placeholder="Website consultation"></label>
 <label>Begins (Montana time)<input id="new-start" type="datetime-local" required></label><label>Ends (Montana time)<input id="new-end" type="datetime-local" required></label>
-<label class="wide">Zoom meeting URL (optional until scheduled)<input id="new-zoom" type="url" placeholder="https://us02web.zoom.us/j/…"></label><button class="primary wide" type="submit">Create private room</button></form>
+<label class="wide">Video meeting link (Zoom or Google Meet; optional)<input id="new-zoom" type="url" placeholder="https://meet.google.com/abc-defg-hij"></label><button class="primary wide" type="submit">Create private room</button></form>
 <div id="manage-room" class="manage-room" hidden><h3>Manage selected room</h3>
 <div class="form-grid"><label>Status<select id="edit-status"><option value="scheduled">Scheduled / locked</option><option value="open">Open during appointment</option><option value="closed">Closed</option></select></label><button id="save-status" class="secondary" type="button">Save room status</button>
 <label class="wide">Add or invite participant by email<input id="invite-email" type="email" placeholder="guest@example.com"></label><button id="invite" class="secondary wide" type="button">Grant access / send invitation</button>
-<label class="wide">Set or replace Zoom link<input id="edit-zoom" type="url" placeholder="https://us02web.zoom.us/j/…"></label><button id="save-zoom" class="secondary wide" type="button">Save Zoom link</button></div>
+<label class="wide">Set or replace video meeting link<input id="edit-zoom" type="url" placeholder="https://meet.google.com/abc-defg-hij"></label><button id="save-zoom" class="secondary wide" type="button">Save meeting link</button></div>
 <p class="fineprint">Existing accounts are granted access; new addresses receive an approval-only invitation. Email delivery depends on Supabase Auth configuration. Only invited accounts can view this room. Selecting a group does not grant access.</p></div>
 </section>
 <footer>MX Continuity • Private rooms • <a href="../privacy.html">Privacy</a> • <a href="../support.html">Support</a></footer>
