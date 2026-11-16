@@ -141,7 +141,17 @@
     if(!email){notify("Enter the participant's existing sign-in email.");return;}
     const {data,error}=await db.rpc("mx_live_add_member_by_email",{p_room:state.room.id,p_email:email});
     if(error){notify("Could not grant access: "+error.message);return;}
-    $("invite-email").value="";notify(data||"Invitation processed.");
+    if(typeof data==="string" && data.startsWith("No existing sign-in account")){
+      const {data:invited,error:inviteError}=await db.functions.invoke("mx-live-invite",{
+        body:{room_id:state.room.id,email}
+      });
+      if(inviteError || !invited?.ok){
+        notify("New-account invitation unavailable. Check Supabase Auth email delivery.");return;
+      }
+      $("invite-email").value="";
+      notify(invited.message);return;
+    }
+    $("invite-email").value="";notify(data||"Room access granted.");
   }
   async function saveZoom(){
     if(!state.owner||!state.room)return;const link=$("edit-zoom").value.trim();
