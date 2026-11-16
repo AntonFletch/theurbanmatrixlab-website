@@ -1,9 +1,9 @@
 "use strict";
 (() => {
-  const URL = "https://xdaxbueyftyljsrhabpx.supabase.co";
+  const SUPABASE_URL = "https://xdaxbueyftyljsrhabpx.supabase.co";
   const KEY = "sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ";
   const $ = id => document.getElementById(id);
-  const db = window.supabase?.createClient(URL, KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  const db = window.supabase?.createClient(SUPABASE_URL, KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   const state={user:null,owner:false,audience:"client",rooms:[],room:null,busy:false};
   let poll=null,noticeTimeout=null;
   const label={client:"Client",employee:"Employee",guest:"Guest"};
