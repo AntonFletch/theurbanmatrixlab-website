@@ -10,10 +10,16 @@
   const stamp=value=>new Date(value).toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"});
   const node=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=String(text);return el;};
   const active=room=>room?.status==="open" && Date.now()>=Date.parse(room.starts_at) && Date.now()<=Date.parse(room.ends_at);
-  const isZoomURL=value=>{try{const u=new URL(value);return u.protocol==="https:"&&(u.hostname==="zoom.us"||u.hostname.endsWith(".zoom.us"))&&u.pathname!=="/";}catch{return false;}};
+  const isMeetingURL=value=>{try{
+    const u=new URL(value);
+    if(u.protocol!=="https:")return false;
+    if((u.hostname==="zoom.us"||u.hostname.endsWith(".zoom.us"))&&u.pathname!=="/")return true;
+    return u.hostname==="meet.google.com"&&/^\/[a-z]{3}-[a-z]{4}-[a-z]{3}\/?$/.test(u.pathname);
+  }catch{return false;}};
   function notify(message){const e=$("notice");e.hidden=false;e.textContent=message;clearTimeout(noticeTimeout);noticeTimeout=setTimeout(()=>e.hidden=true,8500);}
   function setSignInMode(signedIn){$("signin").hidden=signedIn;$("workspace").hidden=!signedIn;$("signout").hidden=!signedIn;}
-  function roomsForGroup(){return state.rooms.filter(r=>r.audience===state.audience);}
+  function roomsForGroup(){return state.rooms.filter(r=>r.audience===state.audience)
+    .sort((a,b)=>Number(active(b))-Number(active(a))||Date.parse(a.starts_at)-Date.parse(b.starts_at));}
   function setGroup(type){
     state.audience=type;
     document.querySelectorAll("[data-audience]").forEach(b=>b.classList.toggle("active",b.dataset.audience===type));
@@ -41,10 +47,10 @@
     if(!r){root.append(node("h2","","Select a private room."),node("p","","Only authorized appointments and chats appear here."));return;}
     root.append(node("span","pill",label[r.audience]+" • "+r.status),node("h2","",r.title),node("p","",stamp(r.starts_at)+" – "+stamp(r.ends_at)));
     const canEnter=active(r);
-    $("stage-title").textContent=canEnter?"Your private Zoom session":"Appointment room locked";
+    $("stage-title").textContent=canEnter?"Your private video meeting":"Appointment room locked";
     $("stage-status").textContent=canEnter?"Room is open. Only approved attendees can join.":r.status==="closed"?"This appointment is closed.":r.status==="scheduled"?"Waiting for the host to open this room.":"Access is available only during the appointment window.";
     $("join-video").disabled=true;
-    $("join-video").textContent=canEnter?"Checking Zoom availability…":"Video available at appointment";
+    $("join-video").textContent=canEnter?"Checking meeting availability…":"Video available at appointment";
     $("message").disabled=!canEnter;
     $("message-form").querySelector("button").disabled=!canEnter;
     $("messages").replaceChildren(node("p","muted",canEnter?"Loading private messages…":"Group chat unlocks when this appointment is open."));
@@ -54,14 +60,14 @@
     // Keep the Join control disabled if no real meeting has been configured.
     const {data,error}=await db.rpc("mx_live_get_join_link",{p_room:r.id});
     if(state.room?.id!==r.id)return;
-    if(error||!data||!isZoomURL(data)){
+    if(error||!data||!isMeetingURL(data)){
       $("join-video").disabled=true;
-      $("join-video").textContent="Zoom meeting not configured";
-      $("stage-status").textContent="The host has not connected a Zoom meeting to this appointment.";
+      $("join-video").textContent="Video meeting not configured";
+      $("stage-status").textContent="The host has not connected a video meeting to this appointment.";
       return;
     }
     $("join-video").disabled=false;
-    $("join-video").textContent="Join Zoom video";
+    $("join-video").textContent="Join video meeting";
   }
   async function refresh(preserve=true){
     if(!state.user||state.busy)return;
@@ -111,12 +117,12 @@
     if(meetingTab)meetingTab.opener=null;
     try{
       const {data,error}=await db.rpc("mx_live_get_join_link",{p_room:r.id});if(error)throw error;
-      if(!data){if(meetingTab)meetingTab.close();notify("The host has not assigned an active Zoom meeting link.");return;}
-      if(!isZoomURL(data)){if(meetingTab)meetingTab.close();notify("The configured Zoom link is invalid.");return;}
+      if(!data){if(meetingTab)meetingTab.close();notify("The host has not assigned an active video meeting link.");return;}
+      if(!isMeetingURL(data)){if(meetingTab)meetingTab.close();notify("The configured video meeting link is invalid.");return;}
       if(meetingTab)meetingTab.location.replace(data);
       else window.location.assign(data);
     }catch(err){if(meetingTab)meetingTab.close();notify("Unable to join: "+err.message);}
-    finally{button.disabled=false;button.textContent="Join Zoom video";}
+    finally{button.disabled=false;button.textContent="Join video meeting";}
   }
   async function sendMessage(e){
     e.preventDefault();const r=state.room,body=$("message").value.trim();
@@ -134,14 +140,14 @@
     const audience=$("new-audience").value,title=$("new-title").value.trim();
     const start=new Date($("new-start").value),end=new Date($("new-end").value),zoom=$("new-zoom").value.trim();
     if(title.length<3||!Number.isFinite(start.getTime())||!Number.isFinite(end.getTime())||end<=start){notify("Enter a room name and valid start/end dates.");return;}
-    if(zoom&&!isZoomURL(zoom)){notify("Enter an official https://…zoom.us/ meeting link.");return;}
+    if(zoom&&!isMeetingURL(zoom)){notify("Enter a valid Zoom or Google Meet URL.");return;}
     const b=$("create-form").querySelector('button[type="submit"]');b.disabled=true;
     try{
       const {data,error}=await db.from("mx_live_rooms").insert({
         audience,title,starts_at:start.toISOString(),ends_at:end.toISOString(),
         status:"scheduled",created_by:state.user.id
       }).select("id").single();if(error)throw error;
-      if(zoom){const link=await db.rpc("mx_live_set_zoom_link",{p_room:data.id,p_url:zoom});if(link.error)notify("Room created, but Zoom link was not saved: "+link.error.message);}
+      if(zoom){const link=await db.rpc("mx_live_set_zoom_link",{p_room:data.id,p_url:zoom});if(link.error)notify("Room created, but video link was not saved: "+link.error.message);}
       $("create-form").reset();state.audience=audience;await refresh(false);
       const selected=state.rooms.find(r=>r.id===data.id);
       if(selected){state.room=selected;showRooms();showRoom();loadMessages();}
@@ -175,10 +181,10 @@
   }
   async function saveZoom(){
     if(!state.owner||!state.room)return;const link=$("edit-zoom").value.trim();
-    if(!isZoomURL(link)){notify("Enter a valid https://…zoom.us/ meeting link.");return;}
+    if(!isMeetingURL(link)){notify("Enter a valid Zoom or Google Meet URL.");return;}
     const {error}=await db.rpc("mx_live_set_zoom_link",{p_room:state.room.id,p_url:link});
     if(error){notify("Link not saved: "+error.message);return;}
-    $("edit-zoom").value="";notify("Private Zoom link saved. It remains locked until the room opens.");await showRoom();
+    $("edit-zoom").value="";notify("Private meeting link saved. It remains locked until the room opens.");await showRoom();
   }
   async function setUser(user){
     state.user=user;clearInterval(poll);poll=null;
