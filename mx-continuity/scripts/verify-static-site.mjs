@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import vm from "node:vm";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
@@ -19,6 +20,7 @@ check(home.includes('href="app/"'),"homepage missing client portal route");
 check(home.includes('href="live/"'),"homepage missing private video and group chat link");
 check(portal.includes('href="../live/"'),"client portal missing private room link");
 const livePage=read("live/index.html"),liveScript=read("live/live.js");
+new vm.Script(liveScript,{filename:"live/live.js"});
 for(const group of ['client','employee','guest'])check(livePage.includes('data-audience="'+group+'"'),"missing "+group+" chat selector");
 check(livePage.includes('noindex,nofollow,noarchive')&&livePage.includes('id="signin"')&&livePage.includes('id="workspace"'),"private room sign-in gate missing");
 check(liveScript.includes('mx_live_get_join_link')&&liveScript.includes('mx_live_add_member_by_email')&&liveScript.includes('mx_live_messages'),"private Zoom link and chat wiring missing");
