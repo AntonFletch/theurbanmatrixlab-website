@@ -9,12 +9,22 @@ const required=[
  "refunds.html","cancellation.html","privacy.html","project-order.html",
  "monthly-care-authorization.html","change-order.html","404.html","assets/site.js","assets/style.css",
  "assets/contact-email.js","assets/support-email.js","assets/intake-config.js",
- "assets/support-config.js","assets/mx-logo-horizontal.svg","assets/mx-hero-laptop.webp"
+ "assets/support-config.js","assets/mx-logo-horizontal.svg","assets/mx-hero-laptop.webp",
+ "live/index.html","live/live.css","live/live.js"
 ];
 for(const file of required)check(fs.existsSync(path.join(root,file)),"missing "+file);
 const home=read("index.html"),site=read("assets/site.js"),contact=read("contact.html");
 const portal=read("app/index.html"),portalJs=read("app/portal.js");
 check(home.includes('href="app/"'),"homepage missing client portal route");
+check(home.includes('href="live/"'),"homepage missing private video and group chat link");
+check(portal.includes('href="../live/"'),"client portal missing private room link");
+const livePage=read("live/index.html"),liveScript=read("live/live.js");
+for(const group of ['client','employee','guest'])check(livePage.includes('data-audience="'+group+'"'),"missing "+group+" chat selector");
+check(livePage.includes('noindex,nofollow,noarchive')&&livePage.includes('id="signin"')&&livePage.includes('id="workspace"'),"private room sign-in gate missing");
+check(liveScript.includes('mx_live_get_join_link')&&liveScript.includes('mx_live_add_member_by_email')&&liveScript.includes('mx_live_messages'),"private Zoom link and chat wiring missing");
+check(liveScript.includes("getUser()")&&liveScript.includes('isZoomURL')&&!/service_role|sb_secret_|sk_live_/i.test(liveScript),"private room frontend login or key safety missing");
+check(read("privacy.html").includes("Private appointment video and chat"),"private room privacy disclosure missing");
+
 check(portal.includes("Client &amp; Checkup Center"),"client portal page missing");
 check(portal.includes("noindex,nofollow,noarchive"),"client portal must stay unindexed");
 check(!/sb_secret_|service_role|sk_live_/i.test(portalJs),"client portal contains a server-side credential");
