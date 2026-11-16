@@ -24,10 +24,12 @@ new vm.Script(liveScript,{filename:"live/live.js"});
 for(const group of ['client','employee','guest'])check(livePage.includes('data-audience="'+group+'"'),"missing "+group+" chat selector");
 check(livePage.includes('noindex,nofollow,noarchive')&&livePage.includes('id="signin"')&&livePage.includes('id="workspace"'),"private room sign-in gate missing");
 check(liveScript.includes('mx_live_get_join_link')&&liveScript.includes('mx_live_add_member_by_email')&&liveScript.includes('mx_live_messages'),"private Zoom link and chat wiring missing");
-check(liveScript.includes('mx-live-invite') && liveScript.includes('Zoom meeting not configured') && liveScript.includes('const changed='),"video/chat readiness and owner invitation checks missing");
-check(livePage.includes('live.js?v=20261116-tested'),"video and group chat app cache not refreshed");
+check(liveScript.includes('mx-live-invite') && liveScript.includes('Video meeting not configured') && liveScript.includes('const changed='),"video/chat readiness and owner invitation checks missing");
+check(liveScript.includes("meet.google.com") && liveScript.includes("isMeetingURL"),"Google Meet provider support missing");
+check(livePage.includes("Zoom or Google Meet"),"customer-facing video provider disclosure missing");
+check(livePage.includes('live.js?v=20261116-meet'),"video and group chat app cache not refreshed");
 
-check(liveScript.includes("getUser()")&&liveScript.includes('isZoomURL')&&!/service_role|sb_secret_|sk_live_/i.test(liveScript),"private room frontend login or key safety missing");
+check(liveScript.includes("getUser()")&&liveScript.includes('isMeetingURL')&&!/service_role|sb_secret_|sk_live_/i.test(liveScript),"private room frontend login or key safety missing");
 check(read("privacy.html").includes("Private appointment video and chat"),"private room privacy disclosure missing");
 
 check(portal.includes("Client &amp; Checkup Center"),"client portal page missing");
