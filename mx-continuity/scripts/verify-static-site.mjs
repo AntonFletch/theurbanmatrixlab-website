@@ -27,7 +27,7 @@ check(liveScript.includes('mx_live_get_join_link')&&liveScript.includes('mx_live
 check(liveScript.includes('mx-live-invite') && liveScript.includes('Video meeting not configured') && liveScript.includes('const changed='),"video/chat readiness and owner invitation checks missing");
 check(liveScript.includes("meet.google.com") && liveScript.includes("isMeetingURL"),"Google Meet provider support missing");
 check(livePage.includes("Zoom or Google Meet"),"customer-facing video provider disclosure missing");
-check(livePage.includes('live.js?v=20261116-meet'),"video and group chat app cache not refreshed");
+check(livePage.includes('live.js?v=20261117-owner-link'),"video and group chat app cache not refreshed");
 
 check(liveScript.includes("getUser()")&&liveScript.includes('isMeetingURL')&&!/service_role|sb_secret_|sk_live_/i.test(liveScript),"private room frontend login or key safety missing");
 check(read("privacy.html").includes("Private appointment video and chat"),"private room privacy disclosure missing");
