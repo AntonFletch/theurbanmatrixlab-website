@@ -153,6 +153,18 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 }
 @media(max-width:360px){.service{flex-direction:column;align-items:flex-start}.service-description{border-left:0;border-top:1px solid var(--edge);padding:12px 0 0}.hero-meta{padding-top:140px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Founder statement banner — isolated from the locked page styles. */
+.founder-next-banner{position:relative;isolation:isolate;overflow:hidden;padding:68px 0 74px;text-align:center;background:radial-gradient(ellipse at 50% 48%,rgba(118,53,142,.29),transparent 65%),linear-gradient(115deg,#100819 0%,#301638 50%,#100819 100%);border-top:1px solid rgba(233,183,111,.56);border-bottom:1px solid rgba(233,183,111,.56)}
+.founder-next-banner::before,.founder-next-banner::after{content:"";position:absolute;inset:15px;pointer-events:none;border:1px solid rgba(230,177,108,.18)}
+.founder-next-banner::after{inset:23px;border-color:rgba(177,114,195,.17)}
+.founder-next-inner{position:relative;z-index:1}
+.founder-next-kicker{margin:0 0 15px;color:#e5bc7f;font-size:.75rem;font-weight:800;letter-spacing:.34em;text-transform:uppercase}
+.founder-next-banner h2{margin:0 auto;color:#f8d49b;font:600 clamp(2.1rem,5vw,4.65rem)/1.13 var(--display);letter-spacing:.015em;text-transform:uppercase;max-width:1050px;text-shadow:0 4px 26px rgba(12,4,18,.6)}
+.founder-next-banner h2 span{color:#bb82db}
+.founder-next-line{margin:24px auto 0;max-width:790px;font:italic clamp(1.08rem,2.1vw,1.52rem)/1.65 Georgia,serif;color:#f5e8f3}
+.founder-next-mark{display:block;margin:21px auto 0;color:#edbf7c;font-size:1.1rem}
+@media(max-width:700px){.founder-next-banner{padding:53px 0 59px}.founder-next-banner::before{inset:10px}.founder-next-banner::after{inset:16px}.founder-next-kicker{letter-spacing:.2em;font-size:.65rem}.founder-next-banner h2{font-size:clamp(1.9rem,8vw,3rem)}.founder-next-line{font-size:1.04rem}.founder-next-line br{display:none}}
 </style>
 </head>
 <body>
@@ -320,6 +332,14 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
   </div>
 </section>
 </div>
+<section class="founder-next-banner" aria-labelledby="founder-next-title">
+  <div class="wrap founder-next-inner">
+    <p class="founder-next-kicker">A Vision Still Unfolding</p>
+    <h2 id="founder-next-title">This is just the beginning<span aria-hidden="true">…</span></h2>
+    <p class="founder-next-line">I'm not here to build something that simply exists.<br>I'm here to build something that matters.</p>
+    <span class="founder-next-mark" aria-hidden="true">✦</span>
+  </div>
+</section>
 <section class="build" aria-labelledby="building-title">
   <div class="wrap">
     <div class="center-label" id="building-title">What I Am Building</div>
