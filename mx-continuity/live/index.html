@@ -7,7 +7,17 @@
 <link rel="icon" type="image/svg+xml" href="../assets/mx-favicon.svg">
 <link rel="stylesheet" href="live.css">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0"></script>
-<script defer src="live.js?v=20261116-meet"></script>
+<script defer src="live.js?v=20261117-loginfix"></script>
+<script>window.addEventListener("DOMContentLoaded",function(){
+  if(window.__mxLiveReady)return;
+  var form=document.getElementById("signin-form");
+  if(!form)return;
+  var msg=document.createElement("p");
+  msg.setAttribute("role","alert");
+  msg.textContent="Secure sign-in code did not load. Refresh this page or try turning off Brave Shields for this website, then reload.";
+  msg.style.cssText="padding:12px 14px;background:#332735;border:1px solid #b87676;border-radius:9px;color:#ffd7d7;overflow-wrap:anywhere";
+  form.append(msg);
+});</script>
 </head><body>
 <header class="header"><a class="brand" href="../index.html"><img src="../assets/mx-logo-horizontal.svg" alt="MX Continuity" width="226" height="45"></a><span class="header-note">Private Video &amp; Group Chat</span><button id="signout" class="secondary" hidden>Sign out</button></header>
 <main class="container">
