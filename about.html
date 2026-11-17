@@ -39,7 +39,15 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .hero{position:relative;min-height:575px;border-bottom:1px solid rgba(224,154,98,.6);isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(90deg,rgba(20,9,29,.99) 0%,rgba(23,9,30,.92) 40%,rgba(25,11,34,.44) 65%,rgba(22,10,28,.10) 100%)}
 .hero:after{content:"";position:absolute;inset:auto 0 0;height:100px;background:linear-gradient(transparent,rgba(12,4,17,.7));z-index:-1}
 .hero-art{position:absolute;inset:0 0 0 29%;z-index:-2;overflow:hidden}
-.hero-art svg{width:100%;height:100%;display:block}
+.hero-art picture,.hero-art img{display:block;width:100%;height:100%}
+.hero-art img{object-fit:cover;object-position:57% center;filter:brightness(.76) saturate(.82) contrast(1.12)}
+.hero-art:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(21,9,30,.62),rgba(21,9,30,.18) 45%,rgba(24,11,32,.09));pointer-events:none;z-index:2}
+.hero-art:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(13,5,20,.63),transparent 32%,rgba(32,12,45,.22));pointer-events:none;z-index:2}
+.hero-orbit{position:absolute;z-index:3;pointer-events:none;inset:8% 8% 18% 18%;border:1.5px solid rgba(250,194,122,.64);border-radius:50%;transform:rotate(-8deg);box-shadow:inset 0 0 20px rgba(238,178,100,.07),0 0 15px rgba(238,178,100,.12)}
+.hero-orbit:before,.hero-orbit:after{content:"";position:absolute;top:0;bottom:0;border:1px solid rgba(251,202,132,.63);border-radius:50%;left:24%;right:24%}
+.hero-orbit:after{left:0;right:0;top:30%;bottom:30%;border-left:0;border-right:0}
+.hero-orbit span{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(255,207,143,.54),transparent);left:50%}
+.hero-orbit span:after{content:"";position:absolute;left:-3px;top:-4px;width:7px;height:7px;border-radius:50%;background:#fff1c9;box-shadow:0 0 16px #ffc47c}
 .hero-content{width:100%;padding-top:63px;display:flex;flex-direction:column;flex:1;justify-content:space-between}
 .hero-text{max-width:660px}
 .kicker{display:flex;align-items:center;gap:16px;color:#efc27e;text-transform:uppercase;letter-spacing:.32em;font-size:.75rem;font-weight:800}
@@ -101,7 +109,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
  .mobile-nav nav a{padding:11px 10px;border-bottom:1px solid #54365d;font-size:.86rem}
  .hero{min-height:0}
  .hero-content{padding-top:36px}
- .hero-art{inset:155px -53% 0 4%;opacity:.86}
+ .hero-art{inset:125px -8% 0 -5%;opacity:.88}.hero-art img{object-position:64% 50%}.hero-orbit{inset:12% 0% 22% 21%;opacity:.72}
  .hero h1{font-size:clamp(2rem,9vw,3.3rem);max-width:465px;margin:16px 0 21px}
  .hero-text{position:relative;z-index:1}
  .hero-deck{max-width:315px;background:linear-gradient(90deg,rgba(20,8,27,.88),transparent);font-size:.97rem}
@@ -161,59 +169,11 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 <main id="main">
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero-art" aria-hidden="true">
-    <svg viewBox="0 0 900 575" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#25112f"/><stop offset=".33" stop-color="#713967"/><stop offset=".67" stop-color="#aa6874"/><stop offset=".81" stop-color="#ffc091"/><stop offset="1" stop-color="#241528"/></linearGradient>
-        <linearGradient id="earth" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#da8f94" stop-opacity=".20"/><stop offset=".7" stop-color="#e3ad87" stop-opacity=".05"/><stop offset="1" stop-color="#ffd796" stop-opacity=".19"/></linearGradient>
-        <linearGradient id="mountain" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#48344f"/><stop offset=".7" stop-color="#22192d"/><stop offset="1" stop-color="#0d0915"/></linearGradient>
-        <radialGradient id="glow"><stop stop-color="#ffd8a1" stop-opacity=".86"/><stop offset=".35" stop-color="#eca77b" stop-opacity=".38"/><stop offset="1" stop-color="#eeaa77" stop-opacity="0"/></radialGradient>
-        <linearGradient id="coat" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#211624"/><stop offset=".5" stop-color="#090b15"/><stop offset="1" stop-color="#19111d"/></linearGradient>
-        <filter id="light"><feGaussianBlur stdDeviation="2.5"/></filter>
-        <pattern id="windows" width="25" height="20" patternUnits="userSpaceOnUse"><rect x="7" y="7" width="3" height="5" fill="#e7b777" opacity=".68"/><rect x="16" y="6" width="3" height="5" fill="#d8a8a6" opacity=".34"/></pattern>
-      </defs>
-      <rect width="900" height="575" fill="url(#sky)"/>
-      <path d="M0 218Q170 162 310 199T616 172T900 207" fill="none" stroke="#e8ab93" stroke-opacity=".17" stroke-width="40" filter="url(#light)"/>
-      <circle cx="624" cy="292" r="160" fill="url(#glow)"/>
-      <circle cx="645" cy="300" r="77" fill="url(#glow)"/>
-      <path d="M0 359 100 320 176 337 243 290 303 319 386 248 447 300 514 261 563 303 621 259 685 302 738 266 807 313 862 291 900 308V420H0Z" fill="#54405c"/>
-      <path d="M0 370 100 319l25 11 57 7 60-48 25 12 39 19 81-71 44 18 20 33 57-40 56 42 60-42 38 20 28 20 53-39 24 16 40 31 60-22 40 27 18-10 50 8V424H0Z" fill="#2c223d"/>
-      <path d="M352 284 385 249l44 18 22 33-42-13-20-14-17 13Z M587 287l35-29 40 21-26-6-20 14Z M709 285l30-18 24 19-27-5Z" fill="#ece0db" opacity=".58"/>
-      <path d="M0 400Q175 360 350 394T900 389V575H0Z" fill="url(#mountain)"/>
-      <g opacity=".9">
-        <rect x="12" y="398" width="36" height="90" fill="#2c2235"/><rect x="53" y="408" width="43" height="72" fill="#322339"/>
-        <rect x="114" y="391" width="24" height="88" fill="#25192f"/><rect x="152" y="375" width="36" height="104" fill="#29213a"/>
-        <rect x="202" y="399" width="32" height="74" fill="#21172a"/><rect x="239" y="368" width="30" height="112" fill="#271b31"/>
-        <rect x="288" y="385" width="42" height="92" fill="#32203a"/><rect x="339" y="400" width="33" height="70" fill="#23182c"/>
-        <rect x="390" y="375" width="37" height="104" fill="#292037"/><rect x="432" y="397" width="35" height="87" fill="#35213c"/>
-        <rect x="480" y="382" width="29" height="93" fill="#261b35"/><rect x="518" y="399" width="44" height="82" fill="#301d35"/>
-        <rect x="575" y="385" width="35" height="94" fill="#291a2f"/><rect x="626" y="366" width="42" height="114" fill="#302038"/>
-        <rect x="682" y="395" width="36" height="86" fill="#24172a"/><rect x="728" y="376" width="39" height="106" fill="#2b2136"/>
-        <rect x="775" y="395" width="35" height="85" fill="#2b1b32"/><rect x="826" y="373" width="48" height="108" fill="#25172e"/>
-        <rect x="12" y="365" width="880" height="130" fill="url(#windows)" opacity=".66"/>
-      </g>
-      <path d="M0 464Q80 437 169 461T347 451T547 470T790 453T900 461V575H0Z" fill="#130d1c"/>
-      <g fill="none" stroke="#f0b977" stroke-width="1.2" opacity=".8">
-        <ellipse cx="540" cy="259" rx="325" ry="211"/>
-        <ellipse cx="540" cy="259" rx="185" ry="211"/>
-        <path d="M215 256Q540 174 865 256M245 339Q543 398 840 339M539 48V470"/>
-        <path d="M234 174Q540 44 846 174M251 361Q540 504 825 361"/>
-      </g>
-      <path d="M215 258Q540 174 865 258M234 174Q540 44 846 174" fill="none" stroke="#ffe1a6" stroke-width="2" opacity=".5" filter="url(#light)"/>
-      <g fill="#ffe8bb"><circle cx="539" cy="48" r="4"/><circle cx="215" cy="256" r="3"/><circle cx="865" cy="256" r="4"/><circle cx="299" cy="124" r="3"/><circle cx="739" cy="124" r="3"/></g>
-      <g fill="#ffe2a4" opacity=".45"><circle cx="83" cy="86" r="1.5"/><circle cx="132" cy="208" r="1"/><circle cx="787" cy="45" r="1"/><circle cx="870" cy="104" r="1.2"/></g>
-      <g transform="translate(360 182)">
-        <ellipse cx="130" cy="345" rx="205" ry="32" fill="#09080e" opacity=".6"/>
-        <path d="M87 73c-22-24-15-58 3-72 17-13 53-12 69 2 20 17 26 49 12 75-17 26-61 32-84-5Z" fill="#120e1b"/>
-        <path d="M77 32q28-43 78-14l11 24q-38-16-86 7Z" fill="#100d19"/>
-        <path d="M93 72q-23 13-37 39Q37 139 36 207l19 94 94 38 93-18q9-40-22-79l-18-56q1-49-29-80l-18-31-31 26Z" fill="url(#coat)" stroke="#382536" stroke-width="2"/>
-        <path d="M77 119Q102 97 136 116l18 39-45 30-50-11Z" fill="#231723" opacity=".9"/>
-        <path d="M158 170q38-15 59 11l57 92-22 19-66-78-44 19-32-18Z" fill="#0d0d16"/>
-        <path d="M104 257q90-31 133 10l63 73-35 11-90-51-82 37-62-34Z" fill="#090b14"/>
-        <path d="M155 214q38-17 59-11l46 33-14 19-65-11-59 17Z" fill="#17111a"/>
-        <path d="M42 188q-18 29-15 69l27 52 48-9-35-63 12-31Z" fill="#130e18"/>
-        <path d="M0 343q97-17 195 2t151 22" fill="none" stroke="#3e2d35" stroke-width="20" stroke-linecap="round"/>
-      </g>
-    </svg>
+    <picture>
+      <source srcset="/assets/anthony-missoula-overlook-mobile.jpg" media="(max-width:640px)">
+      <img src="/assets/anthony-missoula-overlook.jpg" alt="" width="1600" height="900" decoding="async" fetchpriority="high">
+    </picture>
+    <div class="hero-orbit"><span></span></div>
   </div>
   <div class="wrap hero-content">
     <div class="hero-text">
