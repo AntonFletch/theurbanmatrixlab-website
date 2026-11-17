@@ -5,7 +5,7 @@
   const $ = id => document.getElementById(id);
   const db = window.supabase?.createClient(SUPABASE_URL, KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   const state={user:null,owner:false,audience:"client",rooms:[],room:null,busy:false};
-  let poll=null,noticeTimeout=null,accessLoad=null;
+  let poll=null,noticeTimeout=null,accessLoad=null,recoveryMode=false;
   const temporaryError=err=>/abort|network|fetch|timeout|connection/i.test(String(err?.message||err||""));
   async function retrySecureRequest(makeRequest){
     let lastError;
@@ -41,7 +41,12 @@
     return u.hostname==="meet.google.com"&&/^\/[a-z]{3}-[a-z]{4}-[a-z]{3}\/?$/.test(u.pathname);
   }catch{return false;}};
   function notify(message){const e=$("notice");e.hidden=false;e.textContent=message;clearTimeout(noticeTimeout);noticeTimeout=setTimeout(()=>e.hidden=true,8500);}
-  function setSignInMode(signedIn){$("signin").hidden=signedIn;$("workspace").hidden=!signedIn;$("signout").hidden=!signedIn;}
+  function setSignInMode(signedIn){
+    $("signin").hidden=signedIn||recoveryMode;
+    $("workspace").hidden=!signedIn||recoveryMode;
+    $("password-recovery").hidden=!recoveryMode;
+    $("signout").hidden=!signedIn||recoveryMode;
+  }
   function roomsForGroup(){return state.rooms.filter(r=>r.audience===state.audience)
     .sort((a,b)=>Number(active(b))-Number(active(a))||Date.parse(a.starts_at)-Date.parse(b.starts_at));}
   function setGroup(type){
@@ -289,7 +294,7 @@
         if(error){
           const reason=error.message||"Unknown authentication error";
           signFeedback(reason==="Invalid login credentials"
-            ?"Email or password not accepted. If you never set a password, use Send sign-in link."
+            ?"Email or password not accepted. If you forgot your password, use Forgot password when email delivery is available."
             : "Sign-in failed: "+reason,true);
         }else if(data?.session){
           signFeedback("Signed in. Loading your approved rooms…");
@@ -306,15 +311,82 @@
       signFeedback("Requesting your personal sign-in link…");
       try{
         const {error}=await db.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});
+        if(error && (error.status===429||/email rate limit|too many requests/i.test(error.message||""))){
+          signFeedback("Email service has reached its sending limit. No link was sent. Do not keep retrying; password sign-in still works if you know your password.",true);
+          magicBtn.disabled=true;
+          magicBtn.textContent="Email temporarily unavailable";
+          return;
+        }
         signFeedback(error?"Sign-in link failed: "+error.message:"Check your inbox and Spam for your personal sign-in link.",!!error);
       }catch(err){
         signFeedback("Could not send sign-in link. Check your connection and browser shields.",true);
-      }finally{magicBtn.disabled=false;magicBtn.textContent="Send sign-in link";}
+      }finally{
+        if(magicBtn.textContent!=="Email temporarily unavailable"){
+          magicBtn.disabled=false;magicBtn.textContent="Send sign-in link";
+        }
+      }
+    });
+    const forgotBtn=$("forgot");
+    forgotBtn.addEventListener("click",async()=>{
+      const email=$("email").value.trim();
+      if(!email){signFeedback("Enter your email first, then select Forgot password.",true);return;}
+      if(forgotBtn.disabled)return;
+      forgotBtn.disabled=true;forgotBtn.textContent="Requesting reset…";
+      try{
+        const {error}=await db.auth.resetPasswordForEmail(email,{
+          redirectTo:location.origin+location.pathname
+        });
+        if(error){
+          if(error.status===429||/email rate limit|too many requests/i.test(error.message||"")){
+            forgotBtn.textContent="Email temporarily unavailable";
+            signFeedback("Password reset email is blocked by the provider's sending limit. No reset was sent. Please do not keep requesting links. Your account and meeting access are unchanged.",true);
+            return;
+          }
+          signFeedback("Password reset request failed: "+error.message,true);
+        }else{
+          signFeedback("If the account is registered and email delivery is available, check your inbox and Spam for a password reset link.");
+        }
+      }catch(err){signFeedback("Could not request password reset: "+(err.message||err),true);}
+      finally{if(forgotBtn.textContent!=="Email temporarily unavailable"){
+        forgotBtn.disabled=false;forgotBtn.textContent="Forgot password? Request reset";
+      }}
+    });
+    $("new-password-form").addEventListener("submit",async e=>{
+      e.preventDefault();
+      if(!recoveryMode)return;
+      const password=$("new-password").value;
+      const confirmation=$("confirm-password").value;
+      const notice=$("password-recovery-notice");
+      notice.hidden=false;
+      if(password.length<12||password!==confirmation){
+        notice.textContent="Use at least 12 characters, and make sure both passwords match.";
+        return;
+      }
+      const save=$("new-password-form").querySelector('button[type="submit"]');
+      save.disabled=true;save.textContent="Saving securely…";
+      try{
+        const {error}=await db.auth.updateUser({password});
+        if(error)throw error;
+        $("new-password-form").reset();
+        recoveryMode=false;
+        notice.hidden=true;
+        const {data}=await db.auth.getUser();
+        await loadAccess(data?.user||null);
+        notify("Password updated. Your approved private rooms are loading.");
+      }catch(err){
+        notice.textContent="Password could not be changed: "+(err.message||err);
+      }finally{save.disabled=false;save.textContent="Save new password";}
     });
     window.__mxLiveReady=true;
     $("signout").addEventListener("click",async()=>{await db.auth.signOut();});
     db.auth.onAuthStateChange((event,session)=>{
-      if(["INITIAL_SESSION","SIGNED_IN","SIGNED_OUT"].includes(event)){
+      if(event==="PASSWORD_RECOVERY"){
+        recoveryMode=true;
+        setSignInMode(true);
+        return;
+      }
+      if(event==="SIGNED_OUT")recoveryMode=false;
+      if(["INITIAL_SESSION","SIGNED_IN","SIGNED_OUT"].includes(event) && !recoveryMode){
         setTimeout(()=>loadAccess(session?.user||null),0);
       }
     });
