@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="../assets/mx-favicon.svg">
 <link rel="stylesheet" href="live.css">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0"></script>
-<script defer src="live.js?v=20261117-abort-retry"></script>
+<script defer src="live.js?v=20261117-recovery"></script>
 <script>window.addEventListener("DOMContentLoaded",function(){
   if(window.__mxLiveReady)return;
   var form=document.getElementById("signin-form");
@@ -26,8 +26,19 @@
 <span class="eyebrow">APPOINTMENT ACCESS</span><h1>Enter your private workspace.</h1>
 <p>Only approved clients, employees and invited guests can access their rooms. A scheduled appointment does not open until the host activates it.</p>
 <form id="signin-form" class="signin-form"><label>Email<input id="email" type="email" required autocomplete="email"></label><label>Password<input id="password" type="password" autocomplete="current-password"></label>
-<button class="primary" type="submit">Sign in</button><button id="magic" class="secondary" type="button">Send sign-in link</button></form>
-<p class="fineprint">Use your existing MX Continuity account. New accounts and guest invitations require owner approval.</p>
+<button class="primary" type="submit">Sign in</button><button id="magic" class="secondary" type="button">Send sign-in link</button>
+<button id="forgot" class="secondary" type="button">Forgot password? Request reset</button></form>
+<p class="fineprint">Use your existing MX Continuity account. New accounts and guest invitations require owner approval. Password reset and sign-in emails are subject to email delivery limits.</p>
+</section>
+<section id="password-recovery" class="gate" hidden>
+<span class="eyebrow">SECURE PASSWORD RECOVERY</span>
+<h1>Choose your new password.</h1>
+<p>This only changes the password for the account whose secure recovery link you opened. Never share passwords.</p>
+<form id="new-password-form" class="signin-form">
+<label>New password<input id="new-password" type="password" autocomplete="new-password" minlength="12" required></label>
+<label>Confirm new password<input id="confirm-password" type="password" autocomplete="new-password" minlength="12" required></label>
+<button class="primary" type="submit">Save new password</button></form>
+<p id="password-recovery-notice" class="fineprint" role="status" aria-live="polite" hidden></p>
 </section>
 <section id="workspace" hidden>
 <div class="headline"><div><span class="eyebrow">MX CONTINUITY • SECURE ROOMS</span><h1>Video &amp; group chat</h1><p>Choose your authorized group. Client sessions open only during an approved appointment.</p></div><button id="reload" class="secondary" type="button">Refresh</button></div>
