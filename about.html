@@ -94,6 +94,26 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .footer .copyright{font-size:.8rem;color:#e7d9e6}
 .footer-links{display:flex;justify-content:center;flex-wrap:wrap;gap:18px;font-size:.73rem;color:#cdb8d0;margin-top:13px}
 .footer-links a:hover{color:var(--gold)}
+
+/* Faithful treatment of the approved Built With Purpose founder mock.
+   Retain actual semantic headings, links and mobile accessibility. */
+.hero{min-height:clamp(495px,39.8vw,575px)}
+.hero-content{padding-top:42px}
+.hero h1{text-transform:uppercase;letter-spacing:-.032em;font-size:clamp(2.55rem,4.8vw,5.15rem);line-height:1.035;max-width:670px;margin:21px 0 17px}
+.hero h1 span{color:#f3c27b}
+.hero-deck{font-size:clamp(1rem,1.65vw,1.2rem);line-height:1.42}
+.hero-art img{filter:brightness(.69) saturate(.84) contrast(1.1);object-position:52% center}
+.hero-art:before{background:linear-gradient(90deg,rgba(27,9,37,.78),rgba(24,8,35,.19) 48%,rgba(32,12,43,.14))}
+.hero-art:after{background:linear-gradient(0deg,rgba(13,5,20,.67),transparent 39%,rgba(53,16,66,.25))}
+.hero-orbit{border-color:rgba(255,199,126,.78);box-shadow:inset 0 0 27px rgba(238,178,100,.09),0 0 20px rgba(238,178,100,.19)}
+.why{isolation:isolate;overflow:hidden}
+.why:before{content:"";position:absolute;inset:auto 0 0;height:145px;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(63,30,76,.4),rgba(19,9,26,.72));clip-path:polygon(0 74%,12% 46%,24% 68%,39% 26%,51% 63%,63% 40%,76% 67%,87% 35%,100% 65%,100% 100%,0 100%);opacity:.75}
+.pillar{background:linear-gradient(158deg,rgba(32,13,43,.93),rgba(14,7,21,.97))}
+.service:first-child{background:linear-gradient(95deg,rgba(19,9,27,.73),rgba(18,8,26,.96) 86%),url('/mx-continuity/assets/mx-hero-laptop.webp') 16% center/cover no-repeat}
+.service:nth-child(2){background:linear-gradient(100deg,rgba(36,14,45,.70),rgba(17,8,25,.97) 88%),url('/assets/mx-visibility-card.svg') 25% 52%/auto 150% no-repeat}
+.site-border{background:linear-gradient(135deg,rgba(233,178,110,.48) 0 1px,transparent 2px) top left/30px 30px no-repeat,linear-gradient(225deg,rgba(233,178,110,.48) 0 1px,transparent 2px) top right/30px 30px no-repeat}
+@media(max-width:700px){.hero{min-height:0}.hero-content{padding-top:34px}.hero h1{font-size:clamp(1.88rem,8.6vw,3.1rem);line-height:1.08;margin:18px 0}.hero-orbit{opacity:.55}.service:first-child,.service:nth-child(2){background-size:cover}}
+
 @media(max-width:970px){.brand-words{font-size:.98rem}.brand-words small{font-size:.51rem}.primary-nav{gap:14px;font-size:.66rem}.hero-art{inset:0 0 0 15%}.hero h1{max-width:620px}.service{padding:22px;gap:13px}.service-brand{gap:7px}.service-description{padding-left:13px;font-size:.82rem}}
 @media(max-width:700px){
  .wrap{width:min(100% - 34px,540px)}
