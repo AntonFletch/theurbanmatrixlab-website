@@ -196,11 +196,16 @@
       state.owner=!!(data?.active&&data.role==="origin");
       $("owner-tools").hidden=!state.owner;
       await refresh(false);
+      // Guests should land directly in their approved Guest room, not an empty Client tab.
+      if(!state.owner && !state.rooms.some(r=>r.audience===state.audience)){
+        const first=state.rooms.find(r=>r.audience==="guest")||state.rooms[0];
+        if(first)setGroup(first.audience);
+      }
       poll=setInterval(async()=>{if(state.user&&!state.busy){await refresh();}},12000);
     }catch(err){notify("Unable to confirm access: "+err.message);}
   }
   async function start(){
-    if(!db){$("signin").querySelector("p").textContent="Secure sign-in could not load.";return;}
+    if(!db){$("signin").querySelector("p").textContent="Secure sign-in could not load. Refresh this page, or try disabling Brave Shields for this website.";return;}
     document.querySelectorAll("[data-audience]").forEach(b=>b.addEventListener("click",()=>setGroup(b.dataset.audience)));
     $("reload").addEventListener("click",()=>refresh());
     $("join-video").addEventListener("click",joinVideo);
@@ -209,17 +214,57 @@
     $("save-status").addEventListener("click",saveStatus);
     $("invite").addEventListener("click",addMember);
     $("save-zoom").addEventListener("click",saveZoom);
+    const signStatus=node("p","fineprint","");
+    signStatus.id="signin-status";
+    signStatus.setAttribute("role","status");
+    signStatus.setAttribute("aria-live","polite");
+    signStatus.style.cssText="margin:3px 0 0;padding:12px 14px;border:1px solid #806b8e;border-radius:9px;background:#272033;color:#f2d29f;font-size:.9rem;overflow-wrap:anywhere";
+    signStatus.hidden=true;
+    $("signin-form").append(signStatus);
+    const signBtn=$("signin-form").querySelector('button[type="submit"]');
+    const magicBtn=$("magic");
+    function signFeedback(message,isError=false){
+      signStatus.textContent=message;
+      signStatus.style.color=isError?"#ffd7d7":"#f2d29f";
+      signStatus.style.borderColor=isError?"#b87676":"#806b8e";
+      signStatus.hidden=false;
+      signStatus.scrollIntoView({block:"nearest",behavior:"instant"});
+    }
     $("signin-form").addEventListener("submit",async e=>{
-      e.preventDefault();const email=$("email").value.trim(),password=$("password").value;
-      if(!password){notify("Enter a password or use the sign-in link.");return;}
-      const {error}=await db.auth.signInWithPassword({email,password});
-      if(error)notify("Sign-in failed: "+error.message);
+      e.preventDefault();
+      if(signBtn.disabled)return;
+      const email=$("email").value.trim(),password=$("password").value;
+      if(!email||!password){signFeedback("Enter your email and password, or use Send sign-in link.",true);return;}
+      signBtn.disabled=true;signBtn.textContent="Signing in…";
+      signFeedback("Checking your private account…");
+      try{
+        const {data,error}=await db.auth.signInWithPassword({email,password});
+        if(error){
+          const reason=error.message||"Unknown authentication error";
+          signFeedback(reason==="Invalid login credentials"
+            ?"Email or password not accepted. If you never set a password, use Send sign-in link."
+            : "Sign-in failed: "+reason,true);
+        }else if(data?.session){
+          signFeedback("Signed in. Loading your approved rooms…");
+        }else{
+          signFeedback("Sign-in was not completed. Try Send sign-in link.",true);
+        }
+      }catch(err){
+        signFeedback("Could not contact secure sign-in. Check your connection, disable Brave Shields for this site if enabled, then retry.",true);
+      }finally{signBtn.disabled=false;signBtn.textContent="Sign in";}
     });
-    $("magic").addEventListener("click",async()=>{
-      const email=$("email").value.trim();if(!email){notify("Enter your email first.");return;}
-      const {error}=await db.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});
-      notify(error?"Sign-in link failed: "+error.message:"If your account is approved, check your email for a sign-in link.");
+    magicBtn.addEventListener("click",async()=>{
+      const email=$("email").value.trim();if(!email){signFeedback("Enter your email first.",true);return;}
+      magicBtn.disabled=true;magicBtn.textContent="Sending link…";
+      signFeedback("Requesting your personal sign-in link…");
+      try{
+        const {error}=await db.auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});
+        signFeedback(error?"Sign-in link failed: "+error.message:"Check your inbox and Spam for your personal sign-in link.",!!error);
+      }catch(err){
+        signFeedback("Could not send sign-in link. Check your connection and browser shields.",true);
+      }finally{magicBtn.disabled=false;magicBtn.textContent="Send sign-in link";}
     });
+    window.__mxLiveReady=true;
     $("signout").addEventListener("click",async()=>{await db.auth.signOut();});
     db.auth.onAuthStateChange((event,session)=>{if(["SIGNED_IN","SIGNED_OUT"].includes(event))setTimeout(()=>setUser(session?.user||null),0);});
     const {data:{user},error}=await db.auth.getUser();
