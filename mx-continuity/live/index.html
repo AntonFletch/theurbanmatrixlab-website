@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="../assets/mx-favicon.svg">
 <link rel="stylesheet" href="live.css">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0"></script>
-<script defer src="live.js?v=20261117-setup-email"></script>
+<script defer src="live.js?v=20261117-owner-link"></script>
 <script>window.addEventListener("DOMContentLoaded",function(){
   if(window.__mxLiveReady)return;
   var form=document.getElementById("signin-form");
@@ -55,6 +55,20 @@
 <div id="manage-room" class="manage-room" hidden><h3>Manage selected room</h3>
 <div class="form-grid"><label>Status<select id="edit-status"><option value="scheduled">Scheduled / locked</option><option value="open">Open during appointment</option><option value="closed">Closed</option></select></label><button id="save-status" class="secondary" type="button">Save room status</button>
 <label class="wide">Add or invite participant by email<input id="invite-email" type="email" placeholder="guest@example.com"></label><button id="invite" class="secondary wide" type="button">Grant access / send invitation</button>
+<div class="wide" style="border-top:1px solid #554266;padding-top:18px">
+<h3>Existing guest account setup</h3>
+<p class="fineprint">Generate a personal password setup link for an already approved attendee. This works without Supabase email delivery.</p>
+</div>
+<label class="wide">Approved participant's email<input id="setup-email" type="email" placeholder="guest@example.com" autocomplete="off"></label>
+<button id="setup-generate" class="secondary wide" type="button">Create secure setup link</button>
+<div id="setup-result" class="wide" hidden style="border:1px solid #947451;border-radius:10px;padding:14px">
+<label>Private, single-use setup link<input id="setup-link" readonly autocomplete="off"></label>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+<button type="button" id="setup-copy" class="secondary">Copy link</button>
+<a id="setup-email-link" class="secondary" href="#" style="display:inline-block;padding:12px 16px;border-radius:10px;text-decoration:none">Email link</a>
+</div>
+<p class="fineprint" style="margin:12px 0 0">Email link opens a prepared message in your email app. You must tap Send. Share privately only with the named guest.</p>
+</div>
 <label class="wide">Set or replace video meeting link<input id="edit-zoom" type="url" placeholder="https://meet.google.com/abc-defg-hij"></label><button id="save-zoom" class="secondary wide" type="button">Save meeting link</button></div>
 <p class="fineprint">Existing accounts are granted access; new addresses receive an approval-only invitation. Email delivery depends on Supabase Auth configuration. Only invited accounts can view this room. Selecting a group does not grant access.</p></div>
 </section>
