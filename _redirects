@@ -2,3 +2,8 @@
 /zoom/ https://us05web.zoom.us/j/3724811504 302
 /publication /publication/index.html 200
 /publication/* /publication/:splat 200
+
+# Approved featured-artist public address
+/JeremyEmmons /jeremy-emmons/ 301
+/JeremyEmmons/ /jeremy-emmons/ 301
+/JeremyEmmons/* /jeremy-emmons/:splat 301
