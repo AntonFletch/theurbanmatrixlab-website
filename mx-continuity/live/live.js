@@ -390,6 +390,31 @@
         setTimeout(()=>loadAccess(session?.user||null),0);
       }
     });
+    // Direct recovery URL uses Supabase TokenHash verification. It does not rely on
+    // the project's outdated Site URL or the built-in email sender.
+    const query=new URLSearchParams(location.search);
+    const tokenHash=query.get("token_hash");
+    const linkType=query.get("type");
+    if(tokenHash && linkType==="recovery"){
+      recoveryMode=true;
+      setSignInMode(true);
+      const recoveryNotice=$("password-recovery-notice");
+      recoveryNotice.hidden=false;
+      recoveryNotice.textContent="Verifying your private recovery link…";
+      history.replaceState(null,document.title,location.pathname);
+      try{
+        const {data,error}=await db.auth.verifyOtp({type:"recovery",token_hash:tokenHash});
+        if(error||!data?.session)throw error||Error("Recovery link was not accepted.");
+        $("new-password-form").querySelector("button").disabled=false;
+        recoveryNotice.textContent="Link verified. Choose a new password with at least 12 characters.";
+        return;
+      }catch(err){
+        recoveryMode=false;
+        setSignInMode(false);
+        notify("Password setup link was not accepted or has expired. Please request a fresh link.");
+        return;
+      }
+    }
     try{
       const {data,error}=await db.auth.getUser();
       if(error&&error.name!=="AuthSessionMissingError")notify("Session check interrupted. Tap Refresh if needed.");
