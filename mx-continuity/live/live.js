@@ -70,6 +70,8 @@
   }
   async function showRoom(){
     const root=$("room-detail");root.replaceChildren();
+    const setupResult=$("setup-result");
+    if(setupResult){setupResult.hidden=true;$("setup-link").value="";}
     const r=state.room;
     $("video-stage").hidden=!r;$("chat-area").hidden=!r;
     $("manage-room").hidden=!state.owner||!r;
@@ -211,6 +213,48 @@
     }
     $("invite-email").value="";notify(data||"Room access granted.");
   }
+  async function generateAccountSetupLink(){
+    if(!state.owner||!state.room)return;
+    const email=$("setup-email").value.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      notify("Enter the approved guest's email first.");return;
+    }
+    const btn=$("setup-generate");
+    btn.disabled=true;btn.textContent="Creating private setup link…";
+    $("setup-result").hidden=true;
+    try{
+      const {data,error}=await db.functions.invoke("mx-live-account-setup",{
+        body:{email,room_id:state.room.id}
+      });
+      if(error||!data?.ok||typeof data.url!=="string"){
+        const reason=data?.error||error?.message||"unknown_error";
+        throw Error(reason);
+      }
+      const u=new URL(data.url);
+      if(u.origin!==location.origin||u.pathname!==location.pathname||
+        u.searchParams.get("type")!=="recovery"||
+        !u.searchParams.get("token_hash"))throw Error("Unexpected setup link.");
+      $("setup-link").value=data.url;
+      const subject="MX Continuity — Finish Your Private Guest Account";
+      const body="Your approved MX Continuity guest account is already created. Open this one-time link to set your own password:\n\n"+
+        data.url+"\n\nChoose a password of at least 12 characters. Do not share this link.\n\n"+
+        "After setup, go to UMX Technology > MX Continuity > Video & Group Chat > Guest.";
+      $("setup-email-link").href="mailto:"+encodeURIComponent(email)+"?subject="+
+        encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
+      $("setup-result").hidden=false;
+      notify("Private setup link ready. Tap Email link, then send the prepared message.");
+    }catch(err){
+      notify("Setup link not created: "+String(err?.message||err));
+    }finally{
+      btn.disabled=false;btn.textContent="Create secure setup link";
+    }
+  }
+  async function copyAccountSetupLink(){
+    const el=$("setup-link"),value=el.value;
+    if(!value)return;
+    try{await navigator.clipboard.writeText(value);notify("Private setup link copied.");}
+    catch{el.focus();el.select();notify("Select Copy to copy the highlighted setup link.");}
+  }
   async function saveZoom(){
     if(!state.owner||!state.room)return;const link=$("edit-zoom").value.trim();
     if(!isMeetingURL(link)){notify("Enter a valid Zoom or Google Meet URL.");return;}
@@ -265,6 +309,8 @@
     $("create-form").addEventListener("submit",createRoom);
     $("save-status").addEventListener("click",saveStatus);
     $("invite").addEventListener("click",addMember);
+    $("setup-generate").addEventListener("click",generateAccountSetupLink);
+    $("setup-copy").addEventListener("click",copyAccountSetupLink);
     $("save-zoom").addEventListener("click",saveZoom);
     const signStatus=node("p","fineprint","");
     signStatus.id="signin-status";
