@@ -5,7 +5,31 @@
   const $ = id => document.getElementById(id);
   const db = window.supabase?.createClient(SUPABASE_URL, KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   const state={user:null,owner:false,audience:"client",rooms:[],room:null,busy:false};
-  let poll=null,noticeTimeout=null;
+  let poll=null,noticeTimeout=null,accessLoad=null;
+  const temporaryError=err=>/abort|network|fetch|timeout|connection/i.test(String(err?.message||err||""));
+  async function retrySecureRequest(makeRequest){
+    let lastError;
+    for(let attempt=0;attempt<3;attempt++){
+      try{
+        const result=await makeRequest();
+        if(result.error)throw result.error;
+        return result;
+      }catch(err){
+        lastError=err;
+        if(!temporaryError(err)||attempt===2)throw err;
+        await new Promise(resolve=>setTimeout(resolve,350*(attempt+1)));
+      }
+    }
+    throw lastError;
+  }
+  function loadAccess(user){
+    if(user && accessLoad?.id===user.id)return accessLoad.promise;
+    const promise=setUser(user);
+    const entry={id:user?.id||null,promise};
+    accessLoad=entry;
+    promise.finally(()=>{if(accessLoad===entry)accessLoad=null;});
+    return promise;
+  }
   const label={client:"Client",employee:"Employee",guest:"Guest"};
   const stamp=value=>new Date(value).toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"});
   const node=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=String(text);return el;};
@@ -73,9 +97,8 @@
     if(!state.user||state.busy)return;
     state.busy=true;
     try{
-      const {data,error}=await db.from("mx_live_rooms").select("id,audience,title,starts_at,ends_at,status,created_at")
-        .order("starts_at",{ascending:false}).limit(150);
-      if(error)throw error;
+      const {data}=await retrySecureRequest(()=>db.from("mx_live_rooms").select("id,audience,title,starts_at,ends_at,status,created_at")
+        .order("starts_at",{ascending:false}).limit(150));
       state.rooms=data||[];
       const wanted=preserve?state.room?.id:null;
       const previous=state.room;
@@ -89,8 +112,12 @@
         showRooms();
         if(active(state.room))await loadMessages();
       }
-    }catch(err){notify("Unable to load private rooms: "+err.message);}
-    finally{state.busy=false;}
+      return true;
+    }catch(err){
+      notify("Unable to load private rooms. Tap Refresh to retry: "+(err.message||err));
+      $("room-list").replaceChildren(node("p","muted","Connection interrupted. Tap Refresh above to retry."));
+      return false;
+    }finally{state.busy=false;}
   }
   async function loadMessages(){
     const r=state.room,root=$("messages");
@@ -187,27 +214,47 @@
     $("edit-zoom").value="";notify("Private meeting link saved. It remains locked until the room opens.");await showRoom();
   }
   async function setUser(user){
+    const previous=state.user?.id;
     state.user=user;clearInterval(poll);poll=null;
     setSignInMode(!!user);
-    if(!user){state.room=null;state.rooms=[];return;}
+    if(!user){state.owner=false;state.room=null;state.rooms=[];$("owner-tools").hidden=true;return;}
+    if(previous!==user.id){state.owner=false;state.room=null;state.rooms=[];$("owner-tools").hidden=true;}
     try{
-      const {data,error}=await db.from("veil_memberships").select("role,active").eq("user_id",user.id).maybeSingle();
-      if(error)throw error;
+      const {data}=await retrySecureRequest(()=>db.from("veil_memberships")
+        .select("role,active").eq("user_id",user.id).maybeSingle());
+      if(state.user?.id!==user.id)return;
       state.owner=!!(data?.active&&data.role==="origin");
       $("owner-tools").hidden=!state.owner;
-      await refresh(false);
-      // Guests should land directly in their approved Guest room, not an empty Client tab.
+      const loaded=await refresh(false);
+      if(!loaded)throw Error("Room list could not be loaded.");
+      if(state.user?.id!==user.id)return;
+      // Open the first authorized group for guests rather than leaving them on an empty Client tab.
       if(!state.owner && !state.rooms.some(r=>r.audience===state.audience)){
         const first=state.rooms.find(r=>r.audience==="guest")||state.rooms[0];
         if(first)setGroup(first.audience);
       }
       poll=setInterval(async()=>{if(state.user&&!state.busy){await refresh();}},12000);
-    }catch(err){notify("Unable to confirm access: "+err.message);}
+    }catch(err){
+      if(state.user?.id!==user.id)return;
+      $("owner-tools").hidden=true;
+      $("room-list").replaceChildren(node("p","muted","Private rooms did not load. Tap Refresh to try again."));
+      notify("Your sign-in worked, but room loading was interrupted. Tap Refresh to retry.");
+    }
   }
   async function start(){
     if(!db){$("signin").querySelector("p").textContent="Secure sign-in could not load. Refresh this page, or try disabling Brave Shields for this website.";return;}
     document.querySelectorAll("[data-audience]").forEach(b=>b.addEventListener("click",()=>setGroup(b.dataset.audience)));
-    $("reload").addEventListener("click",()=>refresh());
+    $("reload").addEventListener("click",async()=>{
+      const btn=$("reload");if(btn.disabled)return;
+      btn.disabled=true;btn.textContent="Checking…";
+      try{
+        if(state.user)await loadAccess(state.user);
+        else{
+          const {data}=await db.auth.getSession();
+          await loadAccess(data.session?.user||null);
+        }
+      }finally{btn.disabled=false;btn.textContent="Refresh";}
+    });
     $("join-video").addEventListener("click",joinVideo);
     $("message-form").addEventListener("submit",sendMessage);
     $("create-form").addEventListener("submit",createRoom);
@@ -266,10 +313,19 @@
     });
     window.__mxLiveReady=true;
     $("signout").addEventListener("click",async()=>{await db.auth.signOut();});
-    db.auth.onAuthStateChange((event,session)=>{if(["SIGNED_IN","SIGNED_OUT"].includes(event))setTimeout(()=>setUser(session?.user||null),0);});
-    const {data:{user},error}=await db.auth.getUser();
-    if(error&&error.name!=="AuthSessionMissingError")notify("Session check: "+error.message);
-    await setUser(user);
+    db.auth.onAuthStateChange((event,session)=>{
+      if(["INITIAL_SESSION","SIGNED_IN","SIGNED_OUT"].includes(event)){
+        setTimeout(()=>loadAccess(session?.user||null),0);
+      }
+    });
+    try{
+      const {data,error}=await db.auth.getUser();
+      if(error&&error.name!=="AuthSessionMissingError")notify("Session check interrupted. Tap Refresh if needed.");
+      await loadAccess(data?.user||null);
+    }catch(err){
+      const {data}=await db.auth.getSession();
+      await loadAccess(data?.session?.user||null);
+    }
   }
   start().catch(err=>notify("Private room setup failed: "+err.message));
 })();
