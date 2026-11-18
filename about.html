@@ -165,6 +165,17 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .founder-next-line{margin:24px auto 0;max-width:790px;font:italic clamp(1.08rem,2.1vw,1.52rem)/1.65 Georgia,serif;color:#f5e8f3}
 .founder-next-mark{display:block;margin:21px auto 0;color:#edbf7c;font-size:1.1rem}
 @media(max-width:700px){.founder-next-banner{padding:53px 0 59px}.founder-next-banner::before{inset:10px}.founder-next-banner::after{inset:16px}.founder-next-kicker{letter-spacing:.2em;font-size:.65rem}.founder-next-banner h2{font-size:clamp(1.9rem,8vw,3rem)}.founder-next-line{font-size:1.04rem}.founder-next-line br{display:none}}
+
+/* Future operations only: the original three cards and all other page elements remain unchanged. */
+.future-divider{display:flex;align-items:center;justify-content:center;gap:16px;margin:35px 0 23px;color:#efc07d;text-align:center;text-transform:uppercase;letter-spacing:.26em;font-size:clamp(.78rem,1.65vw,1.2rem);font-weight:800;white-space:nowrap}
+.future-divider:before,.future-divider:after{content:"";flex:1;height:2px;max-width:210px;background:linear-gradient(90deg,transparent,#bf3cc7 45%,#e7b36c);box-shadow:0 0 11px rgba(175,43,197,.55)}
+.future-divider:after{transform:scaleX(-1)}
+.future-services .service{cursor:default;background:linear-gradient(110deg,rgba(43,20,52,.92),rgba(16,9,23,.98))}
+.future-services .service:hover{background-color:transparent}
+.future-services .service-name{font-size:clamp(1.2rem,2vw,1.8rem)}
+.future-services .service-name small{font-size:.57rem;letter-spacing:.15em}
+@media(max-width:700px){.future-divider{gap:10px;margin:25px 0 19px;letter-spacing:.18em;font-size:.83rem}.future-services .service-name{font-size:clamp(1.1rem,4.7vw,1.65rem)}.future-services .service-name small{font-size:.51rem;letter-spacing:.11em}.future-services .service{background-size:auto}}
+@media(max-width:390px){.future-services .service{gap:10px;padding:13px}.future-services .service-icon{width:44px;height:44px}.future-services .service-description{padding-left:10px;font-size:.76rem}}
 </style>
 </head>
 <body>
@@ -372,6 +383,72 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
         </div>
         <p class="service-description">Featured artist Jeremy Emmons. Explore his original paintings and framing previews.</p>
       </a>
+    </div>
+    <div class="future-divider" role="heading" aria-level="3">Future Operations</div>
+    <div class="services future-services" aria-label="Seven proposed future operations — not currently offered">
+      <div class="service future-card" aria-label="UMX CONSTRUCTION — future operation, not yet launched">
+        <div class="service-brand">
+          <svg class="service-icon" viewBox="0 0 70 70" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 60h56M13 60V25l23-10 22 10v35M10 25h53M36 15V7M24 60V44h24v16M24 33h10v8H24zM40 33h10v8H40z" />
+          </svg>
+          <div class="service-name">UMX<small>CONSTRUCTION</small></div>
+        </div>
+        <p class="service-description">Building, renovations, and property development.</p>
+      </div>
+      <div class="service future-card" aria-label="UMX PROPERTY MAINTENANCE — future operation, not yet launched">
+        <div class="service-brand">
+          <svg class="service-icon" viewBox="0 0 70 70" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 58 46 23M45 15l10 10M13 47l10 10M11 18l13 13M23 18 11 30M32 50l16 16M51 45l-7 7M22 13v23M14 22h18M55 43v18M48 50h14"/>
+          </svg>
+          <div class="service-name">UMX<small>PROPERTY MAINTENANCE</small></div>
+        </div>
+        <p class="service-description">Seasonal services, grounds care, and ongoing property upkeep.</p>
+      </div>
+      <div class="service future-card" aria-label="BRIDGE SERVICES — future operation, not yet launched">
+        <div class="service-brand">
+          <svg class="service-icon" viewBox="0 0 70 70" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="19" cy="23" r="6"/><circle cx="35" cy="19" r="6"/><circle cx="51" cy="23" r="6"/><path d="M9 53c3-11 12-16 26-16s23 5 26 16M5 58c12-11 23-15 30-15s18 4 30 15"/>
+          </svg>
+          <div class="service-name">BRIDGE<small>SERVICES</small></div>
+        </div>
+        <p class="service-description">Housing, resources, and real-world support to help people move forward.</p>
+      </div>
+      <div class="service future-card" aria-label="UMX HOUSING & PROPERTY — future operation, not yet launched">
+        <div class="service-brand">
+          <svg class="service-icon" viewBox="0 0 70 70" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 33 35 11l27 22M15 29v32h40V29M28 61V42h14v19M25 32h8v8h-8zM43 32h8v8h-8z"/>
+          </svg>
+          <div class="service-name">UMX<small>HOUSING & PROPERTY</small></div>
+        </div>
+        <p class="service-description">Acquisition, management, and housing development for long-term stability.</p>
+      </div>
+      <div class="service future-card" aria-label="UMX LOGISTICS — future operation, not yet launched">
+        <div class="service-brand">
+          <svg class="service-icon" viewBox="0 0 70 70" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 20h34v30H7zM41 30h10l11 12v8H41zM41 41h20M12 12h29M6 30H1M6 39H1"/><circle cx="18" cy="53" r="6"/><circle cx="52" cy="53" r="6"/>
+          </svg>
+          <div class="service-name">UMX<small>LOGISTICS</small></div>
+        </div>
+        <p class="service-description">Transportation, hauling, and operational support across UMX projects.</p>
+      </div>
+      <div class="service future-card" aria-label="UMX WORKFORCE — future operation, not yet launched">
+        <div class="service-brand">
+          <svg class="service-icon" viewBox="0 0 70 70" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 43v-7a21 21 0 0 1 42 0v7M7 44h56v8H7zM30 15v16M40 15v16M24 58h22"/><path d="M11 52h48"/>
+          </svg>
+          <div class="service-name">UMX<small>WORKFORCE</small></div>
+        </div>
+        <p class="service-description">Employment pathways, skills training, and workforce development.</p>
+      </div>
+      <div class="service future-card" aria-label="UMX ENVIRONMENTAL SERVICES — future operation, not yet launched">
+        <div class="service-brand">
+          <svg class="service-icon" viewBox="0 0 70 70" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M35 62V33M35 36C14 39 9 25 9 9c19-1 32 5 31 24M35 42C56 43 63 29 63 14c-19-3-31 3-28 28M20 20l15 15M52 25 35 42"/>
+          </svg>
+          <div class="service-name">UMX<small>ENVIRONMENTAL SERVICES</small></div>
+        </div>
+        <p class="service-description">Site cleanup, restoration, and community beautification projects.</p>
+      </div>
     </div>
     <p class="note">The Urban Matrix Lab LLC is the parent company. Each business maintains its own services, customer relationships, and operating systems.</p>
   </div>
