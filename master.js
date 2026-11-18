@@ -109,8 +109,7 @@
     clear(id);
     const configs=[
       {code:"MX",name:"MX Continuity",state:"Website inquiry and support records connected",stateStyle:"info",detail:"Website intake and support tickets are connected. Customer checkups require an activated and authorized care account.",stat:n("mxClients")+" clients · "+n("mxTickets")+" support tickets",links:[["Open client center","/mx-continuity/app/"],["Website","/mx-continuity/"]]},
-      {code:"MX",name:"MX Visibility",state:"In preparation",stateStyle:"warn",detail:"Search optimization and local business visibility. No independent operating data feed is connected yet.",stat:"No tracked revenue or customers connected",links:[["Open website","/mx-visibility/"]]},
-      {code:"ART",name:"Jeremy Emmons",state:"Independent featured artist",stateStyle:"neutral",detail:"Independent painter featured by UMX Technology, not a UMX operating business.",stat:"Artist feature · no operating system connected",links:[["View artist feature","/#featured-artist-title"]]}
+      {code:"MX",name:"MX Visibility",state:"In preparation",stateStyle:"warn",detail:"Search optimization and local business visibility. No independent operating data feed is connected yet.",stat:"No tracked revenue or customers connected",links:[["Open website","/mx-visibility/"]]}
     ];
     configs.forEach(c=>{
       const card=el("article","business-card");
@@ -180,8 +179,7 @@
     const sites=[
       ["UMX Technology","/","UMX Technology | The Urban Matrix Lab"],
       ["MX Continuity","/mx-continuity/","Website Design &amp; Maintenance | MX Continuity"],
-      ["MX Visibility","/mx-visibility/","MX Visibility | Search Visibility & SEO"],
-      ["Jeremy Emmons","/jeremy-emmons/","Jeremy Emmons — Original Paintings"]
+      ["MX Visibility","/mx-visibility/","MX Visibility | Search Visibility & SEO"]
     ];
     clear("public-sites-list");
     append("public-sites-list",empty("Checking public websites…"));
