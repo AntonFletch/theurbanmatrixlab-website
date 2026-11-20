@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="#110d19">
+<title>Company Calendar | MX Continuity</title>
+<link rel="icon" type="image/svg+xml" href="../assets/mx-favicon.svg">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0"></script>
+<style>
+:root{color-scheme:dark;--bg:#0e0a14;--panel:#171321;--panel2:#211a2c;--gold:#e4bd83;--muted:#b2a8bd;--line:#3b3048;--text:#f7f2fa}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% -12%,#382342 0,transparent 35%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,sans-serif}
+a{color:var(--gold)}[hidden]{display:none!important}button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid #554266;border-radius:10px;padding:11px 16px;color:var(--text);background:#2a2037}button:disabled{opacity:.5;cursor:not-allowed}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.primary{background:var(--gold);color:#211521;border-color:var(--gold);font-weight:750}.secondary:hover:not(:disabled){background:#3c2e4b}
+.header{display:flex;align-items:center;gap:16px;padding:14px max(18px,calc((100vw - 1170px)/2));border-bottom:1px solid var(--line);background:#100c18;flex-wrap:wrap}
+.header .brand img{max-width:210px;height:auto;display:block}.header nav{display:flex;gap:16px;flex-wrap:wrap;margin-left:auto;font-size:.85rem}
+.container{width:min(1160px,calc(100% - 30px));margin:26px auto 48px}
+.eyebrow{font-size:.72rem;letter-spacing:.17em;font-weight:800;color:var(--gold);text-transform:uppercase}h1,h2,p{margin-top:0}h1{font:600 clamp(2rem,5vw,3rem)/1.18 Georgia,serif;margin:8px 0 10px}h2{font-size:1.1rem}.muted{color:var(--muted)}.hint{font-size:.83rem;color:var(--muted)}
+.card{background:linear-gradient(145deg,#21172a,#16111f);border:1px solid var(--line);border-radius:17px;padding:20px;box-shadow:0 14px 35px #0003}
+.gate{max-width:550px;margin:50px auto;padding:26px}.gate form,.editor{display:grid;gap:13px}
+label{display:grid;gap:6px;font-size:.85rem;color:#e5d9eb}input,select,textarea{min-width:0;width:100%;padding:11px 12px;border:1px solid #554266;background:#100d18;color:#f7f2fa;border-radius:10px}textarea{resize:vertical}
+.toolbar{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin:12px 0 20px}
+.toolbar p{margin-bottom:0}.controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.controls select{width:auto;max-width:190px}.title-month{font:600 1.45rem Georgia,serif;min-width:200px;text-align:center}
+.main-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(290px,1fr);gap:18px;align-items:start}
+.calendar{padding:16px}.weekdays,.dates{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.weekday{text-align:center;color:var(--gold);font-size:.72rem;letter-spacing:.04em;padding:8px 2px}
+.day{min-height:102px;text-align:left;display:flex;flex-direction:column;gap:5px;padding:9px 8px;background:#1a1422;border:1px solid #362c43;border-radius:9px;color:var(--text)}
+.day.outside{opacity:.45}.day.today{border-color:#9b7549}.day.selected{outline:2px solid var(--gold);outline-offset:-2px;background:#282037}.day-num{font-weight:750}.day.today .day-num{color:var(--gold)}.dots{display:flex;gap:4px;flex-wrap:wrap}.dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}.dot.meeting{background:#dcb87b}.dot.appointment{background:#a78bfa}.dot.care{background:#64c5a4}.dot.operations{background:#80b7ef}.dot.deadline{background:#f5a3a8}
+.day-event{font-size:.68rem;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#dfd5e6}.day-event.more{color:var(--gold)}
+.side{display:grid;gap:16px}.item{display:block;padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}
+.item-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.item strong{display:block;font-size:.94rem}.item small{color:var(--muted)}
+.tag{display:inline-flex;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);border:1px solid #6c536e;border-radius:100px;padding:3px 8px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px}.actions button,.actions a{font-size:.78rem;padding:7px 10px;border:1px solid #5d4b68;border-radius:9px;text-decoration:none;background:#2a2037;color:#eee4f4}
+.summary{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}.summary .big{font:600 1.75rem Georgia,serif;color:var(--gold)}
+.notice{padding:12px 14px;background:#332735;border:1px solid #98744c;color:#fff4e2;border-radius:10px;margin:12px 0}
+.editor{margin-top:12px}.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.editor .foot{display:flex;gap:9px;flex-wrap:wrap}.empty{padding:20px 0;color:var(--muted)}
+footer{margin:28px 0;color:var(--muted);font-size:.8rem}
+@media(max-width:790px){.main-grid{grid-template-columns:1fr}.header nav{margin-left:0}.title-month{min-width:0}.day{min-height:77px;padding:7px 5px}.day-event{display:none}.weekday{font-size:.65rem}.calendar{padding:10px}.card{padding:16px}.editor-grid{grid-template-columns:1fr}.toolbar{flex-direction:column}.controls{width:100%}}
+</style>
+</head>
+<body>
+<header class="header"><a class="brand" href="../index.html" aria-label="MX Continuity home"><img alt="MX Continuity" src="../assets/mx-logo-horizontal.svg" width="210" height="42"></a><nav aria-label="MX Continuity private navigation"><a href="../live/">Private Rooms</a><a href="../app/">Client Center</a><a href="../index.html">Website</a></nav></header>
+<main class="container">
+<div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+<section id="gate" class="card gate">
+<span class="eyebrow">MX CONTINUITY · STAFF ONLY</span><h1>Company Calendar</h1>
+<p class="muted">Private company meetings, appointments, operations and scheduled website care. Existing MX Continuity owner or authorized staff accounts only.</p>
+<form id="signin-form"><label>Email<input id="email" type="email" autocomplete="email" required></label><label>Password<input id="password" type="password" autocomplete="current-password" required></label><button class="primary" type="submit">Sign in</button></form>
+<p class="hint" style="margin-top:15px">Use the same account as your MX Continuity secure rooms. <a href="../live/">Private room sign-in</a></p>
+</section>
+<section id="denied" class="card gate" hidden><h1>Restricted calendar</h1><p>Only authorized MX Continuity staff can view company records. Client and guest room access does not include the company calendar.</p><button id="denied-signout" class="secondary" type="button">Sign out</button></section>
+<section id="workspace" hidden>
+<div class="toolbar"><div><span class="eyebrow">MX CONTINUITY · COMPANY CALENDAR</span><h1>Schedule &amp; Meetings</h1><p class="muted">Private records · Times shown in Missoula (Mountain time)</p></div><div class="controls"><button id="refresh" type="button">Refresh</button><button id="signout" type="button">Sign out</button></div></div>
+<div class="main-grid">
+<section class="card calendar" aria-label="Monthly calendar"><div class="summary" style="margin-bottom:14px"><button id="previous" aria-label="Previous month" type="button">‹</button><span class="title-month" id="month-label">Month</span><div class="controls"><button id="today" type="button">Today</button><button id="next" aria-label="Next month" type="button">›</button></div></div>
+<div id="weekdays" class="weekdays"></div><div id="dates" class="dates"></div>
+<p class="hint" style="margin:16px 4px 0">Select a date to see scheduled work. Calendar entries are protected by your MX Continuity account.</p></section>
+<div class="side">
+<section class="card"><div class="summary"><div><span class="eyebrow">SELECTED DATE</span><h2 id="selected-label" style="margin:8px 0">Today</h2></div><span id="selected-total" class="tag">0 events</span></div><div id="agenda" aria-live="polite"></div></section>
+<section class="card"><div class="summary"><div><span class="eyebrow">UPCOMING</span><h2 style="margin:8px 0">Company work</h2></div><span class="big" id="upcoming-count">0</span></div><div id="upcoming"></div></section>
+<section id="owner" class="card" hidden><div class="summary"><div><span class="eyebrow">OWNER ONLY</span><h2 style="margin:8px 0">Manage calendar</h2></div><button id="add" class="primary" type="button">+ New event</button></div>
+<form id="editor" class="editor" hidden><input id="edit-id" type="hidden"><label>Event title<input id="edit-title" minlength="3" maxlength="160" required placeholder="Team meeting"></label>
+<div class="editor-grid"><label>Type<select id="edit-category"><option value="meeting">Meeting</option><option value="appointment">Appointment</option><option value="care">Website care</option><option value="operations">Operations</option><option value="deadline">Deadline</option></select></label><label>Status<select id="edit-status"><option value="scheduled">Scheduled</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></label></div>
+<div class="editor-grid"><label>Starts (your device time)<input id="edit-start" type="datetime-local" required></label><label>Ends (your device time)<input id="edit-end" type="datetime-local" required></label></div>
+<label>Related secure room (optional)<select id="edit-room"><option value="">No room linked</option></select></label>
+<label>Notes (private)<textarea id="edit-notes" rows="3" maxlength="4000" placeholder="Brief agenda or instructions"></textarea></label>
+<div class="foot"><button class="primary" id="save" type="submit">Save event</button><button id="cancel" type="button">Cancel</button></div>
+<p class="hint">Calendar records do not automatically create Google Meet links or send invitations. Link an existing room when needed.</p></form></section>
+</div>
+</div>
+<footer>MX Continuity · Private company calendar · The Urban Matrix Lab LLC · <a href="../privacy.html">Privacy</a></footer>
+</section>
+</main>
+<script>
+"use strict";
+(() => {
+  const url="https://xdaxbueyftyljsrhabpx.supabase.co";
+  const key="sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ";
+  const $=id=>document.getElementById(id);
+  const zone="America/Denver";
+  const todayISO=()=>new Intl.DateTimeFormat("en-CA",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+  const dateKey=iso=>new Intl.DateTimeFormat("en-CA",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date(iso));
+  const fmtDate=iso=>new Intl.DateTimeFormat("en-US",{timeZone:zone,month:"short",day:"numeric",year:"numeric"}).format(new Date(iso));
+  const fmtTime=iso=>new Intl.DateTimeFormat("en-US",{timeZone:zone,hour:"numeric",minute:"2-digit",timeZoneName:"short"}).format(new Date(iso));
+  const make=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n};
+  const show=(id,yes)=>{$(id).hidden=!yes};
+  let db,owner=false,staff=false,events=[],rooms=[],month="",selected="";
+  function notice(message){$("notice").textContent=message;show("notice",true);}
+  function clearNotice(){show("notice",false)}
+  function monthStart(value){return value.slice(0,7)+"-01";}
+  function pad(n){return String(n).padStart(2,"0")}
+  function fromParts(y,m,d){return y+"-"+pad(m)+"-"+pad(d)}
+  function sorted(){return events.slice().sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at))}
+  function todayAtBrowserTime(s){const d=new Date(s);return fromParts(d.getFullYear(),d.getMonth()+1,d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes())}
+  function appendEvent(root,e){
+    const item=make("div","item");
+    const top=make("div","item-top"),name=make("strong","",e.title),tag=make("span","tag",e.category);
+    top.append(name,tag);item.append(top);
+    item.append(make("small","",fmtTime(e.starts_at)+" · "+e.status));
+    if(e.notes)item.append(make("p","hint",e.notes.length>180?e.notes.slice(0,177)+"…":e.notes));
+    const actions=make("div","actions");
+    if(e.room_id && rooms.some(r=>r.id===e.room_id)){
+      const a=make("a","","Open secure room");a.href="../live/";actions.append(a);
+    }
+    if(owner){
+      const b=make("button","","Edit");b.type="button";b.addEventListener("click",()=>edit(e));actions.append(b);
+    }
+    if(actions.childNodes.length)item.append(actions);
+    root.append(item);
+  }
+  function render(){
+    const [year,mo]=month.split("-").map(Number);const first=new Date(Date.UTC(year,mo-1,1));
+    const count=new Date(Date.UTC(year,mo,0)).getUTCDate();
+    const start=first.getUTCDay();const root=$("dates");root.replaceChildren();
+    $("month-label").textContent=new Intl.DateTimeFormat("en-US",{month:"long",year:"numeric",timeZone:"UTC"}).format(first);
+    for(let cell=0;cell<42;cell++){
+      const day=cell-start+1;const valid=day>=1&&day<=count;
+      const iso=fromParts(year,mo,day);
+      const date=new Date(Date.UTC(year,mo-1,day));
+      const key=fromParts(date.getUTCFullYear(),date.getUTCMonth()+1,date.getUTCDate());
+      const relevant=events.filter(e=>dateKey(e.starts_at)===key);
+      const b=make("button","day"+(!valid?" outside":"")+(key===todayISO()?" today":"")+(key===selected?" selected":""),undefined);
+      b.type="button";b.setAttribute("aria-label",key+", "+relevant.length+" events");b.append(make("span","day-num",String(date.getUTCDate())));
+      if(relevant.length){
+        const dots=make("span","dots");
+        for(const e of relevant.slice(0,5))dots.append(make("span","dot "+e.category));
+        b.append(dots);
+        for(const e of relevant.slice(0,2))b.append(make("span","day-event",e.title));
+        if(relevant.length>2)b.append(make("span","day-event more","+"+(relevant.length-2)+" more"));
+      }
+      b.addEventListener("click",()=>{selected=key;month=monthStart(key);render()});root.append(b);
+    }
+    $("selected-label").textContent=fmtDate(selected+"T12:00:00Z");
+    const chosen=sorted().filter(e=>dateKey(e.starts_at)===selected);
+    $("selected-total").textContent=chosen.length+" event"+(chosen.length===1?"":"s");
+    $("agenda").replaceChildren();
+    if(!chosen.length)$("agenda").append(make("p","empty","Nothing scheduled for this date."));
+    for(const e of chosen)appendEvent($("agenda"),e);
+    const now=Date.now(),upcoming=sorted().filter(e=>e.status==="scheduled"&&Date.parse(e.ends_at)>=now).slice(0,6);
+    $("upcoming-count").textContent=sorted().filter(e=>e.status==="scheduled"&&Date.parse(e.ends_at)>=now).length;
+    $("upcoming").replaceChildren();
+    if(!upcoming.length)$("upcoming").append(make("p","empty","No upcoming calendar entries."));
+    for(const e of upcoming)appendEvent($("upcoming"),e);
+  }
+  async function reload(){
+    if(!staff)return;
+    $("refresh").disabled=true;clearNotice();
+    try{
+      const [cal,rs]=await Promise.all([
+        db.from("mx_company_calendar_events").select("id,title,category,starts_at,ends_at,status,notes,room_id").order("starts_at",{ascending:true}).limit(1000),
+        db.from("mx_live_rooms").select("id,title,audience,starts_at,ends_at,status").limit(150)
+      ]);
+      if(cal.error)throw cal.error;
+      if(rs.error)throw rs.error;
+      rooms=rs.data||[];events=cal.data||[];
+      const select=$("edit-room");select.replaceChildren();
+      const none=make("option","","No room linked");none.value="";select.append(none);
+      for(const r of rooms){const o=make("option","",r.title+" ("+r.audience+")");o.value=r.id;select.append(o)}
+      render();
+    }catch(e){notice("Calendar could not load: "+(e.message||String(e)));}
+    finally{$("refresh").disabled=false;}
+  }
+  function edit(e){
+    if(!owner)return;
+    show("editor",true);$("edit-id").value=e?.id||"";
+    $("edit-title").value=e?.title||"";
+    $("edit-category").value=e?.category||"meeting";
+    $("edit-status").value=e?.status||"scheduled";
+    const start=e?new Date(e.starts_at):new Date();const end=e?new Date(e.ends_at):new Date(Date.now()+60*60*1000);
+    $("edit-start").value=todayAtBrowserTime(start);$("edit-end").value=todayAtBrowserTime(end);
+    $("edit-room").value=e?.room_id||"";$("edit-notes").value=e?.notes||"";
+    $("editor").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  async function save(e){
+    e.preventDefault();if(!owner)return;
+    const id=$("edit-id").value,title=$("edit-title").value.trim();
+    const start=new Date($("edit-start").value),end=new Date($("edit-end").value);
+    if(title.length<3||!Number.isFinite(+start)||!Number.isFinite(+end)||end<=start){notice("Enter a title and an end time after the start.");return;}
+    const payload={title,category:$("edit-category").value,status:$("edit-status").value,
+      starts_at:start.toISOString(),ends_at:end.toISOString(),room_id:$("edit-room").value||null,
+      notes:$("edit-notes").value.trim(),updated_at:new Date().toISOString()};
+    $("save").disabled=true;
+    try{
+      const r=id?await db.from("mx_company_calendar_events").update(payload).eq("id",id).select("id").single():
+        await db.from("mx_company_calendar_events").insert(payload).select("id").single();
+      if(r.error)throw r.error;
+      show("editor",false);selected=dateKey(payload.starts_at);month=monthStart(selected);
+      await reload();notice("Calendar event saved.");
+    }catch(err){notice("Unable to save event: "+(err.message||String(err)));}
+    finally{$("save").disabled=false;}
+  }
+  async function access(user){
+    if(!user){staff=false;owner=false;show("workspace",false);show("denied",false);show("gate",true);return;}
+    const r=await db.from("veil_memberships").select("role,active").eq("user_id",user.id).maybeSingle();
+    if(r.error){notice("Unable to check calendar permissions.");return;}
+    const roles={origin:6,council:5,architect:4,operator:3,member:2,guest:1};
+    const rank=r.data?.active?(roles[r.data.role]||0):0;
+    staff=rank>=3;owner=rank>=6;
+    show("gate",false);show("denied",!staff);show("workspace",staff);show("owner",owner);
+    if(staff){selected=todayISO();month=monthStart(selected);await reload()}
+  }
+  async function start(){
+    ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>$("weekdays").append(make("div","weekday",d)));
+    selected=todayISO();month=monthStart(selected);
+    if(!window.supabase?.createClient){notice("Secure calendar sign-in could not load. Refresh the page.");return;}
+    db=window.supabase.createClient(url,key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    $("signin-form").addEventListener("submit",async e=>{
+      e.preventDefault();const b=$("signin-form").querySelector("button");b.disabled=true;
+      try{
+        const r=await db.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});
+        if(r.error)throw r.error;$("password").value="";await access(r.data.user);
+      }catch(err){notice("Sign-in failed: "+(err.message||String(err)));}
+      finally{b.disabled=false;}
+    });
+    const signout=async()=>{await db.auth.signOut();await access(null)};
+    $("signout").addEventListener("click",signout);
+    $("denied-signout").addEventListener("click",signout);
+    $("refresh").addEventListener("click",reload);
+    $("previous").addEventListener("click",()=>{const [y,m]=month.split("-").map(Number);month=monthStart(fromParts(y,m-1,1));render()});
+    $("next").addEventListener("click",()=>{const [y,m]=month.split("-").map(Number);month=monthStart(fromParts(y,m+1,1));render()});
+    $("today").addEventListener("click",()=>{selected=todayISO();month=monthStart(selected);render()});
+    $("add").addEventListener("click",()=>edit(null));$("cancel").addEventListener("click",()=>show("editor",false));
+    $("editor").addEventListener("submit",save);
+    db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")setTimeout(()=>access(null),0);if(event==="SIGNED_IN")setTimeout(()=>access(session?.user||null),0)});
+    const r=await db.auth.getUser();await access(r.data?.user||null);
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>start().catch(e=>notice("Calendar unavailable: "+e.message)),{once:true});
+  else start().catch(e=>notice("Calendar unavailable: "+e.message));
+})();
+</script>
+</body>
+</html>
