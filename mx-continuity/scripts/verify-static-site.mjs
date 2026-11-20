@@ -28,7 +28,7 @@ check(liveScript.includes('mx-live-invite') && liveScript.includes('Video meetin
 check(liveScript.includes("meet.google.com") && liveScript.includes("isMeetingURL"),"Google Meet provider support missing");
 check(livePage.includes("Zoom or Google Meet"),"customer-facing video provider disclosure missing");
 // Require a versioned private-room script so browser caches update with releases, without pinning one dated version forever.
-const liveScriptRef=livePage.match(/<script[^>]+src="live\\.js\\?v=([A-Za-z0-9._-]{8,})"[^>]*><\\/script>/i);
+const liveScriptRef=livePage.match(/src="live[.]js[?]v=([A-Za-z0-9._-]{8,})"/i);
 check(Boolean(liveScriptRef) && liveScriptRef[1]!=="20261117-owner-link",
   "video and group chat app cache not refreshed");
 
