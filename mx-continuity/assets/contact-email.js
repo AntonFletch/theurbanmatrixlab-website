@@ -10,7 +10,6 @@
   let requestId = null;
   let pending = false;
   let completed = false;
-  let lastMailto = null;
   const notify = message => { if (status) status.textContent = message; };
 
   const params = new URLSearchParams(location.search);
@@ -25,7 +24,6 @@
     if (completed) {
       completed = false;
       requestId = null;
-      lastMailto = null;
       button.textContent = "Submit project inquiry";
       notify("Review your details and submit to the secure inquiry records.");
     }
@@ -33,7 +31,10 @@
 
   button.addEventListener("click", async () => {
     if (pending) return;
-    if (completed && lastMailto) { window.location.href = lastMailto; return; }
+    if (completed) {
+      notify("This inquiry has already been received. Edit the form to submit a new request.");
+      return;
+    }
     if (!form.reportValidity()) return;
     if (!form.elements.contact_consent.checked) {
       notify("Please acknowledge the Privacy Policy before submitting.");
@@ -80,39 +81,10 @@
           "The system could not confirm saving your inquiry. Nothing has been marked as received.");
       }
       completed = true;
-      const leadId = result.inquiry_id;
-      const ownerLink = location.origin + "/master.html?lead=" + encodeURIComponent(leadId) + "#customers";
-      const subject = "MX Continuity project inquiry — " + plan.split(" — ")[0];
-      const body = [
-        "MX Continuity — Project Inquiry",
-        "",
-        "Inquiry reference: " + leadId,
-        "Owner record: " + ownerLink,
-        "",
-        "Name: " + name,
-        "Contact email: " + email,
-        "Business: " + business,
-        "Package: " + plan,
-        "",
-        "Project details:",
-        details,
-        "",
-        "Inquiry only — no order, payment, or subscription."
-      ].join("\n");
-      const mailto = "mailto:TheUrbanMatrixLab@outlook.com?subject=" +
-        encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-      lastMailto = mailto;
-      if (status) {
-        status.replaceChildren();
-        status.append(document.createTextNode("Saved securely (reference " + leadId.slice(0, 8) +
-          "). An email copy is prepared. Press Send in your email app to deliver the email copy. "));
-        const fallback = document.createElement("a");
-        fallback.href = mailto;
-        fallback.textContent = "Open email copy again";
-        status.append(fallback);
-      }
-      button.textContent = "Open email copy again";
-      window.location.href = mailto;
+      button.textContent = "Inquiry received";
+      notify("Inquiry received and saved securely. Reference: " +
+        result.inquiry_id.slice(0, 8) + ". No email app or second send is needed. " +
+        "The MX Continuity team will reply to the email you provided.");
     } catch (error) {
       notify(error.message || "Submission was not confirmed. Try again; we will not create duplicate records for retries.");
     } finally {
