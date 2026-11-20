@@ -89,6 +89,7 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
   function monthStart(value){return value.slice(0,7)+"-01";}
   function pad(n){return String(n).padStart(2,"0")}
   function fromParts(y,m,d){return y+"-"+pad(m)+"-"+pad(d)}
+  function shiftMonth(value,step){const [y,m]=value.split("-").map(Number);const d=new Date(Date.UTC(y,m-1+step,1));return fromParts(d.getUTCFullYear(),d.getUTCMonth()+1,1)}
   function sorted(){return events.slice().sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at))}
   function todayAtBrowserTime(s){const d=new Date(s);return fromParts(d.getFullYear(),d.getMonth()+1,d.getDate())+"T"+pad(d.getHours())+":"+pad(d.getMinutes())}
   function appendEvent(root,e){
@@ -215,8 +216,8 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
     $("signout").addEventListener("click",signout);
     $("denied-signout").addEventListener("click",signout);
     $("refresh").addEventListener("click",reload);
-    $("previous").addEventListener("click",()=>{const [y,m]=month.split("-").map(Number);month=monthStart(fromParts(y,m-1,1));render()});
-    $("next").addEventListener("click",()=>{const [y,m]=month.split("-").map(Number);month=monthStart(fromParts(y,m+1,1));render()});
+    $("previous").addEventListener("click",()=>{month=shiftMonth(month,-1);render()});
+    $("next").addEventListener("click",()=>{month=shiftMonth(month,1);render()});
     $("today").addEventListener("click",()=>{selected=todayISO();month=monthStart(selected);render()});
     $("add").addEventListener("click",()=>edit(null));$("cancel").addEventListener("click",()=>show("editor",false));
     $("editor").addEventListener("submit",save);
