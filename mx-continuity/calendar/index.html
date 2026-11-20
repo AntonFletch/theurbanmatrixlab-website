@@ -99,7 +99,12 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
     top.append(name,tag);item.append(top);
     item.append(make("small","",fmtTime(e.starts_at)+" · "+e.status));
     if(e.notes)item.append(make("p","hint",e.notes.length>180?e.notes.slice(0,177)+"…":e.notes));
-    const actions=make("div","actions");
+    const toUtc=s=>new Date(s).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}Z$/,"Z");
+    const query=new URLSearchParams({action:"TEMPLATE",text:"MX Continuity — "+e.title,dates:toUtc(e.starts_at)+"/"+toUtc(e.ends_at),ctz:"America/Denver",details:"MX Continuity company event. Open the private workspace to view room access."});
+    const phone=make("a","","Add to phone calendar");
+    phone.href="https://calendar.google.com/calendar/render?"+query.toString();phone.target="_blank";phone.rel="noopener noreferrer";
+
+    const actions=make("div","actions");actions.append(phone);
     if(e.room_id && rooms.some(r=>r.id===e.room_id)){
       const a=make("a","","Open secure room");a.href="../live/";actions.append(a);
     }
