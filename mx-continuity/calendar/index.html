@@ -49,7 +49,7 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
 </section>
 <section id="denied" class="card gate" hidden><h1>Restricted calendar</h1><p>Only authorized MX Continuity staff can view company records. Client and guest room access does not include the company calendar.</p><button id="denied-signout" class="secondary" type="button">Sign out</button></section>
 <section id="workspace" hidden>
-<div class="toolbar"><div><span class="eyebrow">MX CONTINUITY · COMPANY CALENDAR</span><h1>Schedule &amp; Meetings</h1><p class="muted">Private records · Times shown in Missoula (Mountain time)</p></div><div class="controls"><button id="refresh" type="button">Refresh</button><button id="signout" type="button">Sign out</button></div></div>
+<div class="toolbar"><div><span class="eyebrow">MX CONTINUITY · COMPANY CALENDAR</span><h1>Schedule &amp; Meetings</h1><p class="muted">Private records · Times shown in Missoula (Mountain time)</p></div><div class="controls"><button id="quick-add" class="primary" type="button" hidden>+ Add to Calendar</button><button id="refresh" type="button">Refresh</button><button id="signout" type="button">Sign out</button></div></div>
 <div class="main-grid">
 <section class="card calendar" aria-label="Monthly calendar"><div class="summary" style="margin-bottom:14px"><button id="previous" aria-label="Previous month" type="button">‹</button><span class="title-month" id="month-label">Month</span><div class="controls"><button id="today" type="button">Today</button><button id="next" aria-label="Next month" type="button">›</button></div></div>
 <div id="weekdays" class="weekdays"></div><div id="dates" class="dates"></div>
@@ -57,13 +57,13 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
 <div class="side">
 <section class="card"><div class="summary"><div><span class="eyebrow">SELECTED DATE</span><h2 id="selected-label" style="margin:8px 0">Today</h2></div><span id="selected-total" class="tag">0 events</span></div><div id="agenda" aria-live="polite"></div></section>
 <section class="card"><div class="summary"><div><span class="eyebrow">UPCOMING</span><h2 style="margin:8px 0">Company work</h2></div><span class="big" id="upcoming-count">0</span></div><div id="upcoming"></div></section>
-<section id="owner" class="card" hidden><div class="summary"><div><span class="eyebrow">OWNER ONLY</span><h2 style="margin:8px 0">Manage calendar</h2></div><button id="add" class="primary" type="button">+ New event</button></div>
+<section id="owner" class="card" hidden><div class="summary"><div><span class="eyebrow">OWNER ONLY</span><h2 style="margin:8px 0">Manage calendar</h2></div><button id="add" class="primary" type="button">+ Add to Calendar</button></div>
 <form id="editor" class="editor" hidden><input id="edit-id" type="hidden"><label>Event title<input id="edit-title" minlength="3" maxlength="160" required placeholder="Team meeting"></label>
 <div class="editor-grid"><label>Type<select id="edit-category"><option value="meeting">Meeting</option><option value="appointment">Appointment</option><option value="care">Website care</option><option value="operations">Operations</option><option value="deadline">Deadline</option></select></label><label>Status<select id="edit-status"><option value="scheduled">Scheduled</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select></label></div>
 <div class="editor-grid"><label>Starts (your device time)<input id="edit-start" type="datetime-local" required></label><label>Ends (your device time)<input id="edit-end" type="datetime-local" required></label></div>
 <label>Related secure room (optional)<select id="edit-room"><option value="">No room linked</option></select></label>
 <label>Notes (private)<textarea id="edit-notes" rows="3" maxlength="4000" placeholder="Brief agenda or instructions"></textarea></label>
-<div class="foot"><button class="primary" id="save" type="submit">Save event</button><button id="cancel" type="button">Cancel</button></div>
+<div class="foot"><button class="primary" id="save" type="submit">Save to Company Calendar</button><button id="cancel" type="button">Cancel</button></div>
 <p class="hint">Calendar records do not automatically create Google Meet links or send invitations. Link an existing room when needed.</p></form></section>
 </div>
 </div>
@@ -84,6 +84,7 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
   const make=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n};
   const show=(id,yes)=>{$(id).hidden=!yes};
   let db,owner=false,staff=false,events=[],rooms=[],month="",selected="";
+  let initialRoom= new URLSearchParams(location.search).get("room");
   function notice(message){$("notice").textContent=message;show("notice",true);}
   function clearNotice(){show("notice",false)}
   function monthStart(value){return value.slice(0,7)+"-01";}
@@ -157,6 +158,18 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
       const none=make("option","","No room linked");none.value="";select.append(none);
       for(const r of rooms){const o=make("option","",r.title+" ("+r.audience+")");o.value=r.id;select.append(o)}
       render();
+      if(initialRoom && owner){
+        const r=rooms.find(x=>x.id===initialRoom);
+        initialRoom=null;
+        if(r){
+          edit(null);
+          $("edit-title").value=(r.title.length>150?r.title.slice(0,150):r.title);
+          $("edit-category").value=r.audience==="client"?"appointment":"meeting";
+          $("edit-room").value=r.id;
+          $("edit-notes").value="Private meeting in MX Continuity secure rooms. Open the linked room to join."; 
+          notice("Meeting details ready. Set the date and time, then tap Save to Company Calendar.");
+        }else notice("This room is not available for your account.");
+      }
     }catch(e){notice("Calendar could not load: "+(e.message||String(e)));}
     finally{$("refresh").disabled=false;}
   }
@@ -196,7 +209,7 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
     const roles={origin:6,council:5,architect:4,operator:3,member:2,guest:1};
     const rank=r.data?.active?(roles[r.data.role]||0):0;
     staff=rank>=3;owner=rank>=6;
-    show("gate",false);show("denied",!staff);show("workspace",staff);show("owner",owner);
+    show("gate",false);show("denied",!staff);show("workspace",staff);show("owner",owner);show("quick-add",owner);
     if(staff){selected=todayISO();month=monthStart(selected);await reload()}
   }
   async function start(){
@@ -219,7 +232,7 @@ footer{margin:28px 0;color:var(--muted);font-size:.8rem}
     $("previous").addEventListener("click",()=>{month=shiftMonth(month,-1);render()});
     $("next").addEventListener("click",()=>{month=shiftMonth(month,1);render()});
     $("today").addEventListener("click",()=>{selected=todayISO();month=monthStart(selected);render()});
-    $("add").addEventListener("click",()=>edit(null));$("cancel").addEventListener("click",()=>show("editor",false));
+    $("add").addEventListener("click",()=>edit(null));$("quick-add").addEventListener("click",()=>edit(null));$("cancel").addEventListener("click",()=>show("editor",false));
     $("editor").addEventListener("submit",save);
     db.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT")setTimeout(()=>access(null),0);if(event==="SIGNED_IN")setTimeout(()=>access(session?.user||null),0)});
     const r=await db.auth.getUser();await access(r.data?.user||null);
