@@ -59,7 +59,9 @@ check(read("privacy.html").includes("Smith.ai website chat"),"Smith.ai chat priv
 check(contact.includes('id="email-inquiry-btn"'),"working inquiry email action missing");
 check(contact.includes('name="contact_consent"'),"inquiry privacy consent missing");
 check(contact.includes("assets/contact-email.js"),"inquiry email script missing");
-check(contactJs.includes("mailto:TheUrbanMatrixLab@outlook.com"),"inquiry email recipient missing");
+check(contact.includes("mailto:TheUrbanMatrixLab@outlook.com"),"contact email fallback missing");
+new vm.Script(contactJs,{filename:"assets/contact-email.js"});
+check(!contactJs.includes("window.location.href") && contactJs.includes('button.textContent = "Inquiry received"'),"public inquiry must confirm secure submission without forcing customer email");
 check(contactJs.includes("/functions/v1/mx-project-inquiry")&&contactJs.includes("request_id")&&contactJs.includes("contact_consent")&&contactJs.includes("result.ok !== true"),"secure project inquiry endpoint, request id, consent or save check missing");
 check(contact.includes("Submit project inquiry")&&contact.includes('name="company_website"'),"inquiry button or spam trap missing");
 check(contactJs.includes("form"),"inquiry email script malformed");
@@ -82,7 +84,7 @@ for(const file of ["project-order.html","monthly-care-authorization.html"]){
 const legalPages=["terms.html","ownership.html","refunds.html","cancellation.html","privacy.html"];
 for(const file of legalPages){
  const html=read(file);
- check(html.includes(file==="privacy.html"?"November 16, 2026":"November 9, 2026"),"policy lacks current effective/update date: "+file);
+ check(html.includes(file==="privacy.html"?"November 20, 2026":"November 9, 2026"),"policy lacks current effective/update date: "+file);
  check(!/Version 1\.0|Version 2\.0|Before publishing this notice|temporary business contact|draft for review|must be verified before this agreement/i.test(html),
    "policy has draft instructions or temporary information: "+file);
 }
@@ -124,7 +126,7 @@ check(read("cancellation.html").includes("is effective for that upcoming renewal
 check(!read("cancellation.html").includes("becomes effective for that renewal;"),"cancellation clause contains old sentence error");
 check(read("cancellation.html").includes("Cancel%20MX%20monthly%20care"),"direct cancellation route missing");
 check(read("refunds.html").includes("Refund%20Request"),"direct refund contact missing");
-check(read("privacy.html").includes("email application") && read("privacy.html").includes("protected MX Continuity record system"),"new website-form storage and optional email-copy disclosure missing");
+check(read("privacy.html").includes("email application") && read("privacy.html").includes("protected MX Continuity record system") && read("privacy.html").includes("Internal owner notifications"),"website form handling and owner notification disclosure missing");
 const htmls=fs.readdirSync(root).filter(f=>f.endsWith(".html"));
 let references=0;
 for(const file of htmls){
