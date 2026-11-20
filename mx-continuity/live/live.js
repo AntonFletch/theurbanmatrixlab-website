@@ -77,6 +77,7 @@
     $("manage-room").hidden=!state.owner||!r;
     if(!r){root.append(node("h2","","Select a private room."),node("p","","Only authorized appointments and chats appear here."));return;}
     root.append(node("span","pill",label[r.audience]+" • "+r.status),node("h2","",r.title),node("p","",stamp(r.starts_at)+" – "+stamp(r.ends_at)));
+    if(state.owner){const saveToCal=node("a","secondary","Save to Company Calendar");saveToCal.href="../calendar/?room="+encodeURIComponent(r.id);saveToCal.style.cssText="display:inline-block;text-decoration:none;border:1px solid #675272;border-radius:10px;padding:10px 15px;margin:0 0 15px";root.append(saveToCal);}
     const canEnter=active(r);
     $("stage-title").textContent=canEnter?"Your private video meeting":"Appointment room locked";
     $("stage-status").textContent=canEnter?"Room is open. Only approved attendees can join.":r.status==="closed"?"This appointment is closed.":r.status==="scheduled"?"Waiting for the host to open this room.":"Access is available only during the appointment window.";
