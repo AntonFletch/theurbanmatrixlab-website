@@ -63,6 +63,11 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./mx-continuity
+      # GitHub sometimes reports the newly uploaded Pages artifact as missing for a few seconds.
+      # Give its metadata time to propagate before deploy-pages queries the run artifacts API.
+      - name: Allow Pages artifact metadata to propagate
+        shell: bash
+        run: sleep 15
       - name: Publish original approved website
         id: deployment
         uses: actions/deploy-pages@v4
