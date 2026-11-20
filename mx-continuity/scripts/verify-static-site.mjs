@@ -2,6 +2,7 @@ import fs from "node:fs";
 import vm from "node:vm";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
+import "./verify-inquiry-flow.mjs";
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 function check(ok,why){if(!ok)throw new Error("MX Continuity QA FAIL: "+why);}
@@ -11,7 +12,7 @@ const required=[
  "monthly-care-authorization.html","change-order.html","404.html","assets/site.js","assets/style.css",
  "assets/contact-email.js","assets/support-email.js","assets/intake-config.js",
  "assets/support-config.js","assets/mx-logo-horizontal.svg","assets/mx-hero-laptop.webp",
- "live/index.html","live/live.css","live/live.js"
+ "live/index.html","live/live.css","live/live.js", "scripts/verify-inquiry-flow.mjs"
 ];
 for(const file of required)check(fs.existsSync(path.join(root,file)),"missing "+file);
 const home=read("index.html"),site=read("assets/site.js"),contact=read("contact.html");
