@@ -8,7 +8,7 @@
   const $ = (id) => document.getElementById(id);
   const fmt = (value) => value ? new Date(value).toLocaleString("en-US", {dateStyle:"medium",timeStyle:"short",timeZone:"America/Denver"}) + " MT" : "Not recorded";
   const stamp = (value) => value ? new Date(value).toLocaleDateString("en-US", {month:"short",day:"numeric",year:"numeric",timeZone:"UTC"}) : "Not scheduled";
-  const state = { user:null,clients:[],targets:[],checks:[],inquiries:[],tickets:[],comments:[],selectedClient:"all",selectedCheck:null,tab:"overview",busy:false,isStaff:false,draft:"" };
+  const state = { user:null,clients:[],targets:[],checks:[],inquiries:[],tickets:[],comments:[],selectedClient:"all",selectedCheck:null,tab:"overview",busy:false,isStaff:false,calendar:[],calendarError:"",draft:"" };
   let db=null, timer=null, toastTimer=null;
   function element(tag, cls, text) {const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=String(text);return e;}
   function empty(message){return element("p","empty",message);}
@@ -46,7 +46,7 @@
   }
   function setTab(tab){
     state.tab=tab;
-    const names={overview:"Overview",checkups:"Checkups",inquiries:"Customer inquiries",support:"Support"};
+    const names={overview:"Overview",checkups:"Checkups",inquiries:"Customer inquiries",support:"Support",calendar:"Company Calendar"};
     document.querySelectorAll(".nav").forEach(button=>button.classList.toggle("active",button.dataset.tab===tab));
     document.querySelectorAll(".panel").forEach(panel=>panel.hidden=panel.id!==tab);
     $("page-title").textContent=names[tab]||"Overview";
@@ -54,7 +54,8 @@
       overview:"Your website operations at a glance.",
       checkups:"Follow actual automated checks and talk through each result.",
       inquiries:"See and manage inquiries from your own customer website.",
-      support:"See maintenance issues and support history."
+      support:"See maintenance issues and support history.",
+      calendar:"Save company appointments and meetings to your phone calendar."
     }[tab];
     render();
   }
@@ -153,11 +154,40 @@
       b.append(head,element("span","meta",clientName(t.client_id)+" · "+(t.ticket_code||"Ticket")+" · "+fmt(t.created_at)),element("p","",t.description||"No further details"),element("span","meta","Priority: "+(t.priority||"normal")));return b;});
     replace("ticket-list",rows.length?rows:[empty("No support tickets for this business. If you have a website problem, use Contact support.")]);
   }
-  function render(){renderOverview();renderCheckList();renderDetail();renderInquiries();renderTickets();}
+
+  function googleCalendarUrl(e){
+    const toUtc=s=>new Date(s).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}Z$/,"Z");
+    const p=new URLSearchParams({action:"TEMPLATE",text:"MX Continuity — "+e.title,dates:toUtc(e.starts_at)+"/"+toUtc(e.ends_at),ctz:"America/Denver",details:"MX Continuity company calendar appointment. Check your secure workspace for room access."});
+    return "https://calendar.google.com/calendar/render?"+p.toString();
+  }
+  function renderCalendar(){
+    const root=$("calendar-list");if(!root)return;
+    if(!state.isStaff){root.replaceChildren(empty("Staff-only calendar."));return;}
+    if(state.calendarError){root.replaceChildren(empty("Unable to load company calendar: "+state.calendarError));return;}
+    const rows=state.calendar.filter(e=>e.status!=="cancelled").sort((a,b)=>Date.parse(a.starts_at)-Date.parse(b.starts_at));
+    if(!rows.length){root.replaceChildren(empty("No company events recorded yet. Create an event in the company calendar first."));return;}
+    root.replaceChildren(...rows.map(e=>{
+      const box=element("article","item");
+      const top=element("div","item-header");top.append(element("strong","",e.title),pill(e.category||"meeting"));
+      box.append(top,element("span","meta",fmt(e.starts_at)+" – "+fmt(e.ends_at)+" · "+e.status));
+      const a=element("a","btn primary","Add to phone calendar");
+      a.href=googleCalendarUrl(e);a.target="_blank";a.rel="noopener noreferrer";
+      a.style.marginTop="12px";
+      a.setAttribute("aria-label","Add "+e.title+" to Google Calendar on your phone");
+      box.append(a);return box;
+    }));
+  }
+  async function loadCalendar(){
+    if(!state.isStaff){state.calendar=[];state.calendarError="";return;}
+    const {data,error}=await db.from("mx_company_calendar_events").select("id,title,category,starts_at,ends_at,status").order("starts_at",{ascending:true}).limit(200);
+    state.calendar=error?[]:(data||[]);state.calendarError=error?error.message:"";
+  }
+  function render(){renderOverview();renderCheckList();renderDetail();renderInquiries();renderTickets();renderCalendar();}
   async function refresh(){
     if(!state.user||state.busy)return;
     const input=$("comment-text");if(input)state.draft=input.value;
     state.busy=true;$("connection").textContent="Updating records…";
+    await loadCalendar();
     try{
       const {data:clients,error:ce}=await db.from("veil_clients").select("id,business_name,domain,project_status,package_name,recurring_plan").order("business_name").limit(200);
       if(ce)throw ce;state.clients=clients||[];
@@ -195,8 +225,10 @@
     $("signin").hidden=!!user;$("workspace").hidden=!user;$("refresh").hidden=!user;$("signout").hidden=!user;
     if(!user){$("connection").textContent="Private workspace";return;}
     const {data:member}=await db.from("veil_memberships").select("role,active").eq("user_id",user.id).maybeSingle();
-    state.isStaff=!!(member?.active&&["owner","admin","manager","staff","operator"].includes(member.role));
+    state.isStaff=!!(member?.active&&["origin","council","architect","operator","owner","admin","manager","staff"].includes(member.role));
     $("account-type").textContent=state.isStaff?"MX CONTINUITY · TEAM":"MX CONTINUITY · CLIENT";
+    $("calendar-nav").hidden=!state.isStaff;
+    if(!state.isStaff&&state.tab==="calendar")setTab("overview");
     await refresh();timer=setInterval(refresh,CONFIG.refreshMs);
   }
   async function signIn(event){
