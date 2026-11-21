@@ -39,7 +39,7 @@ function createHarness({ valid=true, consent=true, failFirst=false }={}) {
     document:{getElementById(id){
       return {"inquiry-form":form,"email-inquiry-btn":button,"form-status":status}[id]||null;
     }},
-    URLSearchParams,location,
+    URL,URLSearchParams,location,
     crypto:{randomUUID:()=> `aaaaaaaa-aaaa-4aaa-8aaa-${String(++ids).padStart(12,"0")}`},
     fetch:async (url,options)=>{
       assert(url==="https://xdaxbueyftyljsrhabpx.supabase.co/functions/v1/mx-project-inquiry","unexpected endpoint");
