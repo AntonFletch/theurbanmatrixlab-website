@@ -35,6 +35,7 @@ function createHarness({ valid=true, consent=true, failFirst=false }={}) {
   let ids = 0;
   const location = { search:"?package=basic",origin:"https://theurbanmatrixlab.com",href:"https://theurbanmatrixlab.com/mx-continuity/contact.html" };
   const mock = {
+    window:{MX_INTAKE_CONFIG:{enabled:true,allowedOrigin:"https://theurbanmatrixlab.com",supabaseUrl:"https://xdaxbueyftyljsrhabpx.supabase.co",publishableKey:"sb_publishable_test"}},
     document:{getElementById(id){
       return {"inquiry-form":form,"email-inquiry-btn":button,"form-status":status}[id]||null;
     }},
