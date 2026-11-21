@@ -3,8 +3,14 @@ import vm from "node:vm";
 
 const source = fs.readFileSync(new URL("../assets/contact-email.js", import.meta.url), "utf8");
 const assert = (condition, why) => { if (!condition) throw Error("MX inquiry flow FAIL: " + why); };
+const validIntake={
+  enabled:true,
+  allowedOrigin:"https://theurbanmatrixlab.com",
+  supabaseUrl:"https://xdaxbueyftyljsrhabpx.supabase.co",
+  publishableKey:"sb_publishable_test"
+};
 
-function createHarness({ valid=true, consent=true, failFirst=false }={}) {
+function createHarness({ valid=true, consent=true, failFirst=false, intake=validIntake }={}) {
   const callbacks = {};
   const buttonCallbacks = {};
   const status = { textContent: "" };
@@ -35,7 +41,7 @@ function createHarness({ valid=true, consent=true, failFirst=false }={}) {
   let ids = 0;
   const location = { search:"?package=basic",origin:"https://theurbanmatrixlab.com",href:"https://theurbanmatrixlab.com/mx-continuity/contact.html" };
   const mock = {
-    window:{MX_INTAKE_CONFIG:{enabled:true,allowedOrigin:"https://theurbanmatrixlab.com",supabaseUrl:"https://xdaxbueyftyljsrhabpx.supabase.co",publishableKey:"sb_publishable_test"}},
+    window:{MX_INTAKE_CONFIG:intake},
     document:{getElementById(id){
       return {"inquiry-form":form,"email-inquiry-btn":button,"form-status":status}[id]||null;
     }},
@@ -51,12 +57,23 @@ function createHarness({ valid=true, consent=true, failFirst=false }={}) {
     }
   };
   vm.runInNewContext(source,mock,{filename:"assets/contact-email.js"});
-  assert(typeof buttonCallbacks.click==="function","submit click handler not installed");
   return {form,button,status,fields,requests,location,
-    click:()=>buttonCallbacks.click(),
+    click:()=>buttonCallbacks.click?.(),
     edit:()=>callbacks.input?.()
   };
 }
+
+const paused=createHarness({intake:{...validIntake,enabled:false}});
+await paused.click();
+assert(paused.button.disabled===true,"disabled intake left inquiry button active");
+assert(paused.button.textContent==="Online inquiries paused","disabled intake lacks paused state");
+assert(paused.status.textContent.includes("Nothing is submitted or saved"),"disabled intake lacks clear notice");
+assert(paused.requests.length===0,"disabled intake submitted to backend");
+
+const wrongOrigin=createHarness({intake:{...validIntake,allowedOrigin:"https://preview.example.invalid"}});
+await wrongOrigin.click();
+assert(wrongOrigin.button.disabled===true,"wrong-origin intake left inquiry button active");
+assert(wrongOrigin.requests.length===0,"wrong-origin intake submitted to backend");
 
 const empty=createHarness({valid:false});
 await empty.click();
