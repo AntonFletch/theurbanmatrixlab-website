@@ -5,12 +5,40 @@
   const status = document.getElementById("form-status");
   if (!form || !button) return;
 
-  const API = "https://xdaxbueyftyljsrhabpx.supabase.co/functions/v1/mx-project-inquiry";
-  const PUBLIC_KEY = "sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ";
+  // Fail closed: the live form must follow the separate prelaunch configuration.
+  // The project and origin checks prevent this switch from routing another site
+  // or a misconfigured preview into MX Continuity's production inquiry endpoint.
+  const config = window.MX_INTAKE_CONFIG;
+  const expectedSupabaseOrigin = "https://xdaxbueyftyljsrhabpx.supabase.co";
+  let supabaseBase = "";
+  try {
+    const parsed = new URL(config?.supabaseUrl || "");
+    if (parsed.protocol === "https:" && parsed.origin === expectedSupabaseOrigin) {
+      supabaseBase = parsed.origin;
+    }
+  } catch {}
+  const intakeReady =
+    config?.enabled === true &&
+    config.allowedOrigin === location.origin &&
+    supabaseBase === expectedSupabaseOrigin &&
+    typeof config.publishableKey === "string" &&
+    config.publishableKey.startsWith("sb_publishable_");
+
+  const notify = message => { if (status) status.textContent = message; };
+  if (!intakeReady) {
+    button.disabled = true;
+    button.textContent = "Online inquiries paused";
+    notify("Online inquiry intake is paused. Nothing is submitted or saved through this form right now. Please use the business email listed on this page.");
+    return;
+  }
+
+  const API = supabaseBase + "/functions/v1/mx-project-inquiry";
+  const PUBLIC_KEY = config.publishableKey;
+  button.disabled = false;
+  button.textContent = "Submit project inquiry";
   let requestId = null;
   let pending = false;
   let completed = false;
-  const notify = message => { if (status) status.textContent = message; };
 
   const params = new URLSearchParams(location.search);
   const requested = (params.get("package") || "").toLowerCase();
