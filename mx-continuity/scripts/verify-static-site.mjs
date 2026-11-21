@@ -64,7 +64,7 @@ check(contact.includes("mailto:TheUrbanMatrixLab@outlook.com"),"contact email fa
 new vm.Script(contactJs,{filename:"assets/contact-email.js"});
 check(!contactJs.includes("window.location.href") && contactJs.includes('button.textContent = "Inquiry received"'),"public inquiry must confirm secure submission without forcing customer email");
 check(contactJs.includes("/functions/v1/mx-project-inquiry")&&contactJs.includes("request_id")&&contactJs.includes("contact_consent")&&contactJs.includes("result.ok !== true"),"secure project inquiry endpoint, request id, consent or save check missing");
-check(contact.includes("Submit project inquiry")&&contact.includes('name="company_website"'),"inquiry button or spam trap missing");
+check(contact.includes("Online inquiries paused")&&contact.includes('disabled=""')&&contact.includes('name="company_website"'),"paused inquiry CTA or spam trap missing");
 check(contactJs.includes("form"),"inquiry email script malformed");
 check(contactJs.includes("reportValidity"),"inquiry validation missing");
 check(support.includes('id="email-support-btn"'),"working support email action missing");
