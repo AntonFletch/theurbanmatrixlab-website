@@ -1,3 +1,10 @@
 /*
   X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
   Cache-Control: no-store
+
+# The independent Jeremy Emmons gallery is public; all other private UMX pages stay blocked.
+/jeremy-emmons/*
+  ! X-Robots-Tag
+  X-Robots-Tag: index, follow, max-image-preview:large
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
