@@ -36,6 +36,51 @@ jobs:
           test "$status" = "200"
           jq -e '.ok == true and .inquiry_storage == "active"' /tmp/health.json
           jq -r '"OWNER EMAIL ALERT: "+.owner_email_alert' /tmp/health.json
+      - name: Browser QA gallery, frame selector, inquiry prefilling and responsive layout
+        run: |
+          mkdir -p /tmp/jeremy-browser-qa
+          cd /tmp/jeremy-browser-qa
+          npm install --no-audit --no-fund --silent playwright@1.56.1
+          npx playwright install --with-deps chromium >/dev/null
+          cat > audit.cjs <<'JS'
+          const { chromium } = require('playwright');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            for(const viewport of [{width:390,height:844},{width:1280,height:800}]){
+              const page=await browser.newPage({viewport});
+              const errors=[];
+              page.on('pageerror',e=>errors.push(e.message));
+              await page.goto('https://theurbanmatrixlab.com/jeremy-emmons/',{waitUntil:'domcontentloaded',timeout:30000});
+              await page.locator('#gallery .art-card').first().waitFor({timeout:15000});
+              if(await page.locator('#gallery .art-card').count()!==10)throw Error('Not 10 paintings');
+              const allLoaded=await page.locator('#gallery .art-photo img').evaluateAll(list=>list.every(img=>img.complete&&img.naturalWidth>0));
+              if(!allLoaded)throw Error('Artwork images did not load');
+              const tilted=await page.locator('.hero-art').evaluate(el=>getComputedStyle(el).transform);
+              if(tilted!=='none')throw Error('Real frame is still rotated: '+tilted);
+              if(await page.locator('meta[name="robots"]').getAttribute('content').then(s=>String(s).includes('noindex')))throw Error('Gallery remains noindexed');
+              const art=page.locator('#gallery .art-card').nth(2);
+              await art.locator('.art-button').click();
+              await page.locator('#artDialog[open]').waitFor();
+              await page.locator('#frameYes').click();
+              await page.locator('#nextFrame').click();
+              await page.locator('#frameConfirm').click();
+              await page.locator('#requestThisArt').click();
+              if(await page.locator('#quickPainting').inputValue()!=='JE-003')throw Error('Wrong painting selected in inquiry');
+              if(await page.locator('#quickFramed').inputValue()!=='framed')throw Error('Frame choice not carried into inquiry');
+              const backupHidden=await page.locator('#quickInquiryBackup').isHidden();
+              if(!backupHidden)throw Error('Backup email shown before failure');
+              await page.locator('#quickSubmit').click();
+              if(await page.locator('#quickName').inputValue()!=='')throw Error('Unexpected form state');
+              if(errors.length)throw Error('JavaScript errors: '+errors.join('; '));
+              const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
+              if(overflow>2)throw Error('Horizontal overflow of '+overflow+'px for viewport '+viewport.width);
+              console.log('PASS',viewport.width,'painting images, frame, inquiry, validation, responsive layout');
+              await page.close();
+            }
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          JS
+          node audit.cjs
       - name: Browser test gallery and real form submit on mobile
         if: github.event_name == 'workflow_dispatch'
         run: |
