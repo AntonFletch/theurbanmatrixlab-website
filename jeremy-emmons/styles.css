@@ -41,3 +41,26 @@
   .mainhead nav button{display:none}
   .identity>span{font-size:26px}
 }
+/* Dedicated Jeremy Emmons inquiry sheet; no checkout or payment fields. */
+.inquiry-section{display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:8%;padding:80px 5.8%;background:#ede8df;scroll-margin-top:20px}
+.inquiry-intro h2{font:normal clamp(36px,4.7vw,61px)/1.12 Georgia,serif;margin:15px 0 24px}
+.inquiry-intro>p:not(.eyebrow){font-size:14px;line-height:1.85;color:#655d53;max-width:410px}
+.quick-inquiry{background:#fffdf9;border:1px solid #d8d0c6;padding:34px 36px;box-shadow:0 8px 20px rgba(35,31,27,.035)}
+.inquiry-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.quick-inquiry label:not(.bot-field){display:block;font-size:12px;color:#504940;font-weight:600;line-height:1.5}
+.quick-inquiry input:not([type=checkbox]),.quick-inquiry select,.quick-inquiry textarea{display:block;width:100%;min-height:44px;margin-top:7px;border:1px solid #c3bbb0;border-radius:2px;background:#fff;padding:10px 11px;color:#292622;font:normal 14px/1.4 system-ui,sans-serif}
+.quick-inquiry input:focus-visible,.quick-inquiry select:focus-visible,.quick-inquiry textarea:focus-visible{outline:2px solid #7e674e;outline-offset:2px}
+.quick-inquiry .optional{font-size:10px;color:#847d74;font-weight:400}
+.inquiry-notes{margin-top:19px}
+.inquiry-consent{display:flex!important;gap:9px;align-items:flex-start;margin:19px 0 14px;font-size:11px!important;line-height:1.6!important;font-weight:400!important}
+.inquiry-consent input{margin-top:3px;flex:0 0 auto;accent-color:#28221d}
+.inquiry-consent a{text-decoration:underline}
+.inquiry-submit{margin:16px 0 10px;cursor:pointer}
+.inquiry-submit:disabled{opacity:.6;cursor:wait}
+.inquiry-status{min-height:1.2em;color:#5c4c3a;font-size:13px;line-height:1.6;margin:12px 0}
+.inquiry-status.is-error{color:#a03333}.inquiry-status.is-success{color:#225c3b;font-weight:600}
+.inquiry-fineprint{font-size:10px;line-height:1.65;color:#7d766e;margin:10px 0 0}
+.art-inquiry-link{display:inline-block;text-decoration:underline;text-underline-offset:4px;font-size:10px;letter-spacing:1px;padding:10px 0 0;color:#5d4931}
+.art-inquiry-link:hover{color:#99734b}
+@media(max-width:890px){.inquiry-section{grid-template-columns:1fr;gap:25px}.inquiry-intro>p:not(.eyebrow){max-width:650px}}
+@media(max-width:690px){.inquiry-section{padding:54px 17px}.quick-inquiry{padding:23px 18px}.inquiry-grid{grid-template-columns:1fr;gap:14px}}
