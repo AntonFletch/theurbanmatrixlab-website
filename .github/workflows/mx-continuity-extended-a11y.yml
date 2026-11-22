@@ -1,0 +1,126 @@
+name: MX Continuity extended live accessibility audit
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/mx-continuity-extended-a11y.yml']
+permissions:
+  contents: read
+jobs:
+  extended-read-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright axe-core pngjs
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Measure targets, contrast and accessibility tree on live origin
+        shell: bash
+        run: |
+          cat > audit.cjs <<'JS'
+          const {chromium,webkit,devices}=require('playwright');
+          const {PNG}=require('pngjs');
+          const axe=require.resolve('axe-core/axe.min.js');
+          const base='https://theurbanmatrixlab.com/mx-continuity/';
+          const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','calendar/','project-order.html','monthly-care-authorization.html','change-order.html'];
+          const configs=[['Android Chrome (emulated)',chromium,'Pixel 7'],['iPhone Safari engine (emulated)',webkit,'iPhone 13']];
+          const lum=rgb=>rgb.slice(0,3).map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((v,x,i)=>v+x*[.2126,.7152,.0722][i],0);
+          const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+          (async()=>{
+            const counts={pages:0,layoutFailures:0,targetFailures:0,targetReview:0,contrastSamples:0,contrastFailures:0,contrastReview:0,treeControls:0,unnamedControls:0,treePages:0,keyboardChecks:0,keyboardFailures:0,errors:0};
+            for(const [name,engine,device] of configs){
+              const browser=await engine.launch({headless:true});
+              const context=await browser.newContext({...devices[device],deviceScaleFactor:1,reducedMotion:'reduce'});
+              await context.route('**/*',r=>['GET','HEAD','OPTIONS'].includes(r.request().method())?r.continue():r.abort());
+              for(const path of paths){
+                const page=await context.newPage();
+                try{
+                  const res=await page.goto(base+path,{waitUntil:'domcontentloaded',timeout:20000});
+                  if(!res?.ok()||!page.url().startsWith(base))throw Error('unexpected navigation '+page.url());
+                  const menu=page.locator('.menu-toggle');
+                  if(await menu.count())await page.locator('.standard-position-action-btn').first().waitFor({state:'attached',timeout:12000});
+                  await page.waitForTimeout(250);
+                  counts.pages++;
+                  const dims=await page.evaluate(()=>({viewport:innerWidth,scroll:document.documentElement.scrollWidth,touch:navigator.maxTouchPoints}));
+                  if(dims.scroll>dims.viewport+1)counts.layoutFailures++;
+                  console.log('DEVICE',name,path||'home',JSON.stringify(dims));
+                  await page.addScriptTag({path:axe});
+                  const scan=async()=>page.evaluate(async()=>await axe.run(document,{runOnly:{type:'rule',values:['target-size','color-contrast','button-name','link-name','label','aria-prohibited-attr']}}));
+                  const result=await scan();
+                  let results=[['closed',result]];
+                  if(await menu.isVisible()){
+                    await menu.tap();
+                    counts.keyboardChecks++;
+                    if(await menu.getAttribute('aria-expanded')!=='true')counts.keyboardFailures++;
+                    results.push(['menu open',await scan()]);
+                    await page.keyboard.press('Escape');
+                    if(await menu.getAttribute('aria-expanded')!=='false')counts.keyboardFailures++;
+                  }
+                  for(const [state,result] of results){
+                    for(const rule of result.violations){
+                      const nodes=rule.nodes.map(n=>({target:n.target,summary:n.failureSummary}));
+                      if(rule.id==='target-size')counts.targetFailures+=nodes.length;
+                      else if(rule.id==='color-contrast')counts.contrastFailures+=nodes.length;
+                      else counts.errors+=nodes.length;
+                      console.log('VIOLATION',name,path||'home',state,rule.id,JSON.stringify(nodes));
+                    }
+                    for(const rule of result.incomplete){
+                      if(rule.id==='color-contrast')counts.contrastReview+=rule.nodes.length;
+                      if(rule.id==='target-size')counts.targetReview+=rule.nodes.length;
+                      console.log('REVIEW',name,path||'home',state,rule.id,JSON.stringify(rule.nodes.map(n=>({target:n.target,summary:n.failureSummary}))).slice(0,8000));
+                    }
+                    console.log('RULES',name,path||'home',state,JSON.stringify(result.passes.map(v=>({id:v.id,nodes:v.nodes.length}))));
+                  }
+                  // Measure actual rendered control sizes, not just declared CSS.
+                  const targets=await page.evaluate(()=>Array.from(document.querySelectorAll('button,input:not([type=hidden]),select,textarea,a[href],summary')).filter(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility==='visible'&&e.getClientRects().length&&!e.closest('[aria-hidden=true]')&&r.right>0&&r.left<innerWidth&&!e.disabled}).map(e=>{const r=e.getBoundingClientRect();return {tag:e.tagName,text:(e.getAttribute('aria-label')||e.innerText||e.getAttribute('placeholder')||e.id||e.name||'').trim().slice(0,65),w:Math.round(r.width*10)/10,h:Math.round(r.height*10)/10}}));
+                  console.log('TARGET DIMENSIONS',name,path||'home',JSON.stringify({total:targets.length,under24:targets.filter(t=>t.w<24||t.h<24),primary:targets.filter(t=>t.tag==='BUTTON'||t.tag==='INPUT'||t.tag==='SELECT'||t.tag==='TEXTAREA').slice(0,20)}));
+                  if(engine===chromium){
+                    const cdp=await context.newCDPSession(page);
+                    await cdp.send('Accessibility.enable');
+                    const tree=await cdp.send('Accessibility.getFullAXTree');
+                    const interactive=tree.nodes.filter(n=>!n.ignored&&['button','link','textbox','combobox','checkbox','radio','searchbox','switch','tab','menuitem'].includes(n.role?.value));
+                    const unnamed=interactive.filter(n=>!String(n.name?.value||'').trim());
+                    counts.treePages++;counts.treeControls+=interactive.length;counts.unnamedControls+=unnamed.length;
+                    console.log('AX TREE',path||'home',JSON.stringify({controls:interactive.length,unnamed:unnamed.map(n=>({role:n.role?.value,node:n.backendDOMNodeId})),headings:tree.nodes.filter(n=>!n.ignored&&n.role?.value==='heading').map(n=>n.name?.value).slice(0,15)}));
+                    await cdp.detach();
+                    // Independently calculate contrast using actual rendered background pixels.
+                    // Text is made transparent temporarily in this isolated browser only.
+                    const samples=await page.evaluate(()=>{
+                      const list=Array.from(document.querySelectorAll('h1,h2,p,label,button,.eyebrow,.proactive-avatar-status-badge')).filter(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>5&&r.height>5&&s.visibility==='visible'&&!e.closest('[aria-hidden=true]')&&e.textContent.trim()&&!e.querySelector('input,select,textarea')});
+                      const selected=[...list.slice(0,8),...list.filter(e=>e.matches('.proactive-avatar-status-badge,.button-gold,.form-note')).slice(0,4)];
+                      return Array.from(new Set(selected)).map((e,i)=>{e.dataset.mxQaContrast=String(i);const s=getComputedStyle(e);return{id:i,txt:e.textContent.trim().slice(0,60),color:s.color,size:parseFloat(s.fontSize),weight:parseInt(s.fontWeight,10)||400,opacity:parseFloat(s.opacity)}});
+                    });
+                    for(const s of samples){
+                      const loc=page.locator('[data-mx-qa-contrast="'+s.id+'"]');
+                      try{
+                        await loc.scrollIntoViewIfNeeded();
+                        const range=await loc.evaluate(e=>{const w=document.createTreeWalker(e,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(!n.textContent.trim())continue;const r=document.createRange();r.selectNodeContents(n);const b=r.getClientRects()[0];if(b&&b.width>2&&b.height>2)return {x:b.x,y:b.y,width:b.width,height:b.height}}return null});
+                        if(!range||s.opacity!==1||!/rgba?\(/.test(s.color))continue;
+                        const fg=s.color.match(/[\d.]+/g).map(Number);
+                        if(fg.length>3&&fg[3]!==1)continue;
+                        const prev=await loc.evaluate(e=>{const p=[e.style.getPropertyValue('color'),e.style.getPropertyPriority('color')];e.style.setProperty('color','transparent','important');return p});
+                        let png;
+                        try{png=PNG.sync.read(await page.screenshot({animations:'disabled'}));}
+                        finally{await loc.evaluate((e,p)=>{if(p[0])e.style.setProperty('color',p[0],p[1]);else e.style.removeProperty('color')},prev)}
+                        const x=Math.max(0,Math.floor(range.x)),y=Math.max(0,Math.floor(range.y)),w=Math.min(png.width-x,Math.floor(range.width)),h=Math.min(png.height-y,Math.floor(range.height));
+                        if(w<2||h<2)continue;
+                        let min=100,max=0;
+                        for(let ix=x;ix<x+w;ix+=Math.max(1,Math.floor(w/10)))for(let iy=y;iy<y+h;iy+=Math.max(1,Math.floor(h/4))){const off=(iy*png.width+ix)*4;const cr=ratio(fg,Array.from(png.data.subarray(off,off+3)));min=Math.min(min,cr);max=Math.max(max,cr)}
+                        const threshold=s.size>=24||(s.size>=18.66&&s.weight>=700)?3:4.5;
+                        counts.contrastSamples++;
+                        // A low sampled ratio is a manual-review candidate, not immediate failure: descendants, overlays and image pixels can confound sampling.
+                        console.log('CONTRAST SAMPLE',path||'home',JSON.stringify({text:s.txt,foreground:s.color,min:+min.toFixed(2),max:+max.toFixed(2),threshold,review:min<threshold}));
+                      }catch(e){console.log('SAMPLE UNAVAILABLE',path,s.txt,String(e).slice(0,200))}
+                    }
+                  }
+                }catch(e){counts.errors++;console.log('ERROR',name,path,String(e))}
+                finally{await page.close()}
+              }
+              await browser.close();
+            }
+            console.log('EXTENDED RESULT',JSON.stringify(counts));
+            if(counts.errors||counts.layoutFailures||counts.targetFailures||counts.contrastFailures||counts.unnamedControls||counts.keyboardFailures)process.exitCode=1;
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+          node audit.cjs
