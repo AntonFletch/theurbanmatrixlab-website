@@ -64,3 +64,9 @@
 .art-inquiry-link:hover{color:#99734b}
 @media(max-width:890px){.inquiry-section{grid-template-columns:1fr;gap:25px}.inquiry-intro>p:not(.eyebrow){max-width:650px}}
 @media(max-width:690px){.inquiry-section{padding:54px 17px}.quick-inquiry{padding:23px 18px}.inquiry-grid{grid-template-columns:1fr;gap:14px}}
+
+/* Artwork inquiry fallbacks and comfortable touch targets */
+.inquiry-backup{font-size:12px;line-height:1.65;padding:12px 14px;border-left:3px solid #947c55;background:#f5ecdc;color:#554431}
+.inquiry-backup a{font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.art-inquiry-link{display:flex;align-items:center;min-height:44px;padding:10px 0}
+.frame-arrows>button{min-height:46px}
