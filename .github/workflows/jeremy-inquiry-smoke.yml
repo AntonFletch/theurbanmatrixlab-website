@@ -53,7 +53,8 @@ jobs:
               await page.goto('https://theurbanmatrixlab.com/jeremy-emmons/',{waitUntil:'domcontentloaded',timeout:30000});
               await page.locator('#gallery .art-card').first().waitFor({timeout:15000});
               if(await page.locator('#gallery .art-card').count()!==10)throw Error('Not 10 paintings');
-              const allLoaded=await page.locator('#gallery .art-photo img').evaluateAll(list=>list.every(img=>img.complete&&img.naturalWidth>0));
+              await page.waitForFunction(()=>Array.from(document.querySelectorAll('#gallery .art-photo img')).length===10 && Array.from(document.querySelectorAll('#gallery .art-photo img')).every(img=>img.complete&&img.naturalWidth>0),{timeout:30000});
+              const allLoaded=true;
               if(!allLoaded)throw Error('Artwork images did not load');
               const tilted=await page.locator('.hero-art').evaluate(el=>getComputedStyle(el).transform);
               if(tilted!=='none')throw Error('Real frame is still rotated: '+tilted);
