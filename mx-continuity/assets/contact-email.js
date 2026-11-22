@@ -22,7 +22,9 @@
     config.allowedOrigin === location.origin &&
     supabaseBase === expectedSupabaseOrigin &&
     typeof config.publishableKey === "string" &&
-    config.publishableKey.startsWith("sb_publishable_");
+    config.publishableKey.startsWith("sb_publishable_") &&
+    typeof config.turnstileSiteKey === "string" &&
+    config.turnstileSiteKey.length > 10;
 
   const notify = message => { if (status) status.textContent = message; };
   if (!intakeReady) {
@@ -34,8 +36,38 @@
 
   const API = supabaseBase + "/functions/v1/mx-project-inquiry";
   const PUBLIC_KEY = config.publishableKey;
-  button.disabled = false;
-  button.textContent = "Submit project inquiry";
+  // The prelaunch-disabled page never loads Turnstile or accepts submissions.
+  // Once explicitly activated, require a solved widget and server validation.
+  button.disabled = true;
+  button.textContent = "Loading security check";
+  const challengeBox = document.createElement("div");
+  challengeBox.className = "field";
+  challengeBox.setAttribute("aria-label", "Project inquiry security verification");
+  form.insertBefore(challengeBox, button);
+  let widgetId = null;
+  const challengeScript = document.createElement("script");
+  challengeScript.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+  challengeScript.async = true;
+  challengeScript.onerror = () => notify("The security check could not load. Please use the business email listed on this page.");
+  challengeScript.onload = () => {
+    if (typeof window.turnstile?.render !== "function") {
+      notify("The security check is unavailable. Please try again later.");
+      return;
+    }
+    try {
+      widgetId = window.turnstile.render(challengeBox, {
+        sitekey: config.turnstileSiteKey,
+        action: "mx_project_inquiry",
+        theme: "dark"
+      });
+      button.disabled = false;
+      button.textContent = "Submit project inquiry";
+      notify("Complete the security check before submitting your inquiry.");
+    } catch {
+      notify("Unable to initialize the security check. Please try again later.");
+    }
+  };
+  document.head.appendChild(challengeScript);
   let requestId = null;
   let pending = false;
   let completed = false;
@@ -73,6 +105,11 @@
     const business = form.elements.business_name.value.trim();
     const plan = form.elements.package.value.trim();
     const details = form.elements.description.value.trim();
+    const turnstileToken = widgetId === null ? "" : (window.turnstile?.getResponse?.(widgetId) || "");
+    if (!turnstileToken) {
+      notify("Complete the security check before submitting.");
+      return;
+    }
     if (!requestId) requestId = crypto.randomUUID();
     const payload = {
       request_id: requestId,
@@ -83,7 +120,8 @@
       project_details: details,
       company_website: form.elements.company_website.value,
       contact_consent: true,
-      consent_version: "contact-v1"
+      consent_version: "contact-v1",
+      turnstile_token: turnstileToken
     };
 
     pending = true;
@@ -114,6 +152,7 @@
         result.inquiry_id.slice(0, 8) + ". No email app or second send is needed. " +
         "The MX Continuity team will reply to the email you provided.");
     } catch (error) {
+      if (widgetId !== null) window.turnstile?.reset?.(widgetId);
       notify(error.message || "Submission was not confirmed. Try again; we will not create duplicate records for retries.");
     } finally {
       pending = false;
