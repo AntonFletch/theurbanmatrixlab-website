@@ -25,7 +25,7 @@ let current=art[0],frameIndex=0,choice='unframed',phase='ask',start=null,toastTi
 $('year').textContent=new Date().getFullYear();
 const inquiryForm=$('quickInquiry'),inquiryStatus=$('quickInquiryStatus');let pendingInquiryId=null;
 inquiryForm.addEventListener('input',()=>{pendingInquiryId=null;});
-inquiryForm.addEventListener('change',()=>{pendingInquiryId=null;});
+inquiryForm.addEventListener('change',ev=>{pendingInquiryId=null;if(ev.target?.id==='quickFramed'&&$('quickFramed').value!=='framed')$('quickFrameStyle').value='';});
 // Public artwork inquiries are stored privately; no payment processing is included.
 function buildCards(){
  for(const a of art){
@@ -106,13 +106,14 @@ dialog.addEventListener('keydown',e=>{if(phase==='frames'&&(e.key==='ArrowLeft'|
 function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3000);}
 
 
-function chooseInquiry(painting,presentation){
+function chooseInquiry(painting,presentation,frame=''){
  $('quickPainting').value=painting;
  $('quickFramed').value=presentation;
+ $('quickFrameStyle').value=presentation==='framed'?frame:'';
  pendingInquiryId=null;
 }
 $('requestThisArt').addEventListener('click',()=>{
- chooseInquiry(current.id,choice==='framed'?'framed':'unframed');
+ chooseInquiry(current.id,choice==='framed'?'framed':'unframed',choice==='framed'?finishes[frameIndex].id:'');
  closeArt();
  $('inquiry').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
  $('quickName').focus({preventScroll:true});
@@ -134,7 +135,7 @@ inquiryForm.addEventListener('submit',async(ev)=>{
   contact_phone:$('quickPhone').value.trim(),
   painting_id:$('quickPainting').value,
   presentation:$('quickFramed').value,
-  frame_style:'',
+  frame_style:$('quickFrameStyle').value,
   message:$('quickMessage').value.trim(),
   contact_consent:$('quickConsent').checked,
   website:''
