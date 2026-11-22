@@ -8,9 +8,10 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0"></script>
 <script defer src="portal.js?v=20261120-phone-calendar"></script>
 </head><body>
-<header class="topbar"><a class="brand" href="../index.html" aria-label="MX Continuity public website"><span class="brand-mark">MX</span><span><strong>CONTINUITY</strong><small>CLIENT &amp; CHECKUP CENTER</small></span></a><div class="top-actions"><span id="connection" class="connection">Private workspace</span><button id="refresh" class="btn subtle" type="button" hidden>↻ Refresh</button><button id="signout" class="btn subtle" type="button" hidden>Sign out</button></div></header>
+<a class="skip-main" href="#main">Skip to main content</a>
+<header class="topbar"><a class="brand" href="../index.html" ><span class="brand-mark">MX</span> <span><strong>CONTINUITY</strong> <small>CLIENT &amp; CHECKUP CENTER</small></span></a><div class="top-actions"><span id="connection" class="connection">Private workspace</span><button id="refresh" class="btn subtle" type="button" hidden>↻ Refresh</button><button id="signout" class="btn subtle" type="button" hidden>Sign out</button></div></header>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<main>
+<main id="main" tabindex="-1">
 <section id="signin" class="signin">
 <div class="signin-copy"><span class="eyebrow">MX CONTINUITY • SECURE WORKSPACE</span><h1>Everything about your website.<br><em>In one clear place.</em></h1><p>View checkup results, review your incoming inquiries, and join the conversation when a website check takes place.</p><div class="feature-grid"><span>✓ Scheduled care</span><span>✓ Recorded results</span><span>✓ Client check-in</span><span>✓ Support history</span></div></div>
 <form id="signin-form" class="signin-card"><div class="card-head"><span class="eyebrow">AUTHORIZED ACCESS</span><h2>Welcome back</h2><p>Sign in with the email used for your MX Continuity client or staff account.</p></div><label>Email<input id="email" type="email" autocomplete="username" placeholder="you@company.com" required></label><label>Password (if set)<input id="password" type="password" autocomplete="current-password" placeholder="Optional for email-link sign in"></label><button class="btn primary full" type="submit">Sign in</button><button id="magic" class="btn ghost full" type="button">Send me a sign-in email</button><p id="auth-note" class="fineprint" role="status">Access is limited to approved client and staff accounts. No account is created automatically.</p></form>

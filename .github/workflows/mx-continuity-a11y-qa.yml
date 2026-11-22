@@ -1,0 +1,83 @@
+name: MX Continuity mobile and accessibility QA
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/mx-continuity-a11y-qa.yml','mx-continuity/**']
+permissions:
+  contents: read
+jobs:
+  live-read-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright axe-core
+      - run: npx playwright install --with-deps chromium
+      - name: Audit candidate MX Continuity without submission
+        shell: bash
+        run: |
+          cat > audit.cjs <<'JS'
+          const {chromium}=require('playwright');
+          const fs=require('node:fs');
+          const pathUtil=require('node:path');
+          const axe=require.resolve('axe-core/axe.min.js');
+          const base='https://theurbanmatrixlab.com/mx-continuity/';
+          const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','calendar/','project-order.html','monthly-care-authorization.html','change-order.html'];
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const context=await browser.newContext({reducedMotion:'reduce'});
+            await context.route('**/*',async r=>{
+              if(!['GET','HEAD','OPTIONS'].includes(r.request().method()))return r.abort();
+              const u=new URL(r.request().url());
+              if(u.origin==='https://theurbanmatrixlab.com'&&u.pathname.startsWith('/mx-continuity/')){
+                const file=pathUtil.resolve('.'+u.pathname+(u.pathname.endsWith('/')?'index.html':''));
+                if(file.startsWith(pathUtil.resolve('mx-continuity')+pathUtil.sep)&&fs.existsSync(file)&&fs.statSync(file).isFile())return r.fulfill({path:file});
+              }
+              return r.continue();
+            });
+            let issues=0,checks=0;
+            for(const path of paths){
+              const page=await context.newPage();
+              try{
+                const res=await page.goto(base+path,{waitUntil:'domcontentloaded',timeout:18000});
+                if(!res?.ok()){console.log('FAIL HTTP',path,res?.status());issues++;continue}
+                if(!page.url().startsWith(base)){console.log('FAIL redirect',path,page.url());issues++;continue}
+                for(const width of [320,375,390,768,1280]){
+                  await page.setViewportSize({width,height:900});
+                  await page.waitForTimeout(150);
+                  const layout=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,heading:!!document.querySelector('h1'),title:document.title}));
+                  checks++;if(layout.scroll>width+1||!layout.heading||!layout.title){issues++;console.log('FAIL layout',path,width,JSON.stringify(layout))}else console.log('PASS layout',path||'home',width);
+                  const menu=page.locator('.menu-toggle');
+                  if(width<=768&&await menu.isVisible()){
+                    await menu.focus();await page.keyboard.press('Enter');
+                    const expanded=await menu.getAttribute('aria-expanded');
+                    const nav=await page.locator('.main-nav').isVisible();
+                    await page.keyboard.press('Escape');
+                    if(expanded!=='true'||!nav||await menu.getAttribute('aria-expanded')!=='false'){issues++;console.log('FAIL menu keyboard',path,width)}else console.log('PASS menu keyboard',path||'home',width);
+                  }
+                  if(width===375||width===1280){
+                    if(await page.locator('.menu-toggle').count()){
+                      try{await page.locator('.standard-position-action-btn').first().waitFor({state:'attached',timeout:6000});}catch(e){issues++;console.log('FAIL chat widget not loaded',path,width);}
+                      await page.waitForTimeout(350);
+                    }
+                    await page.addScriptTag({path:axe});
+                    if(path===''&&width===1280)console.log('WIDGET DOM',JSON.stringify(await page.evaluate(()=>Array.from(document.querySelectorAll('.standard-position-action-btn,.proactive-avatar-status-badge,[data-testid^="tiled-avatar"] .img')).map(e=>({outer:e.outerHTML.slice(0,1500),parent:e.parentElement?.outerHTML.slice(0,2000)})))));
+                    const result=await page.evaluate(async()=>await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}}));
+                    for(const v of result.violations){issues++;console.log('FAIL axe',path||'home',width,v.id,v.impact,JSON.stringify(v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))))}
+                    console.log('AXE summary',path||'home',width,'violations',result.violations.length,'incomplete',result.incomplete.map(x=>x.id).join(','));
+                  }
+                }
+                await page.setViewportSize({width:375,height:812});
+                await page.reload({waitUntil:'domcontentloaded'});
+                await page.keyboard.press('Tab');
+                const first=await page.evaluate(()=>({tag:document.activeElement?.tagName,text:document.activeElement?.textContent?.trim()?.slice(0,60),focus:getComputedStyle(document.activeElement).outlineStyle}));console.log('FIRST TAB',path||'home',first);
+              }catch(e){issues++;console.log('FAIL audit',path,String(e))}
+              finally{await page.close()}
+            }
+            await browser.close();console.log('RESULT',JSON.stringify({checks,issues,paths:paths.length}));if(issues)process.exitCode=1;
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+          node audit.cjs
