@@ -25,6 +25,41 @@ jobs:
           grep -q 'id="quickInquiry"' /tmp/jeremy.html
           curl -fsSL --retry 3 'https://theurbanmatrixlab.com/jeremy-emmons/script.js' -o /tmp/jeremy.js
           grep -q 'quickInquiry' /tmp/jeremy.js
+      - name: Browser test gallery and real form submit on mobile
+        run: |
+          mkdir -p /tmp/jeremy-pw
+          cd /tmp/jeremy-pw
+          npm install --no-audit --no-fund --silent playwright@1.56.1
+          npx playwright install --with-deps chromium >/dev/null
+          cat > test.cjs <<'JS'
+          const { chromium } = require('playwright');
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+            const errors = [];
+            page.on('pageerror', error => errors.push(error.message));
+            await page.goto('https://theurbanmatrixlab.com/jeremy-emmons/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+            await page.locator('#gallery .art-card').first().waitFor({timeout:15000});
+            const cards = await page.locator('#gallery .art-card').count();
+            if (cards !== 10) throw new Error('Expected 10 gallery paintings, got '+cards);
+            await page.locator('#gallery .art-card .art-button').first().click();
+            await page.locator('#artDialog[open]').waitFor();
+            await page.locator('#closeModal').click();
+            await page.locator('#quickName').fill('QA Site Test');
+            await page.locator('#quickEmail').fill('qa-test@example.com');
+            await page.locator('#quickPainting').selectOption('JE-005');
+            await page.locator('#quickFramed').selectOption('framed');
+            await page.locator('#quickConsent').check();
+            await page.locator('#quickSubmit').click();
+            await page.locator('#quickInquiryStatus.is-success').waitFor({ timeout: 30000 });
+            const result = await page.locator('#quickInquiryStatus').innerText();
+            if (!result.includes('received')) throw new Error('Unexpected form result: '+result);
+            if (errors.length) throw new Error('Browser JavaScript errors: '+errors.join('; '));
+            console.log('MOBILE FORM PASS: 10 gallery cards, artwork preview, live submission receipt, no page JS errors');
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1) });
+          JS
+          node test.cjs
       - name: Submit marked QA inquiry, verify receipt and idempotence
         env:
           API_KEY: sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ
