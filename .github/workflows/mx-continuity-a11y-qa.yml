@@ -2,7 +2,7 @@ name: MX Continuity mobile and accessibility QA
 on:
   pull_request:
     branches: [main]
-    paths: ['.github/workflows/mx-continuity-a11y-qa.yml']
+    paths: ['.github/workflows/mx-continuity-a11y-qa.yml','mx-continuity/**']
 permissions:
   contents: read
 jobs:
@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -20,13 +21,23 @@ jobs:
         run: |
           cat > audit.cjs <<'JS'
           const {chromium}=require('playwright');
+          const fs=require('node:fs');
+          const pathUtil=require('node:path');
           const axe=require.resolve('axe-core/axe.min.js');
           const base='https://theurbanmatrixlab.com/mx-continuity/';
           const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','project-order.html','monthly-care-authorization.html','change-order.html'];
           (async()=>{
             const browser=await chromium.launch({headless:true});
             const context=await browser.newContext({reducedMotion:'reduce'});
-            await context.route('**/*',r=>['GET','HEAD','OPTIONS'].includes(r.request().method())?r.continue():r.abort());
+            await context.route('**/*',async r=>{
+              if(!['GET','HEAD','OPTIONS'].includes(r.request().method()))return r.abort();
+              const u=new URL(r.request().url());
+              if(u.origin==='https://theurbanmatrixlab.com'&&u.pathname.startsWith('/mx-continuity/')){
+                const file=pathUtil.resolve('.'+u.pathname+(u.pathname.endsWith('/')?'index.html':''));
+                if(file.startsWith(pathUtil.resolve('mx-continuity')+pathUtil.sep)&&fs.existsSync(file)&&fs.statSync(file).isFile())return r.fulfill({path:file});
+              }
+              return r.continue();
+            });
             let issues=0,checks=0;
             for(const path of paths){
               const page=await context.newPage();
@@ -49,6 +60,7 @@ jobs:
                   }
                   if(width===375||width===1280){
                     await page.addScriptTag({path:axe});
+                    if(path===''&&width===375)console.log('WIDGET DOM',JSON.stringify(await page.evaluate(()=>Array.from(document.querySelectorAll('.standard-position-action-btn,.proactive-avatar-status-badge,[data-testid^="tiled-avatar"] .img')).map(e=>({outer:e.outerHTML.slice(0,1500),parent:e.parentElement?.outerHTML.slice(0,2000)})))));
                     const result=await page.evaluate(async()=>await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}}));
                     for(const v of result.violations){issues++;console.log('FAIL axe',path||'home',width,v.id,v.impact,JSON.stringify(v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))))}
                     console.log('AXE summary',path||'home',width,'violations',result.violations.length,'incomplete',result.incomplete.map(x=>x.id).join(','));
