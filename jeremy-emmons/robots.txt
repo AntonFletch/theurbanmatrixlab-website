@@ -1,3 +1,1 @@
-User-agent: *
-Disallow: /
-# Remove this file restriction AND noindex only after Jeremy authorizes public launch.
+# Crawlers use /robots.txt at the domain root, not a directory-level robots.txt.
