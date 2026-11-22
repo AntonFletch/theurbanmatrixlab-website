@@ -1,8 +1,7 @@
-/* Seller-approved configuration. Leave blank until Jeremy verifies ownership and details.
-   NEVER put Stripe secret keys, email API keys, or passwords here. */
+/* Independent Jeremy Emmons artist showcase configuration. Public values only. */
 window.JEREMY_STORE_CONFIG = Object.freeze({
-  publicContactEmail: '',
-  inquiryEndpoint: '',
-  turnstileSiteKey: '',
-  status: 'PRELAUNCH'
+  publicContactEmail: 'TheUrbanMatrixLab@gmail.com',
+  inquiryEndpoint: 'https://xdaxbueyftyljsrhabpx.supabase.co/functions/v1/jeremy-art-inquiry',
+  status: 'INQUIRY_ONLY',
+  checkoutEnabled: false
 });
