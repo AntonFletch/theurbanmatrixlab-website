@@ -25,7 +25,19 @@ jobs:
           grep -q 'id="quickInquiry"' /tmp/jeremy.html
           curl -fsSL --retry 3 'https://theurbanmatrixlab.com/jeremy-emmons/script.js' -o /tmp/jeremy.js
           grep -q 'quickInquiry' /tmp/jeremy.js
+      - name: Verify inquiry API and email alert configuration
+        env:
+          API_KEY: sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ
+          URL: https://xdaxbueyftyljsrhabpx.supabase.co/functions/v1/jeremy-art-inquiry
+        run: |
+          status="$(curl -sS --max-time 20 -o /tmp/health.json -w '%{http_code}' "$URL" -H 'Origin: https://theurbanmatrixlab.com' -H "apikey: $API_KEY")"
+          echo "HTTP $status"
+          cat /tmp/health.json
+          test "$status" = "200"
+          jq -e '.ok == true and .inquiry_storage == "active"' /tmp/health.json
+          jq -r '"OWNER EMAIL ALERT: "+.owner_email_alert' /tmp/health.json
       - name: Browser test gallery and real form submit on mobile
+        if: github.event_name == 'workflow_dispatch'
         run: |
           mkdir -p /tmp/jeremy-pw
           cd /tmp/jeremy-pw
@@ -61,6 +73,7 @@ jobs:
           JS
           node test.cjs
       - name: Submit marked QA inquiry, verify receipt and idempotence
+        if: github.event_name == 'workflow_dispatch'
         env:
           API_KEY: sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ
           URL: https://xdaxbueyftyljsrhabpx.supabase.co/functions/v1/jeremy-art-inquiry
@@ -82,6 +95,7 @@ jobs:
           test "$status" = "200"
           jq -e '.ok == true and .replayed == true' /tmp/replay.json
       - name: Refuse foreign-origin submission
+        if: github.event_name == 'workflow_dispatch'
         env:
           API_KEY: sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ
         run: |
