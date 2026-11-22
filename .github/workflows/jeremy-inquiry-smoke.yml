@@ -1,0 +1,54 @@
+name: Jeremy Inquiry Smoke Test
+on:
+  push:
+    paths:
+      - '.github/workflows/jeremy-inquiry-smoke.yml'
+      - 'jeremy-emmons/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate inquiry page script
+        run: |
+          node --check jeremy-emmons/script.js
+          grep -q 'id="quickInquiry"' jeremy-emmons/index.html
+          grep -q 'name="painting_id"' jeremy-emmons/index.html
+          grep -q 'name="presentation"' jeremy-emmons/index.html
+      - name: Check live publication
+        run: |
+          curl -fsSL --retry 3 --retry-delay 2 'https://theurbanmatrixlab.com/jeremy-emmons/' -o /tmp/jeremy.html
+          grep -q 'id="quickInquiry"' /tmp/jeremy.html
+          curl -fsSL --retry 3 'https://theurbanmatrixlab.com/jeremy-emmons/script.js' -o /tmp/jeremy.js
+          grep -q 'quickInquiry' /tmp/jeremy.js
+      - name: Submit marked QA inquiry, verify receipt and idempotence
+        env:
+          API_KEY: sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ
+          URL: https://xdaxbueyftyljsrhabpx.supabase.co/functions/v1/jeremy-art-inquiry
+        run: |
+          set -euo pipefail
+          REQUEST_ID="$(cat /proc/sys/kernel/random/uuid)"
+          export REQUEST_ID
+          python3 - <<'PY' > /tmp/payload.json
+          import json,os
+          print(json.dumps(dict(request_id=os.environ["REQUEST_ID"],contact_name="QA Site Test",contact_email="qa-test@example.com",contact_phone="",painting_id="JE-003",presentation="unframed",frame_style="",message="Automated QA test only. Not a customer.",contact_consent=True,website="")))
+          PY
+          status="$(curl -sS --max-time 20 -o /tmp/response.json -w '%{http_code}' -X POST "$URL" -H 'Origin: https://theurbanmatrixlab.com' -H 'Content-Type: application/json' -H "apikey: $API_KEY" --data-binary @/tmp/payload.json)"
+          echo "First request HTTP $status"
+          cat /tmp/response.json
+          test "$status" = "201"
+          jq -e '.ok == true and (.inquiry_id|type=="string")' /tmp/response.json
+          status="$(curl -sS --max-time 20 -o /tmp/replay.json -w '%{http_code}' -X POST "$URL" -H 'Origin: https://theurbanmatrixlab.com' -H 'Content-Type: application/json' -H "apikey: $API_KEY" --data-binary @/tmp/payload.json)"
+          echo "Replay HTTP $status"
+          test "$status" = "200"
+          jq -e '.ok == true and .replayed == true' /tmp/replay.json
+      - name: Refuse foreign-origin submission
+        env:
+          API_KEY: sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ
+        run: |
+          status="$(curl -sS --max-time 20 -o /tmp/foreign.json -w '%{http_code}' -X POST 'https://xdaxbueyftyljsrhabpx.supabase.co/functions/v1/jeremy-art-inquiry' -H 'Origin: https://not-theurbanmatrixlab.example' -H 'Content-Type: application/json' -H "apikey: $API_KEY" --data '{"contact_name":"No","contact_email":"no@example.com"}')"
+          test "$status" = "403"
