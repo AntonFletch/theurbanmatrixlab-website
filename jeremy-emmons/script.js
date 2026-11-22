@@ -24,8 +24,9 @@ const gallery=$('gallery'),dialog=$('artDialog'),splash=$('signatureSplash'),fra
 let current=art[0],frameIndex=0,choice='unframed',phase='ask',start=null,toastTimer=null;
 $('year').textContent=new Date().getFullYear();
 const inquiryForm=$('quickInquiry'),inquiryStatus=$('quickInquiryStatus');let pendingInquiryId=null;
-/* Send is intentionally held until complete verified anti-spam integration and seller approval. */
-// No network transmission occurs in the unconfigured preview.
+inquiryForm.addEventListener('input',()=>{pendingInquiryId=null;});
+inquiryForm.addEventListener('change',()=>{pendingInquiryId=null;});
+// Public artwork inquiries are stored privately; no payment processing is included.
 function buildCards(){
  for(const a of art){
   const card=document.createElement('article');card.className='art-card';
@@ -120,6 +121,7 @@ inquiryForm.addEventListener('submit',async(ev)=>{
  ev.preventDefault();
  inquiryStatus.classList.remove('is-error','is-success');
  inquiryStatus.textContent='';
+ $('quickInquiryBackup').hidden=true;
  if(!inquiryForm.checkValidity()){inquiryForm.reportValidity();return;}
  if($('quickWebsite').value.trim()){inquiryStatus.textContent='Please try again.';inquiryStatus.classList.add('is-error');return;}
  const btn=$('quickSubmit');
@@ -154,10 +156,11 @@ inquiryForm.addEventListener('submit',async(ev)=>{
   inquiryForm.reset();
   pendingInquiryId=null;
   inquiryStatus.classList.add('is-success');
-  inquiryStatus.textContent='Your painting inquiry was received. We will contact you to discuss the details. Reference: '+String(result.inquiry_id||'').slice(0,8).toUpperCase();
+  inquiryStatus.textContent='Your painting inquiry was received. Reference: '+String(result.inquiry_id||'').slice(0,8).toUpperCase()+'. Please save this reference. No payment has been collected.';
  }catch(error){
   inquiryStatus.classList.add('is-error');
   inquiryStatus.textContent=error instanceof Error?error.message:'Could not send your inquiry. Please try again.';
+  $('quickInquiryBackup').hidden=false;
  }finally{
   btn.disabled=false;btn.innerHTML='SEND PAINTING INQUIRY <span>↗</span>';
  }
