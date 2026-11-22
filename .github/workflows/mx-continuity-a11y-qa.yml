@@ -22,7 +22,7 @@ jobs:
           const {chromium}=require('playwright');
           const axe=require.resolve('axe-core/axe.min.js');
           const base='https://theurbanmatrixlab.com/mx-continuity/';
-          const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','project-order.html','care-authorization.html','change-order.html'];
+          const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','project-order.html','monthly-care-authorization.html','change-order.html'];
           (async()=>{
             const browser=await chromium.launch({headless:true});
             const context=await browser.newContext({reducedMotion:'reduce'});
