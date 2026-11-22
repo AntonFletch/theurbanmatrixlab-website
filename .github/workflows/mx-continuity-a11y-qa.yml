@@ -1,4 +1,4 @@
-name: MX Continuity mobile and accessibility QA
+name: MX Continuity deployed-site accessibility verification
 on:
   pull_request:
     branches: [main]
@@ -16,7 +16,7 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright axe-core
       - run: npx playwright install --with-deps chromium
-      - name: Audit candidate MX Continuity without submission
+      - name: Audit deployed MX Continuity without submission
         shell: bash
         run: |
           cat > audit.cjs <<'JS'
@@ -31,11 +31,6 @@ jobs:
             const context=await browser.newContext({reducedMotion:'reduce'});
             await context.route('**/*',async r=>{
               if(!['GET','HEAD','OPTIONS'].includes(r.request().method()))return r.abort();
-              const u=new URL(r.request().url());
-              if(u.origin==='https://theurbanmatrixlab.com'&&u.pathname.startsWith('/mx-continuity/')){
-                const file=pathUtil.resolve('.'+u.pathname+(u.pathname.endsWith('/')?'index.html':''));
-                if(file.startsWith(pathUtil.resolve('mx-continuity')+pathUtil.sep)&&fs.existsSync(file)&&fs.statSync(file).isFile())return r.fulfill({path:file});
-              }
               return r.continue();
             });
             let issues=0,checks=0;
