@@ -16,7 +16,7 @@ jobs:
           node-version: '22'
       - run: npm install --no-save playwright axe-core
       - run: npx playwright install --with-deps chromium
-      - name: Audit live MX Continuity without submission
+      - name: Audit candidate MX Continuity without submission
         shell: bash
         run: |
           cat > audit.cjs <<'JS'
@@ -25,7 +25,7 @@ jobs:
           const pathUtil=require('node:path');
           const axe=require.resolve('axe-core/axe.min.js');
           const base='https://theurbanmatrixlab.com/mx-continuity/';
-          const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','project-order.html','monthly-care-authorization.html','change-order.html'];
+          const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','calendar/','project-order.html','monthly-care-authorization.html','change-order.html'];
           (async()=>{
             const browser=await chromium.launch({headless:true});
             const context=await browser.newContext({reducedMotion:'reduce'});
@@ -67,9 +67,9 @@ jobs:
                   }
                 }
                 await page.setViewportSize({width:375,height:812});
-                await page.evaluate(()=>document.activeElement?.blur());
+                await page.reload({waitUntil:'domcontentloaded'});
                 await page.keyboard.press('Tab');
-                console.log('FIRST TAB',path||'home',await page.evaluate(()=>({tag:document.activeElement?.tagName,text:document.activeElement?.textContent?.trim()?.slice(0,60),focus:getComputedStyle(document.activeElement).outlineStyle})));
+                const first=await page.evaluate(()=>({tag:document.activeElement?.tagName,text:document.activeElement?.textContent?.trim()?.slice(0,60),focus:getComputedStyle(document.activeElement).outlineStyle}));console.log('FIRST TAB',path||'home',first);
               }catch(e){issues++;console.log('FAIL audit',path,String(e))}
               finally{await page.close()}
             }
