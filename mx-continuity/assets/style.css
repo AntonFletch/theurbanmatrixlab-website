@@ -26,3 +26,6 @@
 #support-status{overflow-wrap:anywhere}
 .surface a[href^="mailto:"]{overflow-wrap:anywhere;color:var(--gold2);text-decoration:underline}
 .contact-form input[type="checkbox"]{width:auto;min-height:auto;margin-right:9px;accent-color:var(--gold2)}
+
+/* Mobile and keyboard accessibility: allow intrinsic form content to shrink. */
+.surface,.contact-form,.field{min-width:0}.field input:not([type=checkbox]),.field select,.field textarea{width:100%;max-width:100%;min-width:0}.field input[type=checkbox]{min-height:0;accent-color:var(--gold)}.field select:focus-visible,.policy-content table:focus-visible{outline:3px solid var(--gold2);outline-offset:3px}.surface{overflow-wrap:anywhere}
