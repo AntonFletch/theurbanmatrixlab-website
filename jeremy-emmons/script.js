@@ -23,7 +23,7 @@ const $=id=>document.getElementById(id),fmt=n=>'$'+n.toLocaleString('en-US');
 const gallery=$('gallery'),dialog=$('artDialog'),splash=$('signatureSplash'),frameObject=$('frameObject');
 let current=art[0],frameIndex=0,choice='unframed',phase='ask',start=null,toastTimer=null;
 $('year').textContent=new Date().getFullYear();
-const sendBtn=$('sendInquiry');
+const inquiryForm=$('quickInquiry'),inquiryStatus=$('quickInquiryStatus');let pendingInquiryId=null;
 /* Send is intentionally held until complete verified anti-spam integration and seller approval. */
 // No network transmission occurs in the unconfigured preview.
 function buildCards(){
@@ -38,7 +38,8 @@ function buildCards(){
   photo.append(img,count,open);
   if(a.existing){const b=document.createElement('span');b.className='already';b.textContent='ALREADY FRAMED';photo.append(b);}
   const meta=document.createElement('div');meta.className='art-meta';meta.innerHTML=`<div><h3>${a.name}</h3><p>${a.id==='JE-001'?'FEATURED ORIGINAL · ONE OF ONE':'ONE-OF-ONE ORIGINAL'}</p></div><div class="art-pricing"><strong>${fmt(a.unframed)}</strong><small>Frame from +${fmt(finishes[0].upgrade)}</small></div>`;
-  button.append(photo,meta);card.append(button);button.addEventListener('click',()=>openArt(a));gallery.append(card);
+  button.append(photo,meta);card.append(button);button.addEventListener('click',()=>openArt(a));
+  const inquire=document.createElement('a');inquire.href='#inquiry';inquire.className='art-inquiry-link';inquire.textContent='INQUIRE ABOUT '+a.id+' ↗';inquire.addEventListener('click',()=>chooseInquiry(a.id,''));card.append(inquire);gallery.append(card);
  }
 }
 buildCards();
@@ -103,20 +104,62 @@ stage.addEventListener('pointercancel',()=>{start=null;});
 dialog.addEventListener('keydown',e=>{if(phase==='frames'&&(e.key==='ArrowLeft'||e.key==='ArrowRight')){e.preventDefault();selectFrame(frameIndex+(e.key==='ArrowRight'?1:-1));}});
 function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.remove('show'),3000);}
 
-function inquiryText(){
- const e=(id)=>$(id).value.trim();
- return `JEREMY EMMONS — ORIGINAL ARTWORK INQUIRY\n\nCustomer: ${e('buyerName')}\nReply email: ${e('buyerEmail')}\nFulfillment: ${e('buyerFulfillment')}\nNote: ${e('buyerMessage')||'None'}\n\nArtwork: ${current.name} (${current.id})\nPresentation: ${choice==='framed'?finishes[frameIndex].label:'Unframed'}\nOriginal art proposed price: ${fmt(current.unframed)}\nFraming proposed upgrade: ${choice==='framed'?fmt(finishes[frameIndex].upgrade):'None'}\nProposed total (excludes shipping): ${fmt(total(current,choice==='framed',frameIndex))}\nSelected frame style: ${choice==='framed'?finishes[frameIndex].product:'Not requested'}\n\nNOT AN ORDER OR RESERVATION. Price, artwork availability, canvas size/depth, compatibility, fulfillment and payment must be confirmed directly by Jeremy before any sale. No payment has been collected.`;
+
+function chooseInquiry(painting,presentation){
+ $('quickPainting').value=painting;
+ $('quickFramed').value=presentation;
+ pendingInquiryId=null;
 }
-function checkInquiry(){const n=$('buyerName'),e=$('buyerEmail'),ok=n.value.trim()&&e.validity.valid&&e.value.trim()&&$('buyerConsent').checked; $('inquiryError').hidden=!!ok;if(!ok){(n.value.trim()?e.validity.valid&&e.value.trim()?$('buyerConsent'):e:n).focus()}return !!ok;}
-// Live sending requires a separately deployed HTTPS endpoint and human-verification site key.
-// The worker validates server-side; browser prices must never be trusted as a purchase charge.
-sendBtn.addEventListener('click',async()=>{
- if(!checkInquiry())return;
- const out=$('sendResult');out.textContent='';out.classList.remove('is-error');
- if(!$('buyerWebsite').value && storeConfig.inquiryEndpoint && storeConfig.turnstileSiteKey){
-  out.textContent='This feature requires a configured anti-spam verification widget before activation. Use Copy Inquiry for now.';
- }else{out.textContent='Please use Copy Inquiry until live sending is configured.';out.classList.add('is-error');}
+$('requestThisArt').addEventListener('click',()=>{
+ chooseInquiry(current.id,choice==='framed'?'framed':'unframed');
+ closeArt();
+ $('inquiry').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+ $('quickName').focus({preventScroll:true});
 });
-$('inquiryForm').addEventListener('submit',async ev=>{ev.preventDefault();if(!checkInquiry())return;const message=inquiryText();try{await navigator.clipboard.writeText(message);toast('Inquiry copied. No request has been sent.');}catch(_){const ta=document.createElement('textarea');ta.value=message;document.body.append(ta);ta.select();const ok=document.execCommand('copy');ta.remove();toast(ok?'Inquiry copied; nothing was sent.':'Copy unavailable. Use Save Inquiry instead.');}});
-$('downloadInquiry').addEventListener('click',()=>{if(!checkInquiry())return;const blob=new Blob([inquiryText()],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Jeremy-Emmons-Inquiry-'+current.id+'.txt';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);toast('Inquiry saved on your device; nothing was sent.');});
+inquiryForm.addEventListener('submit',async(ev)=>{
+ ev.preventDefault();
+ inquiryStatus.classList.remove('is-error','is-success');
+ inquiryStatus.textContent='';
+ if(!inquiryForm.checkValidity()){inquiryForm.reportValidity();return;}
+ if($('quickWebsite').value.trim()){inquiryStatus.textContent='Please try again.';inquiryStatus.classList.add('is-error');return;}
+ const btn=$('quickSubmit');
+ if(btn.disabled)return;
+ if(!pendingInquiryId)pendingInquiryId=crypto.randomUUID();
+ const body={
+  request_id:pendingInquiryId,
+  contact_name:$('quickName').value.trim(),
+  contact_email:$('quickEmail').value.trim(),
+  contact_phone:$('quickPhone').value.trim(),
+  painting_id:$('quickPainting').value,
+  presentation:$('quickFramed').value,
+  frame_style:'',
+  message:$('quickMessage').value.trim(),
+  contact_consent:$('quickConsent').checked,
+  website:''
+ };
+ btn.disabled=true;btn.textContent='SENDING INQUIRY…';
+ try{
+  const response=await fetch('https://xdaxbueyftyljsrhabpx.supabase.co/functions/v1/jeremy-art-inquiry',{
+   method:'POST',mode:'cors',credentials:'omit',
+   headers:{'Content-Type':'application/json','apikey':'sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ'},
+   body:JSON.stringify(body)
+  });
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok||result.ok!==true){
+   const reason=response.status===429?'Too many inquiries from this connection. Please try again later.':
+    response.status===503?'The inquiry service is temporarily unavailable. Please try again shortly.':
+    'The inquiry could not be sent. Please check the details and retry.';
+   throw new Error(reason);
+  }
+  inquiryForm.reset();
+  pendingInquiryId=null;
+  inquiryStatus.classList.add('is-success');
+  inquiryStatus.textContent='Your painting inquiry was received. We will contact you to discuss the details. Reference: '+String(result.inquiry_id||'').slice(0,8).toUpperCase();
+ }catch(error){
+  inquiryStatus.classList.add('is-error');
+  inquiryStatus.textContent=error instanceof Error?error.message:'Could not send your inquiry. Please try again.';
+ }finally{
+  btn.disabled=false;btn.innerHTML='SEND PAINTING INQUIRY <span>↗</span>';
+ }
+});
 })();
