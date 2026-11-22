@@ -25,6 +25,8 @@ jobs:
           grep -q 'id="quickInquiry"' /tmp/jeremy.html
           curl -fsSL --retry 3 'https://theurbanmatrixlab.com/jeremy-emmons/script.js' -o /tmp/jeremy.js
           grep -q 'quickInquiry' /tmp/jeremy.js
+          curl -sSI 'https://theurbanmatrixlab.com/jeremy-emmons/' -o /tmp/jeremy-headers
+          grep -iq '^x-robots-tag: index' /tmp/jeremy-headers
       - name: Verify inquiry API and email alert configuration
         env:
           API_KEY: sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ
