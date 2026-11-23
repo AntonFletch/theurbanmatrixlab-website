@@ -48,6 +48,13 @@ jobs:
           const { chromium } = require('playwright');
           (async()=>{
             const browser=await chromium.launch({headless:true});
+            for(const path of ['/','/about.html','/humanity.html','/mx-continuity/','/mx-visibility/','/jeremy-emmons/','/publication/']){
+              const p=await browser.newPage();
+              await p.goto('https://theurbanmatrixlab.com'+path+'?utm_source=external-platform',{waitUntil:'domcontentloaded',timeout:30000});
+              if(new URL(p.url()).searchParams.has('utm_source'))throw Error('Tracking parameter still visible on '+path);
+              await p.close();
+            }
+            console.log('UMX CLEAN URL PASS: public pages remove campaign tracking parameters');
             for(const viewport of [{width:390,height:844},{width:1280,height:800}]){
               const page=await browser.newPage({viewport});
               const errors=[];
