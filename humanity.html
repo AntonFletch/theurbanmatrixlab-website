@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+/* Keep displayed UMX addresses free of third-party campaign query tags. */
+(()=>{const u=new URL(location.href);let changed=false;for(const key of [...u.searchParams.keys()]){if(/^utm_/i.test(key)){u.searchParams.delete(key);changed=true;}}if(changed)history.replaceState(history.state,"",u.pathname+u.search+u.hash);})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#09070d">
