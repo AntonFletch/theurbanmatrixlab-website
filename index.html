@@ -176,10 +176,24 @@ body{background:radial-gradient(ellipse at 70% 12%,rgba(90,138,187,.24),transpar
 .artist-feature__cta small{color:#e0dfea}
 @media(max-width:640px){.artist-feature__copy{max-width:100%;background:rgba(10,20,34,.78);padding:14px}.artist-feature__cta{background:rgba(10,20,34,.88)}}
 
+
+/* UMX planet opening: existing artwork shown without alteration. */
+.planet-intro{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;overflow:hidden;background:#030108;animation:planet-intro-exit 4.8s ease-in-out forwards}
+.planet-intro img{display:block;width:min(100vw,1800px);height:auto;max-height:100svh;object-fit:contain}
+.planet-intro button{position:absolute;right:max(20px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom));padding:10px 16px;border:1px solid rgba(232,187,115,.5);border-radius:4px;background:#090610;color:#f9d9a0;font:600 12px Inter,Arial,sans-serif;cursor:pointer}
+.planet-intro button:focus-visible{outline:3px solid #f9d9a0;outline-offset:4px}
+.planet-intro.is-dismissed{animation:none;opacity:0;visibility:hidden;transition:opacity 260ms ease,visibility 260ms ease}
+@keyframes planet-intro-exit{0%,68%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}
+@media(prefers-reduced-motion:reduce){.planet-intro{animation-duration:2.4s}}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<div class="planet-intro" id="umx-planet-intro" role="region" aria-label="UMX Technology opening image">
+  <img src="/assets/umx-technology-cosmic-emblem.png" alt="UMX Technology emblem over a purple planet in space" width="1672" height="941" fetchpriority="high">
+  <button type="button" aria-label="Skip UMX planet introduction">Skip intro</button>
+</div>
+
 <header class="site-header"><div class="wrap header-row">
 <a class="brand" href="/" aria-label="UMX Technology home"><strong>UMX</strong> · THE URBAN MATRIX LAB<small>Technology · Digital Business Services</small></a>
 <nav class="nav" aria-label="Main navigation">
@@ -261,5 +275,8 @@ body{background:radial-gradient(ellipse at 70% 12%,rgba(90,138,187,.24),transpar
 <section class="final" aria-labelledby="final-title"><div class="eyebrow">UMX Technology</div><h2 id="final-title">Built to work together.</h2><p>Explore our technology businesses. Each service has its own requirements and activation process.</p><a class="btn" href="mailto:TheUrbanMatrixLab@outlook.com?subject=UMX%20Technology%20Inquiry">Contact UMX <span aria-hidden="true">→</span></a></section>
 </main>
 <footer><div class="wrap foot"><span>© 2026 The Urban Matrix Lab LLC · Missoula, Montana</span><span><a href="/mx-continuity/">MX Continuity</a> &nbsp;·&nbsp; <a href="/mx-visibility/">MX Visibility</a> &nbsp;·&nbsp; <a href="/JeremyEmmons/">Jeremy Emmons</a> &nbsp;·&nbsp; <a href="/about.html">Founder</a> &nbsp;·&nbsp; <a href="/login.html">Master Access</a></span></div></footer>
+<script>
+(()=>{const intro=document.getElementById("umx-planet-intro");intro?.querySelector("button")?.addEventListener("click",()=>intro.classList.add("is-dismissed"));})();
+</script>
 </body>
 </html>
