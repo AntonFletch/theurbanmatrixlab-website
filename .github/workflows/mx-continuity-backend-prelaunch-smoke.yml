@@ -1,0 +1,61 @@
+name: MX Continuity deployed backend prelaunch safety smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/mx-continuity-backend-prelaunch-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-fail-closed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Assert public intake and checkout OFF before sending any request
+        shell: bash
+        run: |
+          node <<'JS'
+          const origin='https://theurbanmatrixlab.com';
+          const project='https://xdaxbueyftyljsrhabpx.supabase.co';
+          const get=async url=>{
+            const r=await fetch(url,{signal:AbortSignal.timeout(15000)});
+            if(!r.ok||new URL(r.url).hostname!=='theurbanmatrixlab.com')throw new Error('Live safety configuration unavailable: '+url);
+            return await r.text();
+          };
+          (async()=>{
+            const config=await get(origin+'/mx-continuity/assets/intake-config.js');
+            const script=await get(origin+'/mx-continuity/assets/site.js');
+            if(!config.includes('enabled:false')||
+               !config.includes('turnstileSiteKey:""')||
+               !script.includes('prelaunch:true')||
+               !script.includes('checkoutEnabled:false')){
+              throw new Error('Public site no longer in verified prelaunch state; NO backend requests attempted');
+            }
+            const cases=[
+              ['mx-project-inquiry','intake_paused'],
+              ['veil-public-support','prelaunch'],
+              ['veil-create-checkout','test_billing_not_configured']
+            ];
+            for(const [slug,expected] of cases){
+              const r=await fetch(project+'/functions/v1/'+slug,{
+                method:'POST',
+                headers:{'Origin':origin,'Content-Type':'application/json'},
+                body:'{}',
+                redirect:'error',
+                signal:AbortSignal.timeout(15000)
+              });
+              const response=await r.json().catch(()=>({}));
+              const ok=r.status===503 && response?.error===expected;
+              console.log(JSON.stringify({endpoint:slug,status:r.status,error:response?.error,
+                expected,prelaunch_blocked:ok}));
+              if(!ok)throw new Error('Unexpected live backend behavior: '+slug);
+            }
+            console.log('PASS: all three deployed server endpoints reject requests in PRELAUNCH');
+          })().catch(error=>{console.error(String(error));process.exitCode=1;});
+          JS
