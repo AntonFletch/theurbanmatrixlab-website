@@ -37,6 +37,9 @@ jobs:
                !script.includes('checkoutEnabled:false')){
               throw new Error('Public site no longer in verified prelaunch state; NO backend requests attempted');
             }
+            // Use only the already public client publishable key, never a secret.
+            const key=config.match(/publishableKey:"(sb_publishable_[A-Za-z0-9_-]+)"/)?.[1];
+            if(!key)throw new Error('No publishable key in live approved intake configuration');
             const cases=[
               ['mx-project-inquiry','intake_paused'],
               ['veil-public-support','prelaunch'],
@@ -45,7 +48,7 @@ jobs:
             for(const [slug,expected] of cases){
               const r=await fetch(project+'/functions/v1/'+slug,{
                 method:'POST',
-                headers:{'Origin':origin,'Content-Type':'application/json'},
+                headers:{'Origin':origin,'Content-Type':'application/json','apikey':key,'Authorization':'Bearer '+key},
                 body:'{}',
                 redirect:'error',
                 signal:AbortSignal.timeout(15000)
