@@ -7,6 +7,6 @@ window.MX_INTAKE_CONFIG=Object.freeze({
   allowedOrigin:"https://theurbanmatrixlab.com",
   supabaseUrl:"https://xdaxbueyftyljsrhabpx.supabase.co",
   publishableKey:"sb_publishable_eZ5ydFnC0SESdeT9Up_-0A_Mez9ljvZ",
-  turnstileSiteKey:"",
+  turnstileSiteKey:"0x4AAAAAAGRQUZkjQdQEjfjj",
   fallbackEmail:"TheUrbanMatrixLab@outlook.com"
 });
