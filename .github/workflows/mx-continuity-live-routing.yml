@@ -54,6 +54,21 @@ jobs:
               if(!ok)failed++;
             }catch(err){failed++;console.error(JSON.stringify({url,result:'FAIL',reason:String(err)}));}
           }
-          console.log('LIVE ROUTE VERIFICATION',failed?'FAILED':'PASSED',{failed,total:routes.length});
+          // Verify actual customer-facing deployment remains in PRELAUNCH.
+          const guards=[
+            ['https://theurbanmatrixlab.com/mx-continuity/assets/intake-config.js',['enabled:false','turnstileSiteKey:""']],
+            ['https://theurbanmatrixlab.com/mx-continuity/assets/site.js',['checkoutEnabled:false','prelaunch:true']],
+            ['https://theurbanmatrixlab.com/robots.txt',['Disallow: /']]
+          ];
+          for(const [url,tokens] of guards){
+            try{
+              const res=await fetch(url,{redirect:'follow',signal:AbortSignal.timeout(15000)});
+              const body=await res.text();
+              const ok=res.ok && tokens.every(t=>body.includes(t)) && new URL(res.url).hostname==='theurbanmatrixlab.com';
+              console.log(JSON.stringify({url,status:res.status,final_url:res.url,checks:tokens.map(t=>({token:t,found:body.includes(t)})),result:ok?'PASS':'FAIL'}));
+              if(!ok)failed++;
+            }catch(err){failed++;console.error(JSON.stringify({url,result:'FAIL',reason:String(err)}));}
+          }
+          console.log('LIVE ROUTE AND PRELAUNCH VERIFICATION',failed?'FAILED':'PASSED',{failed,total:routes.length});
           if(failed)process.exitCode=1;
           JS
