@@ -59,6 +59,20 @@ jobs:
                 expected,prelaunch_blocked:ok}));
               if(!ok)throw new Error('Unexpected live backend behavior: '+slug);
             }
-            console.log('PASS: inquiry/support return prelaunch 503; checkout rejects unauthenticated access 401; all public safety guards stay off');
+            // Deliberately invalid, unsigned-in-effect webhook payload; must be refused.
+            // No customer or payment objects are created and no valid Stripe event is simulated.
+            const webhook=await fetch(project+'/functions/v1/veil-stripe-webhook',{
+              method:'POST',
+              headers:{'Content-Type':'application/json','stripe-signature':'t=0,v1=00000000000000000000000000000000'},
+              body:'{}',
+              redirect:'error',
+              signal:AbortSignal.timeout(15000)
+            });
+            const webhookResult=await webhook.json().catch(()=>({}));
+            const webhookRejected=[400,401,403,503].includes(webhook.status);
+            console.log(JSON.stringify({endpoint:'veil-stripe-webhook',status:webhook.status,
+              error:webhookResult?.error,rejected_invalid_signature:webhookRejected}));
+            if(!webhookRejected)throw new Error('Webhook did not reject invalid signature in prelaunch');
+            console.log('PASS: inquiry/support 503; checkout auth 401; invalid webhook rejected; public guards remain off');
           })().catch(error=>{console.error(String(error));process.exitCode=1;});
           JS
