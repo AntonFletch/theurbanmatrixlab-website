@@ -78,7 +78,8 @@ jobs:
               'veil_support_tickets','veil_setup_checkouts','veil_setup_payment_events',
               'mx_ops_inspections'];
             for(const table of guardedTables){
-              const res=await fetch(project+'/rest/v1/'+table+'?select=id&limit=1',{
+              const column=table==='veil_setup_payment_events'?'stripe_event_id':'id';
+              const res=await fetch(project+'/rest/v1/'+table+'?select='+column+'&limit=1',{
                 headers:{'apikey':key,'Authorization':'Bearer '+key},
                 redirect:'error',
                 signal:AbortSignal.timeout(15000)
