@@ -37,8 +37,10 @@ jobs:
         run: |
           node mx-continuity/scripts/verify-inquiry-flow.mjs
           node mx-continuity/scripts/verify-support-flow.mjs
-      - name: Verify sandbox-only checkout simulated flows
-        run: node mx-continuity/scripts/verify-checkout-flow.mjs
+      - name: Verify sandbox checkout and signed webhook simulated flows
+        run: |
+          node mx-continuity/scripts/verify-checkout-flow.mjs
+          node mx-continuity/scripts/verify-webhook-flow.mjs
       - name: Verify no live activation or legacy payment origins
         shell: bash
         run: |
