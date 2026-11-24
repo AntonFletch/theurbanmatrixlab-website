@@ -98,6 +98,27 @@ jobs:
                 visible_rows:accessible?'LEAK':'NONE',result:accessible?'FAIL':'PASS'}));
               if(accessible)throw new Error('Public access to protected business records: '+table);
             }
+            // Staff-only RPCs must reject anonymous users before rank-gated logic.
+            // Fixed nonexistent UUID prevents any valid workflow from being touched.
+            const neverValid='00000000-0000-0000-0000-000000000000';
+            const deniedRPCs=[
+              ['veil_create_quote_for_lead',{p_lead_id:neverValid,p_service_code:'qa-noaction',p_valid_days:1}],
+              ['veil_complete_project_step',{p_step_id:neverValid}],
+              ['veil_confirm_booking_request',{p_booking_request_id:neverValid,
+                p_start_at:'2026-11-24T11:00:00Z',p_end_at:'2026-11-24T11:30:00Z'}]
+            ];
+            for(const [rpc,payload] of deniedRPCs){
+              const res=await fetch(project+'/rest/v1/rpc/'+rpc,{
+                method:'POST',headers:{'apikey':key,'Authorization':'Bearer '+key,
+                  'Content-Type':'application/json'},
+                body:JSON.stringify(payload),
+                redirect:'error',signal:AbortSignal.timeout(15000)
+              });
+              const blocked=res.status===401||res.status===403;
+              console.log(JSON.stringify({rpc,status:res.status,
+                anonymous_execution_blocked:blocked}));
+              if(!blocked)throw new Error('Staff-only RPC unexpectedly callable by anonymous user: '+rpc);
+            }
             console.log('PASS: inquiry/support 503; checkout auth 401; invalid webhook rejected; public guards remain off');
           })().catch(error=>{console.error(String(error));process.exitCode=1;});
           JS
