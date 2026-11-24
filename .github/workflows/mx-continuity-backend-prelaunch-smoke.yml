@@ -73,6 +73,30 @@ jobs:
             console.log(JSON.stringify({endpoint:'veil-stripe-webhook',status:webhook.status,
               error:webhookResult?.error,rejected_invalid_signature:webhookRejected}));
             if(!webhookRejected)throw new Error('Webhook did not reject invalid signature in prelaunch');
+            // Probe Data API as a public anonymous visitor. Never display customer rows.
+            const guardedTables=['mx_project_inquiries','mx_client_inquiries',
+              'veil_support_tickets','veil_setup_checkouts','veil_setup_payment_events',
+              'mx_ops_inspections'];
+            for(const table of guardedTables){
+              const res=await fetch(project+'/rest/v1/'+table+'?select=id&limit=1',{
+                headers:{'apikey':key,'Authorization':'Bearer '+key},
+                redirect:'error',
+                signal:AbortSignal.timeout(15000)
+              });
+              const body=await res.text();
+              let accessible=false;
+              if(res.status===200){
+                let items;
+                try{items=JSON.parse(body)}catch{throw new Error('Unreadable Data API response: '+table)}
+                if(!Array.isArray(items))throw new Error('Unexpected Data API result shape: '+table);
+                accessible=items.length>0;
+              }else if(![401,403,404].includes(res.status)){
+                throw new Error('Unexpected Data API status on '+table+': '+res.status);
+              }
+              console.log(JSON.stringify({table,anonymous_status:res.status,
+                visible_rows:accessible?'LEAK':'NONE',result:accessible?'FAIL':'PASS'}));
+              if(accessible)throw new Error('Public access to protected business records: '+table);
+            }
             console.log('PASS: inquiry/support 503; checkout auth 401; invalid webhook rejected; public guards remain off');
           })().catch(error=>{console.error(String(error));process.exitCode=1;});
           JS
