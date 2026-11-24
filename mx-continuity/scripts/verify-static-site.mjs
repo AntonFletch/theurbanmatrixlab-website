@@ -13,6 +13,7 @@ const required=[
  "refunds.html","cancellation.html","privacy.html","project-order.html",
  "monthly-care-authorization.html","change-order.html","404.html","assets/site.js","assets/style.css",
  "assets/contact-email.js","assets/support-email.js","assets/intake-config.js","scripts/verify-support-flow.mjs","scripts/verify-checkout-flow.mjs",
+ "server-functions/mx-public-support-legacy/index.ts",
  "assets/support-config.js","assets/mx-logo-horizontal.svg","assets/mx-hero-laptop.webp",
  "live/index.html","live/live.css","live/live.js", "scripts/verify-inquiry-flow.mjs"
 ];
@@ -44,6 +45,8 @@ check(!/sb_secret_|service_role|sk_live_/i.test(portalJs),"client portal contain
 const support=read("support.html"),intake=read("assets/intake-config.js");
 const ticket=read("assets/support-config.js"),contactJs=read("assets/contact-email.js");
 const supportJs=read("assets/support-email.js");
+const legacySupport=read("server-functions/mx-public-support-legacy/index.ts");
+check(legacySupport.includes("endpoint_retired")&&legacySupport.includes("status: 410")&&!legacySupport.includes("veil_support_tickets"),"legacy support endpoint must stay retired and write-free");
 for(const value of ["$299","$49","Care that continues",
   "assets/mx-logo-horizontal.svg","noindex,nofollow,noarchive"]){
  check(home.includes(value),"original homepage pricing/branding missing "+value);
