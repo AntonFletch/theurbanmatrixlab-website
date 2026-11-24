@@ -43,7 +43,7 @@ jobs:
             const cases=[
               ['mx-project-inquiry','intake_paused'],
               ['veil-public-support','prelaunch'],
-              ['veil-create-checkout','test_billing_not_configured']
+              ['veil-create-checkout',null] // Authenticated-user gate must reject public requests before billing handler
             ];
             for(const [slug,expected] of cases){
               const r=await fetch(project+'/functions/v1/'+slug,{
@@ -54,11 +54,11 @@ jobs:
                 signal:AbortSignal.timeout(15000)
               });
               const response=await r.json().catch(()=>({}));
-              const ok=r.status===503 && response?.error===expected;
+              const ok=expected===null ? r.status===401 : (r.status===503 && response?.error===expected);
               console.log(JSON.stringify({endpoint:slug,status:r.status,error:response?.error,
                 expected,prelaunch_blocked:ok}));
               if(!ok)throw new Error('Unexpected live backend behavior: '+slug);
             }
-            console.log('PASS: all three deployed server endpoints reject requests in PRELAUNCH');
+            console.log('PASS: inquiry/support return prelaunch 503; checkout rejects unauthenticated access 401; all public safety guards stay off');
           })().catch(error=>{console.error(String(error));process.exitCode=1;});
           JS
