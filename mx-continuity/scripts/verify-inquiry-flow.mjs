@@ -7,7 +7,8 @@ const validIntake={
   enabled:true,
   allowedOrigin:"https://theurbanmatrixlab.com",
   supabaseUrl:"https://xdaxbueyftyljsrhabpx.supabase.co",
-  publishableKey:"sb_publishable_test"
+  publishableKey:"sb_publishable_test",
+  turnstileSiteKey:"1x00000000000000000000AA"
 };
 
 function createHarness({ valid=true, consent=true, failFirst=false, intake=validIntake }={}) {
@@ -19,9 +20,7 @@ function createHarness({ valid=true, consent=true, failFirst=false, intake=valid
     email: { value: "qa@example.invalid" },
     business_name: { value: "MX Internal Form Test" },
     package: { value: "Custom quote", options: [
-      { text:"Basic — $89 setup",value:"Basic — $89 setup" },
-      { text:"Business — $199 setup",value:"Business — $199 setup" },
-      { text:"Continuity — $400 setup",value:"Continuity — $400 setup" },
+      { text:"Website Setup — $299 one-time",value:"Website Setup — $299 one-time" },
       { text:"Custom quote",value:"Custom quote" }
     ] },
     description: { value: "Internal UI test only; no real submission." },
@@ -31,7 +30,8 @@ function createHarness({ valid=true, consent=true, failFirst=false, intake=valid
   const form = {
     elements:fields,
     reportValidity:()=>valid,
-    addEventListener:(event,fn)=>{callbacks[event]=fn;}
+    addEventListener:(event,fn)=>{callbacks[event]=fn;},
+    insertBefore:()=>{}
   };
   const button = {
     disabled:false,textContent:"Submit project inquiry",
@@ -39,10 +39,10 @@ function createHarness({ valid=true, consent=true, failFirst=false, intake=valid
   };
   const requests = [];
   let ids = 0;
-  const location = { search:"?package=basic",origin:"https://theurbanmatrixlab.com",href:"https://theurbanmatrixlab.com/mx-continuity/contact.html" };
+  const location = { search:"?package=website-setup",origin:"https://theurbanmatrixlab.com",href:"https://theurbanmatrixlab.com/mx-continuity/contact.html" };
   const mock = {
-    window:{MX_INTAKE_CONFIG:intake},
-    document:{getElementById(id){
+    window:{MX_INTAKE_CONFIG:intake,turnstile:{render:()=>"qa-widget",getResponse:()=>"qa-turnstile-token",reset:()=>{}}},
+    document:{head:{appendChild(script){script.onload?.();}},createElement:()=>({setAttribute(){}}),getElementById(id){
       return {"inquiry-form":form,"email-inquiry-btn":button,"form-status":status}[id]||null;
     }},
     URL,URLSearchParams,location,
@@ -58,7 +58,7 @@ function createHarness({ valid=true, consent=true, failFirst=false, intake=valid
   };
   vm.runInNewContext(source,mock,{filename:"assets/contact-email.js"});
   return {form,button,status,fields,requests,location,
-    click:()=>buttonCallbacks.click?.(),
+    debug:mock.window.__packageDebug,click:()=>buttonCallbacks.click?.(),
     edit:()=>callbacks.input?.()
   };
 }
@@ -84,10 +84,10 @@ await noConsent.click();
 assert(noConsent.requests.length===0,"unconsented form submitted");
 
 const success=createHarness();
-assert(success.fields.package.value==="Basic — $89 setup","package deep-link preselection broken");
+assert(success.fields.package.value==="Website Setup — $299 one-time","package deep-link preselection broken");
 await success.click();
 assert(success.requests.length===1,"valid submission did not send exactly once");
-assert(success.requests[0].package_interest==="Basic — $89 setup","wrong package submitted");
+assert(success.requests[0].package_interest==="Website Setup — $299 one-time","wrong package submitted");
 assert(success.requests[0].contact_consent===true,"privacy consent omitted");
 assert(success.status.textContent.includes("Inquiry received and saved securely"),"success confirmation missing");
 assert(success.status.textContent.includes("No email app or second send is needed"),"unnecessary second email step");
