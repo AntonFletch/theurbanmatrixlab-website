@@ -1,0 +1,50 @@
+name: MX Continuity prelaunch gates (no live submissions)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'mx-continuity/**'
+      - '.github/workflows/mx-continuity-prelaunch-gates.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'mx-continuity/**'
+      - '.github/workflows/mx-continuity-prelaunch-gates.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mx-continuity-safe-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prelaunch-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify static site, legal offer, owner access and launch locks
+        run: |
+          node mx-continuity/scripts/verify-static-site.mjs
+          node mx-continuity/scripts/verify-umx-owner.mjs
+      - name: Verify inquiry and support simulated flows
+        run: |
+          node mx-continuity/scripts/verify-inquiry-flow.mjs
+          node mx-continuity/scripts/verify-support-flow.mjs
+      - name: Verify sandbox-only checkout simulated flows
+        run: node mx-continuity/scripts/verify-checkout-flow.mjs
+      - name: Verify no live activation or legacy payment origins
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'enabled:false' mx-continuity/assets/intake-config.js
+          grep -q 'checkoutEnabled:false' mx-continuity/assets/site.js
+          grep -q 'website_setup:\x27price_1UfCIv2OkUQH95j4N25JJMoc\x27' mx-continuity/server-functions/veil-create-checkout/_shared/billing-config.mjs
+          ! grep -rE 'chatgpt[.]site|price_1UeLx(b|c|d)' mx-continuity/server-functions/veil-create-checkout
+          grep -q 'theurbanmatrixlab.com' mx-continuity/server-functions/veil-create-checkout/_shared/billing-config.mjs
