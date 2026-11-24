@@ -1,0 +1,59 @@
+name: UMX live-domain and Continuity route verification
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/mx-continuity-live-routing.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readonly-routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check real HTTP routing and content (GET only)
+        shell: bash
+        run: |
+          node <<'JS'
+          const routes=[
+            ['https://theurbanmatrixlab.com/','UMX Technology'],
+            ['https://theurbanmatrixlab.com/mx-continuity/','MX Continuity'],
+            ['https://theurbanmatrixlab.com/mx-continuity/contact.html','MX Continuity'],
+            ['https://theurbanmatrixlab.com/mx-continuity/support.html','MX Continuity'],
+            ['https://www.theurbanmatrixlab.com/','UMX Technology'],
+            ['https://www.theurbanmatrixlab.com/mx-continuity/','MX Continuity']
+          ];
+          let failed=0;
+          for(const [url,expected] of routes){
+            try {
+              let current=url,redirects=[];
+              let res;
+              for(let n=0;n<8;n++){
+                res=await fetch(current,{redirect:'manual',signal:AbortSignal.timeout(15000),headers:{'user-agent':'UMX-readonly-QA/1.0'}});
+                const loc=res.headers.get('location');
+                if(res.status>=300&&res.status<400&&loc){
+                  let next=new URL(loc,current).href;
+                  redirects.push(next);
+                  current=next;
+                  continue;
+                }
+                break;
+              }
+              const final=new URL(current);
+              const body=await res.text();
+              const ok=res.ok && final.protocol==='https:' &&
+                final.hostname==='theurbanmatrixlab.com' && body.includes(expected) &&
+                !redirects.some(x=>x.includes('.chatgpt.site'));
+              console.log(JSON.stringify({url,status:res.status,final_url:current,redirects,expected_content:expected,contains_expected:body.includes(expected),result:ok?'PASS':'FAIL'}));
+              if(!ok)failed++;
+            }catch(err){failed++;console.error(JSON.stringify({url,result:'FAIL',reason:String(err)}));}
+          }
+          console.log('LIVE ROUTE VERIFICATION',failed?'FAILED':'PASSED',{failed,total:routes.length});
+          if(failed)process.exitCode=1;
+          JS
