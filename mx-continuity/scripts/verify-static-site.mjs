@@ -3,6 +3,8 @@ import vm from "node:vm";
 import path from "node:path";
 import {fileURLToPath} from "node:url";
 import "./verify-inquiry-flow.mjs";
+import "./verify-support-flow.mjs";
+import "./verify-checkout-flow.mjs";
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 function check(ok,why){if(!ok)throw new Error("MX Continuity QA FAIL: "+why);}
@@ -10,7 +12,7 @@ const required=[
  "index.html","about.html","contact.html","support.html","terms.html","ownership.html",
  "refunds.html","cancellation.html","privacy.html","project-order.html",
  "monthly-care-authorization.html","change-order.html","404.html","assets/site.js","assets/style.css",
- "assets/contact-email.js","assets/support-email.js","assets/intake-config.js",
+ "assets/contact-email.js","assets/support-email.js","assets/intake-config.js","scripts/verify-support-flow.mjs","scripts/verify-checkout-flow.mjs",
  "assets/support-config.js","assets/mx-logo-horizontal.svg","assets/mx-hero-laptop.webp",
  "live/index.html","live/live.css","live/live.js", "scripts/verify-inquiry-flow.mjs"
 ];
@@ -42,19 +44,20 @@ check(!/sb_secret_|service_role|sk_live_/i.test(portalJs),"client portal contain
 const support=read("support.html"),intake=read("assets/intake-config.js");
 const ticket=read("assets/support-config.js"),contactJs=read("assets/contact-email.js");
 const supportJs=read("assets/support-email.js");
-for(const value of ["$89","$199","$400","$25","$49","$89","Care that continues",
+for(const value of ["$299","$49","Care that continues",
   "assets/mx-logo-horizontal.svg","noindex,nofollow,noarchive"]){
  check(home.includes(value),"original homepage pricing/branding missing "+value);
 }
-for(const tier of ["basic","business","continuity"]){
- check(home.includes("contact.html?package="+tier),"package action broken: "+tier);
-}
+check(home.includes("contact.html?package=website-setup"),"approved setup inquiry link missing");
+check(!/\$(?:89|199|400|25)(?:\b|\s)/.test(home+contactJs),"stale public offer pricing remains");
 check(!home.includes('disabled="" type="button"'),"package buttons still disabled");
 for(const token of ["prelaunch:true","checkoutEnabled:false","contactEnabled:true"]){
  check(site.includes(token),"backend safety flag missing: "+token);
 }
 check(intake.includes("enabled:false"),"backend intake activated unintentionally");
 check(ticket.includes("enabled:true"),"secure support ticketing unexpectedly disabled");
+check(ticket.includes('turnstileSiteKey:""'),"support Turnstile key placeholder missing");
+check(supportJs.includes("matrix_support")&&supportJs.includes("turnstileToken"),"support Turnstile token/action not integrated");
 check(site.includes('smithChatAccount="61dbafef-826c-45bc-a7a3-055fe772f8b0"') && site.includes("https://app.smith.ai/chat/widget-latest.js"),"Smith.ai chat widget not configured on MX Continuity");
 check(read("privacy.html").includes("Smith.ai website chat"),"Smith.ai chat privacy disclosure missing");
 check(contact.includes('id="email-inquiry-btn"'),"working inquiry email action missing");
@@ -71,7 +74,7 @@ check(support.includes('id="email-support-btn"'),"working support email action m
 check(support.includes("assets/support-email.js"),"support email script missing");
 check(supportJs.includes('"mailto:"') && ticket.includes("TheUrbanMatrixLab@outlook.com"),"support fallback email recipient missing");
 check(support.includes("assets/support-config.js"),"support backend config script missing");
-check(supportJs.includes("/functions/v1/mx-public-support") && supportJs.includes("request_id") && supportJs.includes("privacy_ack") && supportJs.includes("result.ok"),"secure tracked support integration missing");
+check(supportJs.includes("/functions/v1/veil-public-support") && supportJs.includes("request_id") && supportJs.includes("privacy_ack") && supportJs.includes("result.ok"),"secure tracked support integration missing");
 check(supportJs.includes("reportValidity"),"support validation missing");
 check(support.includes("Submit support request")&&support.includes('name="company_website"'),"secure support CTA or spam trap missing");
 check(support.includes("After submitting your support request")&&!support.includes("After you send your email")&&!support.includes("prepare an email to our support team"),"public support instructions contradict recorded-ticket workflow");
@@ -85,12 +88,12 @@ for(const file of ["project-order.html","monthly-care-authorization.html"]){
 const legalPages=["terms.html","ownership.html","refunds.html","cancellation.html","privacy.html"];
 for(const file of legalPages){
  const html=read(file);
- check(html.includes(file==="privacy.html"?"November 20, 2026":"November 9, 2026"),"policy lacks current effective/update date: "+file);
+ check(html.includes(file==="privacy.html"?"November 20, 2026":(["terms.html","refunds.html"].includes(file)?"November 24, 2026":"November 9, 2026")),"policy lacks current effective/update date: "+file);
  check(!/Version 1\.0|Version 2\.0|Before publishing this notice|temporary business contact|draft for review|must be verified before this agreement/i.test(html),
    "policy has draft instructions or temporary information: "+file);
 }
-check(read("terms.html").includes("Basic includes one contact form"),"contract excludes advertised Basic form");
-check(read("terms.html").includes("MX will test the agreed form delivery"),"form delivery acceptance not specified");
+check(read("terms.html").includes("automated customer acknowledgment")&&read("terms.html").includes("owner notification"),"contract offer lacks acknowledgment/owner-alert features");
+check(read("terms.html").includes("MX will test the agreed inquiry delivery"),"form delivery acceptance not specified");
 check(read("terms.html").includes("signed the Project Order"),"copyright signature condition missing");
 check(read("ownership.html").includes("Project Order signed by an authorized MX representative"),"assignment execution ambiguous");
 check(read("project-order.html").includes("It incorporates the"),"project order doesn't incorporate legal terms");
@@ -107,10 +110,11 @@ for(const phrase of ["Customer pays MX","MX issues a credit/refund","Consent to 
 // Contract-to-advertisement consistency guards; maintain one definitive signing form.
 const agreement=read("terms.html"),order=read("project-order.html"),careConsent=read("monthly-care-authorization.html");
 check(!home.includes("Basic on-page search setup")&&!agreement.includes("Basic on-page search setup")&&!order.includes("basic on-page search setup"),"search-service promises must stay outside MX Continuity");
-check(home.includes("hosting coordination is $99")&&agreement.includes("separately authorized $99")&&order.includes("$99 one-time service accepted"),"separate $99 add-on disclosure inconsistent");
+check(!home.includes("$99")&&!agreement.includes("$99")&&!order.includes("$99")&&!read("refunds.html").includes("$99"),"unapproved $99 add-on still advertised");
+check(home.includes("$299")&&home.includes("$49/month")&&agreement.includes("$299 one-time fee")&&agreement.includes("$49 per month")&&careConsent.includes("$49/month"),"approved setup/care pricing inconsistent");
 check(agreement.includes("no undisclosed absolute liability cap")&&agreement.includes("even if the Customer has not authorized public go-live"),"risk and paid handoff terms not aligned");
 check(read("refunds.html").includes("ten business days after receipt of the request"),"refund decision deadline not guaranteed");
-check(home.includes("Priority handling of routine maintenance requests")&&agreement.includes("Continuity priority support")&&order.includes("Continuity maintenance-request priority")&&careConsent.includes("Continuity priority handling"),"continuity support priority promises inconsistent");
+check(home.includes("Scheduled website checkups every Monday and Friday")&&agreement.includes("scheduled checkups every Monday and Friday")&&order.includes("checkups occur Monday and Friday")&&careConsent.includes("checkups every Monday and Friday"),"scheduled care frequency inconsistent");
 check(home.includes("Minor existing-content updates")&&agreement.includes("Routine existing-content updates")&&order.includes("content-update allowance")&&careConsent.includes("monthly content-update allowance"),"routine content updates not bounded or recorded");
 check(!agreement.includes("greater of (i) $500")&&agreement.includes("no undisclosed absolute liability cap"),"unexpected standard liability cap");
 check(!agreement.includes("<h2>Project Order and signatures</h2>")&&agreement.includes("standalone Project Order is the controlling execution form")&&order.includes("Customer signature:"),"agreement has competing signature form");
