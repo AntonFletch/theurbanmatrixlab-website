@@ -2,7 +2,7 @@ import { withSupabase } from "npm:@supabase/server@1.9.2";
 
 const ALLOWED_ORIGIN = "https://theurbanmatrixlab.com";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const PACKAGE_NAMES = new Set(["Website Setup — $299 one-time", "Custom quote"]);
+const PACKAGE_NAMES = new Set(["Basic — $89 setup", "Business — $199 setup", "Continuity — $400 setup", "Custom quote"]);
 const clean = (v: unknown) => typeof v === "string" ? v.trim() : "";
 const goodEmail = (v: string) => /^[^\s@<>\\,;]+@[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/i.test(v);
 
