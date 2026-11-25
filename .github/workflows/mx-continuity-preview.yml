@@ -41,9 +41,12 @@ jobs:
           test -f mx-continuity/privacy.html
           test -f mx-continuity/cancellation.html
           grep -q 'Care that continues' mx-continuity/index.html
-          grep -q '\$299' mx-continuity/index.html
+          grep -q '\$89' mx-continuity/index.html
+          grep -q '\$199' mx-continuity/index.html
+          grep -q '\$400' mx-continuity/index.html
+          grep -q '\$25' mx-continuity/index.html
           grep -q '\$49' mx-continuity/index.html
-          ! grep -Eq '\$(89|199|400)' mx-continuity/index.html
+          ! grep -q '\$299' mx-continuity/index.html
           grep -q 'enabled:false' mx-continuity/assets/intake-config.js
           grep -q 'checkoutEnabled:false' mx-continuity/assets/site.js
       - name: Verify original MX Continuity site and launch guards

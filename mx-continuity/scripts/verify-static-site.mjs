@@ -47,12 +47,12 @@ const ticket=read("assets/support-config.js"),contactJs=read("assets/contact-ema
 const supportJs=read("assets/support-email.js");
 const legacySupport=read("server-functions/mx-public-support-legacy/index.ts");
 check(legacySupport.includes("endpoint_retired")&&legacySupport.includes("status: 410")&&!legacySupport.includes("veil_support_tickets"),"legacy support endpoint must stay retired and write-free");
-for(const value of ["$299","$49","Care that continues",
+for(const value of ["$89","$199","$400","$25","$49","Care that continues",
   "assets/mx-logo-horizontal.svg","noindex,nofollow,noarchive"]){
  check(home.includes(value),"original homepage pricing/branding missing "+value);
 }
-check(home.includes("contact.html?package=website-setup"),"approved setup inquiry link missing");
-check(!/\$(?:89|199|400|25)(?:\b|\s)/.test(home+contactJs),"stale public offer pricing remains");
+check(["basic","business","continuity"].every(p=>home.includes("contact.html?package="+p)),"Three approved package inquiry links missing");
+check(!home.includes("$299") && !contactJs.includes("Website Setup — $299"),"Rejected single-offer pricing returned");
 check(!home.includes('disabled="" type="button"'),"package buttons still disabled");
 for(const token of ["prelaunch:true","checkoutEnabled:false","contactEnabled:true"]){
  check(site.includes(token),"backend safety flag missing: "+token);
@@ -62,7 +62,7 @@ check(ticket.includes("enabled:true"),"secure support ticketing unexpectedly dis
 check(ticket.includes('turnstileSiteKey:""'),"support Turnstile key placeholder missing");
 check(supportJs.includes("matrix_support")&&supportJs.includes("turnstileToken"),"support Turnstile token/action not integrated");
 check(!site.includes('smithChatAccount') && !site.includes('app.smith.ai/chat/widget-latest.js'),"Disallowed chat overlay is present");
-check(home.includes('id="website-setup"') && home.includes('id="included-care"') && home.includes('id="website-care"') && home.includes('<div class="cards">'),"Approved original three-card visual layout missing");
+check(["basic","business","continuity"].every(p=>home.includes('id="'+p+'"')) && home.includes('<div class="cards">') && !home.includes('id="website-setup"'),"Original Basic/Business/Continuity layout missing");
 check(read("privacy.html").includes("Public website chat:") && read("privacy.html").includes("not active"),"Disabled public chat privacy disclosure missing");
 check(contact.includes('id="email-inquiry-btn"'),"working inquiry email action missing");
 check(contact.includes('name="contact_consent"'),"inquiry privacy consent missing");
@@ -115,10 +115,10 @@ for(const phrase of ["Customer pays MX","MX issues a credit/refund","Consent to 
 const agreement=read("terms.html"),order=read("project-order.html"),careConsent=read("monthly-care-authorization.html");
 check(!home.includes("Basic on-page search setup")&&!agreement.includes("Basic on-page search setup")&&!order.includes("basic on-page search setup"),"search-service promises must stay outside MX Continuity");
 check(!home.includes("$99")&&!agreement.includes("$99")&&!order.includes("$99")&&!read("refunds.html").includes("$99"),"unapproved $99 add-on still advertised");
-check(home.includes("$299")&&home.includes("$49/month")&&agreement.includes("$299 one-time fee")&&agreement.includes("$49 per month")&&careConsent.includes("$49/month"),"approved setup/care pricing inconsistent");
+check(["$89","$199","$400","$25","$49"].every(s=>home.includes(s)) && ["$89","$199","$400","$25","$49"].every(s=>agreement.includes(s)) && ["$25","$49","$89"].every(s=>careConsent.includes(s)),"Approved three-package setup/care pricing inconsistent");
 check(agreement.includes("no undisclosed absolute liability cap")&&agreement.includes("even if the Customer has not authorized public go-live"),"risk and paid handoff terms not aligned");
 check(read("refunds.html").includes("ten business days after receipt of the request"),"refund decision deadline not guaranteed");
-check(home.includes("Scheduled website checkups every Monday and Friday")&&agreement.includes("scheduled checkups every Monday and Friday")&&order.includes("checkups occur Monday and Friday")&&careConsent.includes("checkups every Monday and Friday"),"scheduled care frequency inconsistent");
+check(home.includes("Website checkups every Monday and Friday")&&agreement.includes("Monday/Friday checkups")&&order.includes("Continuity every Monday and Friday")&&careConsent.includes("Monday and Friday checkups"),"Scheduled package care frequency inconsistent");
 check(home.includes("Minor existing-content updates")&&agreement.includes("Routine existing-content updates")&&order.includes("content-update allowance")&&careConsent.includes("monthly content-update allowance"),"routine content updates not bounded or recorded");
 check(!agreement.includes("greater of (i) $500")&&agreement.includes("no undisclosed absolute liability cap"),"unexpected standard liability cap");
 check(!agreement.includes("<h2>Project Order and signatures</h2>")&&agreement.includes("standalone Project Order is the controlling execution form")&&order.includes("Customer signature:"),"agreement has competing signature form");

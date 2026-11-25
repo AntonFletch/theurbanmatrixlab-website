@@ -75,8 +75,13 @@
   const params = new URLSearchParams(location.search);
   const requested = (params.get("package") || "").toLowerCase();
   const select = form.elements.package;
-  if (requested === "website-setup") {
-    const option = [...select.options].find(x => x.value === "Website Setup — $299 one-time");
+  const packageOptions = {
+    basic: "Basic — $89 setup",
+    business: "Business — $199 setup",
+    continuity: "Continuity — $400 setup"
+  };
+  if (Object.hasOwn(packageOptions,requested)) {
+    const option = [...select.options].find(x => x.value === packageOptions[requested]);
     if (option) select.value = option.value;
   }
 
