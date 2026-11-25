@@ -45,6 +45,11 @@ jobs:
                 const res=await page.goto(base+path,{waitUntil:'domcontentloaded',timeout:18000});
                 if(!res?.ok()){console.log('FAIL HTTP',path,res?.status());issues++;continue}
                 if(!page.url().startsWith(base)){console.log('FAIL redirect',path,page.url());issues++;continue}
+                if(await page.locator('.menu-toggle').count()){
+                  const supportLink=page.locator('.main-nav a[href="support.html"]');
+                  if(await supportLink.count()!==1){issues++;console.log('FAIL support route missing',path);}
+                }
+                if(path==='support.html'&&await page.locator('#support-form').count()!==1){issues++;console.log('FAIL support form missing');}
                 for(const width of [320,375,390,768,1280]){
                   await page.setViewportSize({width,height:900});
                   await page.waitForTimeout(150);
@@ -59,12 +64,7 @@ jobs:
                     if(expanded!=='true'||!nav||await menu.getAttribute('aria-expanded')!=='false'){issues++;console.log('FAIL menu keyboard',path,width)}else console.log('PASS menu keyboard',path||'home',width);
                   }
                   if(width===375||width===1280){
-                    if(await page.locator('.menu-toggle').count()){
-                      try{await page.locator('.standard-position-action-btn').first().waitFor({state:'attached',timeout:6000});}catch(e){issues++;console.log('FAIL chat widget not loaded',path,width);}
-                      await page.waitForTimeout(350);
-                    }
                     await page.addScriptTag({path:axe});
-                    if(path===''&&width===1280)console.log('WIDGET DOM',JSON.stringify(await page.evaluate(()=>Array.from(document.querySelectorAll('.standard-position-action-btn,.proactive-avatar-status-badge,[data-testid^="tiled-avatar"] .img')).map(e=>({outer:e.outerHTML.slice(0,1500),parent:e.parentElement?.outerHTML.slice(0,2000)})))));
                     const result=await page.evaluate(async()=>await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']}}));
                     for(const v of result.violations){issues++;console.log('FAIL axe',path||'home',width,v.id,v.impact,JSON.stringify(v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))))}
                     console.log('AXE summary',path||'home',width,'violations',result.violations.length,'incomplete',result.incomplete.map(x=>x.id).join(','));
