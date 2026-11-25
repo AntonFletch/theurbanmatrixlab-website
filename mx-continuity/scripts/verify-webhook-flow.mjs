@@ -5,7 +5,7 @@ const origin='https://theurbanmatrixlab.com';
 const eventBase=(type,id='evt_test_001')=>({
   id, type, livemode:false, api_version:'2026-09-30.endive',
   data:{ object:{id:'cs_test_mock',mode:'payment',payment_status:'paid',currency:'usd',
-    amount_total:29900,amount:29900,payment_intent:'pi_test_mock',
+    amount_total:19900,amount:19900,payment_intent:'pi_test_mock',
     customer_email:'not-to-be-persisted@example.invalid',customer_details:{name:'NOT FOR STORAGE'}}}
 });
 const records=new Map();
@@ -72,7 +72,7 @@ const failure=createWebhookHandler({config,verifyEvent,admin:{rpc:async()=>({err
 assert.equal((await failure(req(eventBase(BILLING_EVENTS[0],'evt_unavailable')))).status,503,'failed database write must return retryable error');
 
 const receipt=eventReceipt(eventBase('charge.refunded','evt_redact'));
-assert.equal(receipt.object.amount_total,29900);
+assert.equal(receipt.object.amount_total,19900);
 assert.equal(receipt.object.customer_email,undefined);
 assert.equal(receipt.object.customer_details,undefined);
 

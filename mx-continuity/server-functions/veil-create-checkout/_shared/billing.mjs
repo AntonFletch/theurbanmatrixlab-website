@@ -1,6 +1,6 @@
 const APPROVED_ORIGIN = 'https://theurbanmatrixlab.com';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const APPROVED_SETUP_AMOUNTS = Object.freeze({ website_setup:29900 });
+const APPROVED_SETUP_AMOUNTS = Object.freeze({ basic_setup:8900, business_setup:19900, continuity_setup:40000 });
 export const BILLING_EVENTS = Object.freeze([
   'checkout.session.completed', 'checkout.session.async_payment_succeeded', 'checkout.session.async_payment_failed',
   'charge.refunded', 'charge.dispute.created', 'radar.early_fraud_warning.created'
@@ -11,7 +11,7 @@ export function billingConfigured(config) {
     const origin = new URL(config.origin);
     return config.mode === 'test' && /^(rk|sk)_test_/.test(config.apiKey || '') &&
       origin.protocol === 'https:' && origin.origin === config.origin && config.origin === APPROVED_ORIGIN &&
-      config.prices && ['website_setup'].every(k => /^price_/.test(config.prices[k] || '')) && Boolean(config.webhookSecret?.startsWith('whsec_'));
+      config.prices && Object.keys(APPROVED_SETUP_AMOUNTS).every(k => /^price_/.test(config.prices[k] || '')) && Boolean(config.webhookSecret?.startsWith('whsec_'));
   } catch { return false; }
 }
 

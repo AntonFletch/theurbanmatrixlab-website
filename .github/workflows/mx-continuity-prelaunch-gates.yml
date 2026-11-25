@@ -47,6 +47,8 @@ jobs:
           set -euo pipefail
           grep -q 'enabled:false' mx-continuity/assets/intake-config.js
           grep -q 'checkoutEnabled:false' mx-continuity/assets/site.js
-          grep -Fq "website_setup:'price_1UfCIv2OkUQH95j4N25JJMoc'" mx-continuity/server-functions/veil-create-checkout/_shared/billing-config.mjs
+          grep -q 'MX_STRIPE_TEST_PRICE_BASIC' mx-continuity/server-functions/veil-create-checkout/_shared/billing-config.mjs
+          grep -q 'MX_STRIPE_TEST_PRICE_BUSINESS' mx-continuity/server-functions/veil-create-checkout/_shared/billing-config.mjs
+          grep -q 'MX_STRIPE_TEST_PRICE_CONTINUITY' mx-continuity/server-functions/veil-create-checkout/_shared/billing-config.mjs
           ! grep -rE 'chatgpt[.]site|price_1UeLx(b|c|d)' mx-continuity/server-functions/veil-create-checkout
           grep -q 'theurbanmatrixlab.com' mx-continuity/server-functions/veil-create-checkout/_shared/billing-config.mjs

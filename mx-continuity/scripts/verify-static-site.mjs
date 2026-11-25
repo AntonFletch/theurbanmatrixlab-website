@@ -52,7 +52,7 @@ for(const value of ["$89","$199","$400","$25","$49","Care that continues",
  check(home.includes(value),"original homepage pricing/branding missing "+value);
 }
 check(["basic","business","continuity"].every(p=>home.includes("contact.html?package="+p)),"Three approved package inquiry links missing");
-check(!home.includes("$299") && !contactJs.includes("Website Setup — $299"),"Rejected single-offer pricing returned");
+check(!home.includes("Website Setup")&&!contactJs.includes("Website Setup"),"Obsolete standalone offer returned");
 check(!home.includes('disabled="" type="button"'),"package buttons still disabled");
 for(const token of ["prelaunch:true","checkoutEnabled:false","contactEnabled:true"]){
  check(site.includes(token),"backend safety flag missing: "+token);
