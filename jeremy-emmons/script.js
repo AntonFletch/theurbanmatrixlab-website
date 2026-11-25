@@ -40,7 +40,7 @@ function buildCards(){
   if(a.existing){const b=document.createElement('span');b.className='already';b.textContent='ALREADY FRAMED';photo.append(b);}
   const meta=document.createElement('div');meta.className='art-meta';meta.innerHTML=`<div><h3>${a.name}</h3><p>${a.id==='JE-001'?'FEATURED ORIGINAL · ONE OF ONE':'ONE-OF-ONE ORIGINAL'}</p></div><div class="art-pricing"><strong>${fmt(a.unframed)}</strong><small>Frame from +${fmt(finishes[0].upgrade)}</small></div>`;
   button.append(photo,meta);card.append(button);button.addEventListener('click',()=>openArt(a));
-  const inquire=document.createElement('a');inquire.href='#inquiry';inquire.className='art-inquiry-link';inquire.textContent='INQUIRE ABOUT '+a.id+' ↗';inquire.addEventListener('click',()=>chooseInquiry(a.id,''));card.append(inquire);gallery.append(card);
+  const inquire=document.createElement('a');inquire.href='#inquiry';inquire.className='art-inquiry-link';inquire.textContent='INQUIRE ABOUT '+a.id+' →';inquire.addEventListener('click',()=>chooseInquiry(a.id,''));card.append(inquire);gallery.append(card);
  }
 }
 buildCards();
@@ -163,7 +163,7 @@ inquiryForm.addEventListener('submit',async(ev)=>{
   inquiryStatus.textContent=error instanceof Error?error.message:'Could not send your inquiry. Please try again.';
   $('quickInquiryBackup').hidden=false;
  }finally{
-  btn.disabled=false;btn.innerHTML='SEND PAINTING INQUIRY <span>↗</span>';
+  btn.disabled=false;btn.innerHTML='SEND PAINTING INQUIRY <span>→</span>';
  }
 });
 })();
