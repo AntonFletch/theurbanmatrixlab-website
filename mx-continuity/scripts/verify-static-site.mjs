@@ -63,7 +63,7 @@ check(ticket.includes('turnstileSiteKey:""'),"support Turnstile key placeholder 
 check(supportJs.includes("matrix_support")&&supportJs.includes("turnstileToken"),"support Turnstile token/action not integrated");
 check(!site.includes('smithChatAccount') && !site.includes('app.smith.ai/chat/widget-latest.js'),"Disallowed chat overlay is present");
 check(home.includes('id="website-setup"') && home.includes('id="included-care"') && home.includes('id="website-care"') && home.includes('<div class="cards">'),"Approved original three-card visual layout missing");
-check(read("privacy.html").includes("Smith.ai website chat"),"Smith.ai chat privacy disclosure missing");
+check(read("privacy.html").includes("Public website chat:") && read("privacy.html").includes("not active"),"Disabled public chat privacy disclosure missing");
 check(contact.includes('id="email-inquiry-btn"'),"working inquiry email action missing");
 check(contact.includes('name="contact_consent"'),"inquiry privacy consent missing");
 check(contact.includes("assets/contact-email.js"),"inquiry email script missing");
