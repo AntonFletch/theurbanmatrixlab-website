@@ -25,7 +25,7 @@ jobs:
           const pathUtil=require('node:path');
           const axe=require.resolve('axe-core/axe.min.js');
           const base='https://theurbanmatrixlab.com/mx-continuity/';
-          const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','calendar/','project-order.html','monthly-care-authorization.html','change-order.html'];
+          const paths=['','about.html','contact.html','support.html','terms.html','privacy.html','ownership.html','refunds.html','cancellation.html','app/','live/','calendar/','project-order.html','monthly-care-authorization.html','change-order.html','add-ons/'];
           (async()=>{
             const browser=await chromium.launch({headless:true});
             const context=await browser.newContext({reducedMotion:'reduce'});
@@ -46,10 +46,29 @@ jobs:
                 if(!res?.ok()){console.log('FAIL HTTP',path,res?.status());issues++;continue}
                 if(!page.url().startsWith(base)){console.log('FAIL redirect',path,page.url());issues++;continue}
                 if(await page.locator('.menu-toggle').count()){
-                  const supportLink=page.locator('.main-nav a[href="support.html"]');
+                  const supportLink=page.locator('.main-nav a[href$="support.html"]');
                   if(await supportLink.count()!==1){issues++;console.log('FAIL support route missing',path);}
                 }
                 if(path==='support.html'&&await page.locator('#support-form').count()!==1){issues++;console.log('FAIL support form missing');}
+                if(path==='add-ons/'){
+                  const triggers=page.locator('[data-help],[data-open-detail]');
+                  const triggerCount=await triggers.count();
+                  if(triggerCount!==36){issues++;console.log('FAIL add-on detail controls',triggerCount)}
+                  for(let i=0;i<triggerCount;i++){
+                    const control=triggers.nth(i);
+                    await control.click();
+                    const dialog=page.locator('#addon-detail');
+                    if(!await dialog.isVisible()||!(await page.locator('#addon-detail-title').innerText()).trim()||!(await page.locator('#addon-detail-copy').innerText()).trim()){
+                      issues++;console.log('FAIL add-on detail dialog',i);
+                    }
+                    await page.keyboard.press('Escape');
+                    if(await dialog.isVisible()){issues++;console.log('FAIL add-on detail close',i);}
+                  }
+                  if(await page.locator('form').count()!==0||!await page.getByText('No checkout is available here').count()){
+                    issues++;console.log('FAIL add-on quote-only guard');
+                  }
+                  console.log('ADD-ON controls',triggerCount,'dialog checks completed');
+                }
                 for(const width of [320,375,390,768,1280]){
                   await page.setViewportSize({width,height:900});
                   await page.waitForTimeout(150);
