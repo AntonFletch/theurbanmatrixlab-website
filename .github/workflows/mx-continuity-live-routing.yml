@@ -68,7 +68,7 @@ jobs:
               const body=await res.text();
               const checks=tokens.map(token=>({token,found:body.includes(token)}));
               if(url.endsWith('/assets/intake-config.js')){
-                checks.push({token:'Turnstile site key configured',found:/turnstileSiteKey\\s*:\\s*["'][^"']+["']/.test(body)});
+                checks.push({token:'Turnstile site key configured',found:/turnstileSiteKey\s*:\s*["'][^"']+["']/.test(body)});
               }
               const ok=res.ok && checks.every(check=>check.found) && new URL(res.url).hostname==='theurbanmatrixlab.com';
               console.log(JSON.stringify({url,status:res.status,final_url:res.url,checks,result:ok?'PASS':'FAIL'}));
