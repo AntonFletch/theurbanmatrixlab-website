@@ -58,7 +58,7 @@ jobs:
           }
           // Verify actual customer-facing deployment remains in PRELAUNCH.
           const guards=[
-            ['https://theurbanmatrixlab.com/mx-continuity/assets/intake-config.js',['enabled:false','turnstileSiteKey:""']],
+            ['https://theurbanmatrixlab.com/mx-continuity/assets/intake-config.js',['enabled:false']],
             ['https://theurbanmatrixlab.com/mx-continuity/assets/site.js',['checkoutEnabled:false','prelaunch:true']],
             ['https://theurbanmatrixlab.com/robots.txt',['Disallow: /']]
           ];
@@ -66,8 +66,12 @@ jobs:
             try{
               const res=await fetch(url,{redirect:'follow',signal:AbortSignal.timeout(15000)});
               const body=await res.text();
-              const ok=res.ok && tokens.every(t=>body.includes(t)) && new URL(res.url).hostname==='theurbanmatrixlab.com';
-              console.log(JSON.stringify({url,status:res.status,final_url:res.url,checks:tokens.map(t=>({token:t,found:body.includes(t)})),result:ok?'PASS':'FAIL'}));
+              const checks=tokens.map(token=>({token,found:body.includes(token)}));
+              if(url.endsWith('/assets/intake-config.js')){
+                checks.push({token:'Turnstile site key configured',found:/turnstileSiteKey\\s*:\\s*["'][^"']+["']/.test(body)});
+              }
+              const ok=res.ok && checks.every(check=>check.found) && new URL(res.url).hostname==='theurbanmatrixlab.com';
+              console.log(JSON.stringify({url,status:res.status,final_url:res.url,checks,result:ok?'PASS':'FAIL'}));
               if(!ok)failed++;
             }catch(err){failed++;console.error(JSON.stringify({url,result:'FAIL',reason:String(err)}));}
           }
