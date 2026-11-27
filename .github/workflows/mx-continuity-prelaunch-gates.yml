@@ -33,6 +33,7 @@ jobs:
         run: |
           node mx-continuity/scripts/verify-static-site.mjs
           node mx-continuity/scripts/verify-umx-owner.mjs
+          node mx-continuity/scripts/verify-add-ons-page.mjs
       - name: Verify inquiry and support simulated flows
         run: |
           node mx-continuity/scripts/verify-inquiry-flow.mjs
