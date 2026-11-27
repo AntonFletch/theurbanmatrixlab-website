@@ -61,7 +61,7 @@ check(intake.includes("enabled:false"),"backend intake activated unintentionally
 check(ticket.includes("enabled:true"),"secure support ticketing unexpectedly disabled");
 check(ticket.includes('turnstileSiteKey:""'),"support Turnstile key placeholder missing");
 check(supportJs.includes("matrix_support")&&supportJs.includes("turnstileToken"),"support Turnstile token/action not integrated");
-check(!site.includes('smithChatAccount') && !site.includes('app.smith.ai/chat/widget-latest.js'),"Disallowed chat overlay is present");
+check(site.includes('smithChatAccount="61dbafef-826c-45bc-a7a3-055fe772f8b0"') && site.includes("https://app.smith.ai/chat/widget-latest.js"),"Smith.ai chat widget not configured on MX Continuity");
 check(["basic","business","continuity"].every(p=>home.includes('id="'+p+'"')) && home.includes('<div class="cards">') && !home.includes('id="website-setup"'),"Original Basic/Business/Continuity layout missing");
 check(read("privacy.html").includes("Public website chat:") && read("privacy.html").includes("not active"),"Disabled public chat privacy disclosure missing");
 check(contact.includes('id="email-inquiry-btn"'),"working inquiry email action missing");
