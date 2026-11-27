@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /publication/
-Allow: /jeremy-emmons/
-Allow: /JeremyEmmons/
 Disallow: /
 Sitemap: https://theurbanmatrixlab.com/sitemap.xml

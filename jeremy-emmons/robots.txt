@@ -1,1 +1,0 @@
-# Crawlers use /robots.txt at the domain root, not a directory-level robots.txt.

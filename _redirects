@@ -4,6 +4,3 @@
 /publication/* /publication/:splat 200
 
 # Approved featured-artist public address
-/JeremyEmmons /jeremy-emmons/ 301
-/JeremyEmmons/ /jeremy-emmons/ 301
-/JeremyEmmons/* /jeremy-emmons/:splat 301
