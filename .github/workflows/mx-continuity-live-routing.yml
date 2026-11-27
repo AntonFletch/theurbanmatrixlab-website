@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/mx-continuity-live-routing.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/mx-continuity-live-routing.yml'
   workflow_dispatch:
   schedule:
     - cron: '20 15 * * *'  # Daily read-only route and prelaunch-safeguard verification
