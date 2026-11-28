@@ -72,19 +72,6 @@
   let pending = false;
   let completed = false;
 
-  const params = new URLSearchParams(location.search);
-  const requested = (params.get("package") || "").toLowerCase();
-  const select = form.elements.package;
-  const packageOptions = {
-    basic: "Basic — $89 setup",
-    business: "Business — $199 setup",
-    continuity: "Continuity — $400 setup"
-  };
-  if (Object.hasOwn(packageOptions,requested)) {
-    const option = [...select.options].find(x => x.value === packageOptions[requested]);
-    if (option) select.value = option.value;
-  }
-
   form.addEventListener("input", () => {
     if (completed) {
       completed = false;
