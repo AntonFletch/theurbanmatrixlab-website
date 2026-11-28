@@ -47,7 +47,7 @@ a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var
 .hero-art img{object-fit:cover;object-position:57% center;filter:brightness(.76) saturate(.82) contrast(1.12)}
 .hero-art:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(21,9,30,.62),rgba(21,9,30,.18) 45%,rgba(24,11,32,.09));pointer-events:none;z-index:2}
 .hero-art:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(13,5,20,.63),transparent 32%,rgba(32,12,45,.22));pointer-events:none;z-index:2}
-.hero-orbit{position:absolute;z-index:3;pointer-events:none;inset:8% 8% 18% 18%;border:1.5px solid rgba(250,194,122,.64);border-radius:50%;transform:rotate(-8deg);box-shadow:inset 0 0 20px rgba(238,178,100,.07),0 0 15px rgba(238,178,100,.12)}
+.hero-orbit{position:absolute;z-index:3;pointer-events:none;inset:8% 8% 18% 18%;border:1.5px solid rgba(250,194,122,.64);clip-path:inset(0 0 50% 0);border-radius:50%;transform:rotate(-8deg);box-shadow:inset 0 0 20px rgba(238,178,100,.07),0 0 15px rgba(238,178,100,.12)}
 .hero-orbit:before,.hero-orbit:after{content:"";position:absolute;top:0;bottom:0;border:1px solid rgba(251,202,132,.63);border-radius:50%;left:24%;right:24%}
 .hero-orbit:after{left:0;right:0;top:30%;bottom:30%;border-left:0;border-right:0}
 .hero-orbit span{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(transparent,rgba(255,207,143,.54),transparent);left:50%}
