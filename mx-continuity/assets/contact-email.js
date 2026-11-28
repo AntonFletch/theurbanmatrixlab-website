@@ -27,6 +27,20 @@
     config.turnstileSiteKey.length > 10;
 
   const notify = message => { if (status) status.textContent = message; };
+
+  // Honor package links even while inquiry submissions are paused.
+  const params = new URLSearchParams(location.search);
+  const requested = (params.get("package") || "").toLowerCase();
+  const select = form.elements.package;
+  const packageOptions = {
+    basic: "Basic — $89 setup",
+    business: "Business — $199 setup",
+    continuity: "Continuity — $400 setup"
+  };
+  if (Object.hasOwn(packageOptions,requested)) {
+    const option = [...select.options].find(x => x.value === packageOptions[requested]);
+    if (option) select.value = option.value;
+  }
   if (!intakeReady) {
     button.disabled = true;
     button.textContent = "Online inquiries paused";
